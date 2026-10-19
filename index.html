@@ -80,7 +80,7 @@ body::before {
 a { color: inherit; }
 button { font: inherit; color: inherit; cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-.num, .tally, .rel, .log, .shas, .rels, .tick span, .n { font-variant-numeric: tabular-nums; }
+.num, .rel, .log, .shas, .rels, .tick span, .n { font-variant-numeric: tabular-nums; }
 
 .gutter {
   max-width: 1180px;
@@ -172,25 +172,6 @@ h1 {
   text-wrap: balance;
 }
 h1 .thin { font-weight: 300; color: var(--quiet); letter-spacing: -0.03em; }
-.intro {
-  font-size: clamp(17px, 2vw, 20px);
-  line-height: 1.5;
-  max-width: 58ch;
-  color: var(--caption);
-}
-.tally {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  font: 600 13px/1 var(--font);
-  color: var(--caption);
-}
-.tally span {
-  background: var(--card);
-  border-radius: 999px;
-  padding: 9px 14px;
-}
-.tally b { color: var(--ink); font-weight: 800; }
 
 /* ---------- panels ---------- */
 .panel + .panel { margin-top: 16px; }
@@ -514,7 +495,7 @@ h1 .thin { font-weight: 300; color: var(--quiet); letter-spacing: -0.03em; }
   padding: 14px var(--inset);
   transition: background 0.2s ease;
 }
-.rel + .rel::before {
+.rel:not([hidden]) ~ .rel:not([hidden])::before {
   content: "";
   position: absolute;
   top: 0; left: var(--inset); right: 0;
@@ -674,8 +655,6 @@ footer .gutter {
   <section class="hero" id="top">
     <p class="eyebrow">Release notes · Oct 18–19, 2026</p>
     <h1>What's new <span class="thin">in</span> Lineup</h1>
-    <p class="intro">Every feature added since Library collections, across iPhone and Apple TV, and how each one works under the hood.</p>
-    <p class="tally"><span><b>4</b> releases</span><span><b>24</b> features</span><span>iPhone <b>23</b></span><span>Apple TV <b>7</b></span></p>
   </section>
 
   <section class="demo panel" aria-labelledby="demo-h">
@@ -931,7 +910,7 @@ footer .gutter {
         <p class="lede">Once a game has its channel, the app stops looking.</p>
         <dl class="how">
           <div><dt>Kept games</dt><dd>A game that already has a channel isn't searched again. Each check reads only that one channel's guide.</dd></div>
-          <div><dt>Shortlists</dt><dd>On iPhone, each game's shortlist of possible channels carries over between checks. A full scan runs only when your channels or guide change.</dd></div>
+          <div data-only="iphone"><dt>Shortlists</dt><dd>On iPhone, each game's shortlist of possible channels carries over between checks. A full scan runs only when your channels or guide change.</dd></div>
           <div><dt>College</dt><dd>College games keep their matches like every other league.</dd></div>
           <div><dt>Launch</dt><dd>Matches from your last session are recognized right away instead of searched for again.</dd></div>
         </dl>
@@ -1045,7 +1024,7 @@ footer .gutter {
     <article class="entry" id="skip-intro" data-platform="iphone tv" data-release="84 87" data-release-iphone="84" data-release-tv="87">
       <div class="meta">
         <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels">#84 iPhone · #87 Apple TV</div>
+        <div class="rels"><span data-when="all">#84 iPhone · #87 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#87 · Oct 18</span></div>
         <div class="shas"><span>5a803b2</span><span>b8e66dc</span><span>27314bd</span></div>
       </div>
       <div class="copy">
@@ -1053,7 +1032,7 @@ footer .gutter {
         <p class="lede">Buttons to skip an episode's intro or recap, and Next Episode right as the credits start.</p>
         <dl class="how">
           <div><dt>Source</dt><dd>IntroDB, a community database of intro, recap and credit times, looked up by the show's IMDb ID and the episode number. Only high-confidence times are used.</dd></div>
-          <div><dt>Skipping</dt><dd>The buttons appear only inside an intro or recap. Nothing skips by itself. On Apple TV one press of Select skips, and Back dismisses it.</dd></div>
+          <div><dt>Skipping</dt><dd>The buttons appear only inside an intro or recap. Nothing skips by itself.<span data-only="tv"> On Apple TV one press of Select skips, and Back dismisses it.</span></dd></div>
           <div><dt>Next Episode</dt><dd>At the start of the credits when IntroDB knows them. Otherwise the last 30 seconds, as before.</dd></div>
           <div><dt>After credits</dt><dd>Movies with a scene after the credits show a small notice while the credits run.</dd></div>
           <div><dt>Settings</dt><dd>Four separate switches in <b class="ui">Settings › Metadata</b>.</dd></div>
@@ -1219,8 +1198,8 @@ footer .gutter {
           <div><dt>Guide</dt><dd>The app asks your provider whether the guide changed, and skips the download if it didn't.</dd></div>
           <div><dt>Opening</dt><dd>The schedule is saved to a file, so the app opens with it already filled in.</dd></div>
           <div><dt>Re-checks</dt><dd>Refreshes where only scores changed re-check channels at most every 5 minutes.</dd></div>
-          <div><dt>Heat</dt><dd>In Multiview, when the phone runs hot, the muted picture drops its quality.</dd></div>
-          <div><dt>Reports</dt><dd>On iPhone, a Device Reports screen in Settings shows Apple's own performance reports for the app.</dd></div>
+          <div data-only="iphone"><dt>Heat</dt><dd>In Multiview, when the phone runs hot, the muted picture drops its quality.</dd></div>
+          <div data-only="iphone"><dt>Reports</dt><dd>On iPhone, a Device Reports screen in Settings shows Apple's own performance reports for the app.</dd></div>
         </dl>
         <p class="stack"><span>Swift Observation</span><span>ETag / If-Modified-Since</span><span>MetricKit</span></p>
       </div>
@@ -1249,6 +1228,12 @@ footer .gutter {
   const platButtons = [...document.querySelectorAll(".filters button")];
   const relButtons = [...document.querySelectorAll(".rel")];
   const empty = document.getElementById("empty");
+  const demo = document.querySelector(".demo");
+  const autoSync = document.getElementById("auto-sync");
+  // Lines inside a card that are true of one app only, and labels that read
+  // differently under each filter.
+  const onlyLines = [...document.querySelectorAll("[data-only]")];
+  const whenLines = [...document.querySelectorAll("[data-when]")];
 
   const matches = (el, plat, rel) => {
     const p = el.dataset.platform.split(" ");
@@ -1259,6 +1244,12 @@ footer .gutter {
   };
 
   function apply() {
+    // A release with nothing for the chosen app drops out of the list, and
+    // stops being the filter if it was.
+    if (state.rel) {
+      const left = entries.filter(el => matches(el, state.plat, state.rel)).length;
+      if (left === 0) state.rel = null;
+    }
     let shown = 0;
     entries.forEach(el => {
       const on = matches(el, state.plat, state.rel);
@@ -1279,7 +1270,12 @@ footer .gutter {
       b.setAttribute("aria-pressed", String(b.dataset.release === state.rel));
       const n = entries.filter(el => matches(el, state.plat, b.dataset.release)).length;
       b.querySelector(".n").textContent = n + (n === 1 ? " feature" : " features");
+      b.hidden = n === 0;
     });
+    onlyLines.forEach(el => { el.hidden = state.plat !== "all" && el.dataset.only !== state.plat; });
+    whenLines.forEach(el => { el.hidden = el.dataset.when !== state.plat; });
+    // The readout is Auto Sync's, so it goes when Auto Sync's card does.
+    demo.hidden = autoSync.hidden;
     empty.hidden = shown !== 0;
   }
 
