@@ -258,19 +258,7 @@ a.acc:hover { color: var(--accent); }
   .dl-btn { grid-column: 1 / -1; }
 }
 
-/* ---------- demo ---------- */
-.demo-body {
-  padding: 18px var(--inset) 22px;
-  display: grid;
-  gap: 22px;
-}
-.demo-intro { display: grid; gap: 8px; max-width: 64ch; }
-.demo-title {
-  font: 800 clamp(21px, 2.8vw, 28px)/1.15 var(--font);
-  letter-spacing: -0.025em;
-  color: var(--ink);
-  text-wrap: balance;
-}
+/* ---------- shared ---------- */
 .note { font-size: 14px; color: var(--quiet); line-height: 1.5; }
 .replay {
   display: inline-flex;
@@ -286,247 +274,6 @@ a.acc:hover { color: var(--accent); }
   white-space: nowrap;
 }
 .replay:hover { background: var(--accent-wash); }
-.replay svg { width: 10px; height: 10px; fill: currentColor; }
-
-.demo-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 20px;
-  align-items: start;
-}
-@media (max-width: 900px) {
-  .demo-grid { grid-template-columns: minmax(0, 1fr); }
-}
-
-.frame {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  max-width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-  container-type: inline-size;
-  background:
-    repeating-linear-gradient(90deg, transparent 0 9.4%, var(--chalk) 9.4% 9.7%),
-    radial-gradient(120% 90% at 50% 35%, var(--field-a), var(--field-b));
-}
-.frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(140% 100% at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.55));
-  pointer-events: none;
-}
-.hash {
-  position: absolute;
-  left: 0; right: 0;
-  height: 0.5cqw;
-  background: repeating-linear-gradient(90deg, transparent 0 1.6%, var(--chalk) 1.6% 1.9%);
-}
-.hash.a { top: 38%; }
-.hash.b { top: 56%; }
-.scan {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, transparent 0%, transparent 46%, var(--accent-wash) 50%, transparent 54%, transparent 100%);
-  background-size: 100% 220%;
-  animation: scan 3.6s linear infinite;
-  mix-blend-mode: screen;
-  pointer-events: none;
-  z-index: 1;
-}
-@keyframes scan { from { background-position: 0 100%; } to { background-position: 0 -120%; } }
-.ftag {
-  position: absolute;
-  top: 3cqw;
-  z-index: 2;
-  font: 700 max(9px, 1.4cqw)/1 var(--font);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0.9cqw 1.3cqw;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.5);
-  color: var(--secondary);
-}
-.ftag.l { left: 3cqw; }
-.ftag.r { right: 3cqw; color: var(--accent-soft); }
-.ftag.r.locked { color: var(--positive); background: rgba(0, 0, 0, 0.6); }
-
-.bug {
-  position: absolute;
-  left: 4cqw;
-  bottom: 5.5cqw;
-  z-index: 2;
-  display: flex;
-  align-items: stretch;
-  height: 6.6cqw;
-  background: var(--bug);
-  color: #FFFFFF;
-  border-radius: 0.9cqw;
-  font: 800 3.3cqw/1 var(--font);
-  letter-spacing: -0.01em;
-}
-.seg {
-  display: flex;
-  align-items: center;
-  gap: 1.1cqw;
-  padding: 0 1.7cqw;
-  border-left: 1px solid rgba(255, 255, 255, 0.09);
-  position: relative;
-}
-.seg:first-child { border-left: 0; }
-.seg em { font-style: normal; font-variant-numeric: tabular-nums; }
-.tc { width: 0.8cqw; height: 3.8cqw; border-radius: 0.2cqw; display: block; }
-.tc.kc { background: var(--kc); }
-.tc.buf { background: var(--buf); }
-.seg.per { font-size: 2.4cqw; color: var(--caption); font-weight: 700; }
-.seg.dn { font-size: 2.2cqw; color: var(--warning); font-weight: 700; }
-.box { outline: max(1px, 0.25cqw) dashed var(--accent); outline-offset: -0.5cqw; }
-.box::before {
-  content: attr(data-label);
-  position: absolute;
-  bottom: calc(100% + 0.9cqw);
-  left: 0;
-  font: 800 max(8px, 1.35cqw)/1 var(--font);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #FFFFFF;
-  background: var(--accent);
-  padding: 0.6cqw 1cqw;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-.flash { animation: flash 0.7s ease-out; }
-@keyframes flash { from { background: var(--accent-wash); } to { background: transparent; } }
-
-.readout { display: grid; gap: 12px; min-width: 0; }
-.log {
-  display: grid;
-  gap: 2px;
-  font: 500 13px/1.45 var(--font);
-  border-radius: 16px;
-  padding: 10px;
-  background: var(--ground);
-  overflow-x: auto;
-}
-.log li {
-  display: grid;
-  grid-template-columns: 4.2em 5.6em minmax(0, 1fr) 4.4em;
-  gap: 8px;
-  padding: 6px 8px;
-  border-radius: 10px;
-  transition: opacity 0.35s ease, background 0.35s ease;
-}
-.log .t { color: var(--chevron); white-space: nowrap; }
-.log .src { font-weight: 800; font-size: 11px; line-height: 1.75; letter-spacing: 0.08em; }
-.log .scr { color: var(--accent-soft); }
-.log .espn { color: var(--ink); }
-.log .calc { color: var(--quiet); }
-.log .msg { color: var(--caption); min-width: 0; }
-.log .est { text-align: right; color: var(--ink); font-weight: 700; white-space: nowrap; }
-.log li.off .est, .log li.off .msg { color: var(--chevron); text-decoration: line-through; text-decoration-color: var(--chevron); }
-.log li.lock { background: var(--positive-wash); }
-.log li.lock .src, .log li.lock .msg, .log li.lock .est { color: var(--positive); }
-.log li.pending { opacity: 0.12; }
-@media (max-width: 520px) {
-  .log li {
-    grid-template-columns: 5.2em minmax(0, 1fr) auto;
-    grid-template-areas: "src msg est" "t msg est";
-    row-gap: 0;
-  }
-  .log .t { grid-area: t; font-size: 11.5px; }
-  .log .src { grid-area: src; }
-  .log .msg { grid-area: msg; }
-  .log .est { grid-area: est; }
-}
-
-.scale {
-  border-top: 1px solid var(--divider);
-  padding-top: 18px;
-  display: grid;
-  gap: 8px;
-}
-.scale-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  font: 700 11px/1.3 var(--font);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--secondary);
-}
-.scale-head .key { display: flex; gap: 14px; flex-wrap: wrap; }
-.scale-head .key i {
-  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-  margin-right: 6px; vertical-align: 0;
-}
-.key .k-est { background: var(--accent); }
-.key .k-out { background: transparent; border: 1.5px solid var(--chevron); }
-.key .k-lock { background: var(--positive); border-radius: 1px; width: 3px; }
-.axis-wrap { padding-inline: 18px; }
-.axis { position: relative; height: 86px; }
-.axis .rule {
-  position: absolute; left: 0; right: 0; top: 50px;
-  height: 1px; background: var(--divider);
-}
-.tick {
-  position: absolute; top: 46px;
-  left: calc((var(--v) - 15) / 25 * 100%);
-  width: 1px; height: 9px; background: var(--divider);
-}
-.tick span {
-  position: absolute; top: 14px; left: 50%;
-  transform: translateX(-50%);
-  font: 500 11px/1 var(--font);
-  color: var(--chevron);
-  white-space: nowrap;
-}
-.band {
-  position: absolute; top: 38px; height: 24px;
-  left: calc((var(--a) - 15) / 25 * 100%);
-  width: calc((var(--b) - var(--a)) / 25 * 100%);
-  min-width: 6px;
-  background: var(--accent-wash);
-  border: 1px solid rgba(255, 51, 71, 0.45);
-  border-radius: 999px;
-  transform: translateX(-6px);
-  padding-inline: 6px;
-  box-sizing: content-box;
-}
-.pt {
-  position: absolute; top: 45px;
-  left: calc((var(--v) - 15) / 25 * 100%);
-  width: 11px; height: 11px; margin-left: -5.5px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 3px var(--card);
-  transition: opacity 0.35s ease, transform 0.35s ease;
-}
-.pt.out { background: var(--card); border: 1.5px solid var(--chevron); box-shadow: none; }
-.lockmark {
-  position: absolute; top: 0; height: 62px;
-  left: calc((var(--v) - 15) / 25 * 100%);
-  width: 2px; margin-left: -1px;
-  background: var(--positive);
-  transition: opacity 0.35s ease;
-}
-.lockmark span {
-  position: absolute; top: 0; left: 8px;
-  font: 800 12px/1 var(--font);
-  color: var(--positive);
-  white-space: nowrap;
-}
-.bandlabel {
-  position: absolute; top: 4px;
-  left: calc((var(--a) - 15) / 25 * 100%);
-  transform: translateX(-100%) translateX(-10px);
-  font: 700 12px/1 var(--font);
-  color: var(--accent-soft);
-  white-space: nowrap;
-  transition: opacity 0.35s ease;
-}
-.axis .pending { opacity: 0; transform: scale(0.4); }
-.axis .lockmark.pending, .axis .bandlabel.pending { transform: none; }
 
 /* ---------- ledger ---------- */
 .ledger { overflow: hidden; }
@@ -673,9 +420,7 @@ footer .gutter {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scan { animation: none; }
-  .log li, .pt, .lockmark, .bandlabel, .rel { transition: none; }
-  .flash { animation: none; }
+  .rel { transition: none; }
 }
 </style>
 </head>
@@ -747,80 +492,6 @@ footer .gutter {
       <button type="button" class="rel" data-release="89" aria-pressed="false"><span class="pr">#89</span><span class="when">Oct 19 · 1:56 AM PT</span><span class="what">Live stats for soccer, tennis, UFC and racing; AetherEngine 7.40.1; engine logos</span><span class="n">3 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
       <button type="button" class="rel" data-release="87" aria-pressed="false"><span class="pr">#87</span><span class="when">Oct 18 · 8:51 PM PT</span><span class="what">Skip Intro on Apple TV, live stats and Multiview on iPhone</span><span class="n">4 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
       <button type="button" class="rel" data-release="84" aria-pressed="false"><span class="pr">#84</span><span class="when">Oct 18 · 2:56 PM PT</span><span class="what">Library collections, subtitles, seek previews, replays and playback controls</span><span class="n">11 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
-    </div>
-  </section>
-
-  <section class="demo panel" aria-labelledby="demo-h">
-    <div class="panel-head">
-      <span class="tile blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5h4M16 5h4v4M20 15v4h-4M8 19H4v-4M9 10h6M9 14h4"/></svg></span>
-      <h2 id="demo-h">Auto Sync · example readout</h2>
-      <button type="button" class="replay" id="replay"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1.2v9.6L10.4 6z"/></svg>Replay</button>
-    </div>
-    <div class="panel-rule"></div>
-    <div class="demo-body">
-    <div class="demo-intro">
-      <p class="demo-title">Your iPhone reads the scoreboard to learn how far behind your stream is</p>
-      <p class="note">Every stream runs a different amount behind live. Auto Sync times the moment your screen first shows a clock or a score, then compares it with when ESPN logged that play. Here a football stream locks at 34 seconds behind.</p>
-    </div>
-
-    <div class="demo-grid">
-      <figure class="frame" aria-label="Example broadcast frame. Dashed boxes mark where text recognition read the away score, home score and game clock.">
-        <span class="hash a" aria-hidden="true"></span>
-        <span class="hash b" aria-hidden="true"></span>
-        <span class="scan" aria-hidden="true"></span>
-        <span class="ftag l">frame · BGRA · on device</span>
-        <span class="ftag r locked" id="vstate">Locked · every 4 s</span>
-        <div class="bug" aria-hidden="true">
-          <span class="seg box" data-label="away"><i class="tc kc"></i>KC <em id="kc">24</em></span>
-          <span class="seg box" data-label="home"><i class="tc buf"></i>BUF <em>17</em></span>
-          <span class="seg per">4TH</span>
-          <span class="seg box" data-label="clock"><em id="clock">2:00</em></span>
-          <span class="seg dn">1ST &amp; 10</span>
-        </div>
-      </figure>
-
-      <div class="readout">
-        <ol class="log" id="log" aria-label="Auto Sync log">
-          <li data-step="0"><span class="t">t+0:00</span><span class="src scr">SCREEN</span><span class="msg">clock 4:52, first seen</span><span class="est"></span></li>
-          <li data-step="0"><span class="t">t+0:00</span><span class="src espn">ESPN</span><span class="msg">play at 4:52, logged earlier</span><span class="est">30.3 s</span></li>
-          <li data-step="1"><span class="t">t+0:15</span><span class="src scr">SCREEN</span><span class="msg">clock 4:38, first seen</span><span class="est"></span></li>
-          <li data-step="1"><span class="t">t+0:15</span><span class="src espn">ESPN</span><span class="msg">play at 4:38, logged earlier</span><span class="est">30.6 s</span></li>
-          <li data-step="2"><span class="t">t+3:02</span><span class="src scr">SCREEN</span><span class="msg">KC 21 → 24, read twice</span><span class="est"></span></li>
-          <li data-step="2"><span class="t">t+3:02</span><span class="src espn">ESPN</span><span class="msg">the play that made 24–17</span><span class="est">29.4 s</span></li>
-          <li data-step="3"><span class="t">t+5:47</span><span class="src scr">SCREEN</span><span class="msg">clock 2:00, stopped before the play</span><span class="est"></span></li>
-          <li data-step="3" class="off"><span class="t">t+5:47</span><span class="src espn">ESPN</span><span class="msg">play at 2:00, outlier</span><span class="est">18.7 s</span></li>
-          <li data-step="4"><span class="t"></span><span class="src calc">AGREE</span><span class="msg">3 of 4 within 2.5 s, median</span><span class="est">30.3 s</span></li>
-          <li data-step="4"><span class="t"></span><span class="src calc">MARGIN</span><span class="msg">football, so stats never run early</span><span class="est">+4 s</span></li>
-          <li data-step="4" class="lock"><span class="t"></span><span class="src">LOCKED</span><span class="msg">stats held behind live by</span><span class="est">34 s</span></li>
-        </ol>
-        <p class="note">Example values. Each estimate is when the screen showed it minus when ESPN logged it, less any time you paused.</p>
-      </div>
-    </div>
-
-    <div class="scale">
-      <div class="scale-head">
-        <span>Estimates, seconds behind live</span>
-        <span class="key"><span><i class="k-est"></i>estimate</span><span><i class="k-out"></i>outlier</span><span><i class="k-lock"></i>locked delay</span></span>
-      </div>
-      <div class="axis-wrap">
-        <div class="axis" id="axis" aria-hidden="true">
-          <span class="rule"></span>
-          <span class="tick" style="--v:15"><span>15</span></span>
-          <span class="tick" style="--v:20"><span>20</span></span>
-          <span class="tick" style="--v:25"><span>25</span></span>
-          <span class="tick" style="--v:30"><span>30</span></span>
-          <span class="tick" style="--v:35"><span>35</span></span>
-          <span class="tick" style="--v:40"><span>40 s</span></span>
-          <span class="band" data-step="4" style="--a:29.4;--b:30.6"></span>
-          <span class="bandlabel" data-step="4" style="--a:29.4">3 agree</span>
-          <span class="pt" data-step="0" style="--v:30.3"></span>
-          <span class="pt" data-step="1" style="--v:30.6"></span>
-          <span class="pt" data-step="2" style="--v:29.4"></span>
-          <span class="pt out" data-step="3" style="--v:18.7"></span>
-          <span class="lockmark" data-step="4" style="--v:34"><span>34 s</span></span>
-        </div>
-      </div>
-    </div>
     </div>
   </section>
 
@@ -1306,8 +977,6 @@ footer .gutter {
   const platButtons = [...document.querySelectorAll(".filters button")];
   const relButtons = [...document.querySelectorAll(".rel")];
   const empty = document.getElementById("empty");
-  const demo = document.querySelector(".demo");
-  const autoSync = document.getElementById("auto-sync");
   // Lines inside a card that are true of one app only, and labels that read
   // differently under each filter.
   const onlyLines = [...document.querySelectorAll("[data-only]")];
@@ -1352,8 +1021,6 @@ footer .gutter {
     });
     onlyLines.forEach(el => { el.hidden = state.plat !== "all" && el.dataset.only !== state.plat; });
     whenLines.forEach(el => { el.hidden = el.dataset.when !== state.plat; });
-    // The readout is Auto Sync's, so it goes when Auto Sync's card does.
-    demo.hidden = autoSync.hidden;
     empty.hidden = shown !== 0;
   }
 
@@ -1398,46 +1065,6 @@ footer .gutter {
     }))
     .catch(() => {});
 
-  // ---------- Auto Sync replay ----------
-  const stepped = [...document.querySelectorAll(".demo [data-step]")];
-  const clock = document.getElementById("clock");
-  const kc = document.getElementById("kc");
-  const vstate = document.getElementById("vstate");
-  const frames = [
-    { clock: "4:52", kc: "21" },
-    { clock: "4:38", kc: "21" },
-    { clock: "3:12", kc: "24" },
-    { clock: "2:00", kc: "24" },
-    { clock: "2:00", kc: "24" }
-  ];
-  let timers = [];
-
-  function flash(el) {
-    const box = el.closest(".seg");
-    if (!box) return;
-    box.classList.remove("flash");
-    void box.offsetWidth;
-    box.classList.add("flash");
-  }
-
-  function show(n) {
-    stepped.forEach(el => el.classList.toggle("pending", Number(el.dataset.step) > n));
-    const f = frames[Math.max(0, Math.min(n, frames.length - 1))];
-    if (clock.textContent !== f.clock) { clock.textContent = f.clock; flash(clock); }
-    if (kc.textContent !== f.kc) { kc.textContent = f.kc; flash(kc); }
-    const locked = n >= 4;
-    vstate.textContent = locked ? "Locked · every 4 s" : "Reading · 1 per second";
-    vstate.classList.toggle("locked", locked);
-  }
-
-  document.getElementById("replay").addEventListener("click", () => {
-    timers.forEach(clearTimeout);
-    timers = [];
-    show(-1);
-    clock.textContent = "4:58";
-    kc.textContent = "21";
-    for (let i = 0; i <= 4; i++) timers.push(setTimeout(() => show(i), 700 + i * 1300));
-  });
 })();
 </script>
 
