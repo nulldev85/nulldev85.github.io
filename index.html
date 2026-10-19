@@ -1025,7 +1025,7 @@ img { max-width: 100%; }
   <section class="section" id="player" aria-labelledby="player-h">
     <div class="sec-head"><h2 id="player-h">Player</h2><span class="count" data-count></span></div>
 
-    <article class="entry" id="skip-intro" data-platform="iphone tv" data-release="84 87">
+    <article class="entry" id="skip-intro" data-platform="iphone tv" data-release="84 87" data-release-iphone="84" data-release-tv="87">
       <div class="meta">
         <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
         <div class="rels">#84 iPhone · #87 Apple TV</div>
@@ -1234,7 +1234,9 @@ img { max-width: 100%; }
 
   const matches = (el, plat, rel) => {
     const p = el.dataset.platform.split(" ");
-    const r = el.dataset.release.split(" ");
+    // A feature that reached each app in a different release says which.
+    const own = plat === "tv" ? el.dataset.releaseTv : plat === "iphone" ? el.dataset.releaseIphone : null;
+    const r = (own || el.dataset.release).split(" ");
     return (plat === "all" || p.includes(plat)) && (!rel || r.includes(rel));
   };
 
