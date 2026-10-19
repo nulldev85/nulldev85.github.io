@@ -1,0 +1,82 @@
+name: Publish official builds
+run-name: Publish official builds
+
+# Copies the newest passing official build of each app (main in
+# nulldev85/NullSports) to a release here, where the site's download buttons
+# find it. This repo is public, so anyone with the link can download; the app
+# repo can stay private.
+#
+# Reading the app repo's builds needs NULLSPORTS_ACTIONS_TOKEN: a fine-grained
+# token with read-only Actions access to nulldev85/NullSports and nothing
+# else. Releases here are written with this repo's own token.
+on:
+  workflow_dispatch:
+  # A merge round runs this by hand once the official builds pass; the hourly
+  # run catches any merge that didn't. A run with nothing new does nothing.
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-builds
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      APP_REPO: nulldev85/NullSports
+      APP_TOKEN: ${{ secrets.NULLSPORTS_ACTIONS_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Publish the newest passing build of each app
+        run: |
+          set -euo pipefail
+          if [ -z "$APP_TOKEN" ]; then
+            echo "::notice::NULLSPORTS_ACTIONS_TOKEN is not set yet, so there is nothing to read builds with."
+            exit 0
+          fi
+
+          publish() {
+            local workflow=$1 artifact=$2 file=$3 asset=$4 device=$5
+            local run id sha created tag dir version
+            run=$(GH_TOKEN="$APP_TOKEN" gh run list -R "$APP_REPO" --workflow "$workflow" --branch main \
+              --status success --limit 1 --json databaseId,headSha,createdAt \
+              -q '.[0] | "\(.databaseId) \(.headSha) \(.createdAt)"')
+            if [ -z "$run" ]; then echo "No passing $device build on main."; return; fi
+            read -r id sha created <<<"$run"
+            tag="build-${sha:0:7}"
+            if gh release view "$tag" --json assets -q '.assets[].name' 2>/dev/null | grep -qx "$asset"; then
+              echo "$device build $tag is already published."
+              return
+            fi
+
+            dir=$(mktemp -d)
+            GH_TOKEN="$APP_TOKEN" gh run download "$id" -R "$APP_REPO" -n "$artifact" -D "$dir"
+            test -f "$dir/$file"
+            mv "$dir/$file" "$dir/$asset"
+            unzip -p "$dir/$asset" Payload/Lineup.app/Info.plist > "$dir/Info.plist"
+            version=$(python3 -c 'import plistlib, sys
+          info = plistlib.load(open(sys.argv[1], "rb"))
+          print(info.get("CFBundleShortVersionString", ""), "(" + str(info.get("CFBundleVersion", "")) + ")")' "$dir/Info.plist")
+
+            if ! gh release view "$tag" >/dev/null 2>&1; then
+              gh release create "$tag" --target main \
+                --title "Lineup · $(date -u -d "$created" '+%b %-d, %Y') · ${sha:0:7}" \
+                --notes "Official builds of Lineup from commit ${sha:0:7}. What's new: https://nulldev85.github.io/"
+            fi
+            gh release upload "$tag" "$dir/$asset#$device $version" --clobber
+            echo "Published $device $version as $tag."
+          }
+
+          publish build-ios.yml Lineup-iPhone-unsigned-IPA Lineup-iPhone-unsigned.ipa Lineup-iPhone.ipa "iPhone"
+          publish build-tvos.yml Lineup-tvOS-unsigned-IPA Lineup-unsigned.ipa Lineup-AppleTV.ipa "Apple TV"
+
+          # The newest ten releases are kept; the site only offers the newest.
+          gh release list --limit 100 --json tagName,createdAt \
+            -q 'sort_by(.createdAt) | reverse | .[10:] | .[].tagName' |
+            while read -r old; do gh release delete "$old" --cleanup-tag --yes; done

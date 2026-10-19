@@ -210,6 +210,54 @@ h1 .thin { font-weight: 300; color: var(--quiet); letter-spacing: -0.03em; }
 .tile.indigo { background: var(--t-indigo); }
 .tile.orange { background: var(--t-orange); }
 
+/* ---------- downloads ---------- */
+a.acc { text-decoration: none; color: var(--accent-soft); }
+a.acc:hover { color: var(--accent); }
+.dl-body { padding: 16px var(--inset) 18px; display: grid; gap: 14px; }
+.dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.dl {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--ground);
+  border-radius: 18px;
+}
+.dl-device {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: var(--well);
+  display: grid;
+  place-items: center;
+}
+.dl-device svg { width: 24px; height: 24px; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.dl-text { min-width: 0; }
+.dl h3 { font: 800 18px/1.2 var(--font); letter-spacing: -0.01em; color: var(--ink); }
+.dl-meta { font: 500 13px/1.4 var(--font); color: var(--quiet); font-variant-numeric: tabular-nums; margin-top: 2px; }
+.dl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #FFFFFF;
+  font: 800 15px/1 var(--font);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.dl-btn:hover { filter: brightness(1.08); }
+.dl-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.dl-btn[aria-disabled="true"] { background: var(--well); color: var(--quiet); pointer-events: none; }
+@media (max-width: 400px) {
+  .dl { grid-template-columns: 44px minmax(0, 1fr); }
+  .dl-device { width: 44px; height: 44px; }
+  .dl-btn { grid-column: 1 / -1; }
+}
+
 /* ---------- demo ---------- */
 .demo-body {
   padding: 18px var(--inset) 22px;
@@ -655,6 +703,36 @@ footer .gutter {
   <section class="hero" id="top">
     <p class="eyebrow">Release notes · Oct 18–19, 2026</p>
     <h1>What's new <span class="thin">in</span> Lineup</h1>
+  </section>
+
+  <section class="downloads panel" id="downloads" aria-labelledby="downloads-h">
+    <div class="panel-head">
+      <span class="tile green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg></span>
+      <h2 id="downloads-h">Download</h2>
+      <a class="acc" href="https://github.com/nulldev85/nulldev85.github.io/releases">Earlier builds</a>
+    </div>
+    <div class="panel-rule"></div>
+    <div class="dl-body">
+      <div class="dl-grid">
+        <article class="dl" data-only="iphone">
+          <span class="dl-device" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.6"/><path d="M10.5 5.2h3"/></svg></span>
+          <div class="dl-text">
+            <h3>iPhone</h3>
+            <p class="dl-meta" id="dl-iphone-meta">Latest official build</p>
+          </div>
+          <a class="dl-btn" id="dl-iphone" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-iPhone.ipa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg><span>Download</span></a>
+        </article>
+        <article class="dl" data-only="tv">
+          <span class="dl-device" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="12.5" rx="2"/><path d="M8.5 20.5h7M12 16.5v4"/></svg></span>
+          <div class="dl-text">
+            <h3>Apple TV</h3>
+            <p class="dl-meta" id="dl-tv-meta">Latest official build</p>
+          </div>
+          <a class="dl-btn" id="dl-tv" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-AppleTV.ipa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg><span>Download</span></a>
+        </article>
+      </div>
+      <p class="note">Unsigned IPAs: install them with the sideloading app you already use. Every official build replaces these on its own.</p>
+    </div>
   </section>
 
   <section class="demo panel" aria-labelledby="demo-h">
@@ -1288,6 +1366,37 @@ footer .gutter {
   }));
   document.getElementById("clear").addEventListener("click", () => { state.plat = "all"; state.rel = null; apply(); });
   apply();
+
+  // ---------- downloads ----------
+  // Each official build is a release on this site's repo. An app's download
+  // is the newest release holding its IPA; until the list answers, the
+  // buttons point at the latest release.
+  const downloads = [
+    { key: "iphone", asset: "Lineup-iPhone.ipa" },
+    { key: "tv", asset: "Lineup-AppleTV.ipa" }
+  ];
+  const day = iso => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  fetch("https://api.github.com/repos/nulldev85/nulldev85.github.io/releases?per_page=30",
+        { headers: { Accept: "application/vnd.github+json" } })
+    .then(r => r.ok ? r.json() : Promise.reject(r.status))
+    .then(releases => downloads.forEach(({ key, asset }) => {
+      const button = document.getElementById("dl-" + key);
+      const meta = document.getElementById("dl-" + key + "-meta");
+      const file = releases.filter(r => !r.draft)
+        .map(r => (r.assets || []).find(a => a.name === asset && a.state === "uploaded"))
+        .find(Boolean);
+      if (!file) {
+        button.removeAttribute("href");
+        button.setAttribute("aria-disabled", "true");
+        button.querySelector("span").textContent = "Soon";
+        meta.textContent = "Arrives with the next official build";
+        return;
+      }
+      button.href = file.browser_download_url;
+      const version = (file.label || "").replace(/^(iPhone|Apple TV)\s*/, "");
+      meta.textContent = [version, day(file.updated_at), Math.round(file.size / 1e6) + " MB"].filter(Boolean).join(" · ");
+    }))
+    .catch(() => {});
 
   // ---------- Auto Sync replay ----------
   const stepped = [...document.querySelectorAll(".demo [data-step]")];
