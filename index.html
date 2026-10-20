@@ -1646,12 +1646,30 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
     })
     .catch(() => cards.forEach(card => fill(card, { version: "Latest", build: "—", size: "—", date: "—", hash: "unavailable", label: "Latest build" })));
 
-  // Cards draw themselves when they come into view.
+  // Cards draw themselves each time they come into view, and again when the
+  // page comes back to the front with them on screen.
   if ("IntersectionObserver" in window) {
     const io = new IntersectionObserver(items => items.forEach(it => {
-      if (it.isIntersecting) { it.target.classList.add("is-in"); io.unobserve(it.target); }
-    }), { threshold: .25 });
+      // Drawn once a quarter shows, wiped only once wholly out of view, so a
+      // card never blanks while part of it is on screen.
+      if (it.intersectionRatio >= .25) it.target.classList.add("is-in");
+      else if (!it.isIntersecting) it.target.classList.remove("is-in");
+    }), { threshold: [0, .25] });
     cards.forEach(c => io.observe(c));
+
+    // Back from another tab, app or window: the card stays put and its
+    // drawing starts over.
+    const redraw = card => { card.classList.remove("is-in"); void card.offsetWidth; card.classList.add("is-in"); };
+    let away = false;
+    const leave = () => { away = true; };
+    const back = () => {
+      if (!away || document.hidden) return;
+      away = false;
+      cards.filter(c => c.classList.contains("is-in")).forEach(redraw);
+    };
+    addEventListener("blur", leave);
+    addEventListener("focus", back);
+    document.addEventListener("visibilitychange", () => document.hidden ? leave() : back());
   } else cards.forEach(c => c.classList.add("is-in"));
 
   cards.forEach(card => {
