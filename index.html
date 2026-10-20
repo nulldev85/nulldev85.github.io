@@ -3,1004 +3,1438 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Every feature added to Lineup for iPhone and Apple TV, from Library collections through Auto Sync, and how each one works.">
-<title>What's New in Lineup</title>
+<title>Lineup · Tester notes</title>
+<meta name="description" content="What's new in Lineup for iPhone and Apple TV: every feature, how it works, and the newest official build of each app.">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b0b0c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f2f0e9" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nulldev85.github.io/">
+<meta property="og:title" content="Lineup · Tester notes">
+<meta property="og:description" content="Every feature, how it works, and the newest build of Lineup for iPhone and Apple TV.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23d6f64f'/%3E%3Cg fill='%23121212'%3E%3Ccircle cx='10' cy='8' r='2'/%3E%3Ccircle cx='10' cy='13' r='2'/%3E%3Ccircle cx='10' cy='18' r='2'/%3E%3Ccircle cx='10' cy='23' r='2'/%3E%3Ccircle cx='15' cy='23' r='2'/%3E%3Ccircle cx='20' cy='23' r='2'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@500..900&family=Geist+Mono:wght@400..600&family=Geist:wght@300..800&family=Instrument+Serif:ital@0;1&display=swap">
+<script>
+  // The chosen theme is set before the first paint, so a light-mode reader
+  // never sees a dark flash.
+  try { const t = localStorage.getItem("lineup-notes-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
 <style>
+/* ------------------------------------------------------------------
+   Lineup tester notes.
+   Two type voices: Geist for reading, Instrument Serif italic for the
+   big words, Geist Mono for anything a machine wrote (SHAs, versions,
+   dates). iPhone is lime and Apple TV is lavender, everywhere: chips,
+   the filter, the scoreboard, the tickets.
+   ------------------------------------------------------------------ */
+@property --angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
 :root {
-  /* Layout: Lineup's own panels. A charcoal ground, cards a step lighter with 24pt corners and a
-     header inside each (icon tile, heavy upper-case caption, hairline). Sticky masthead with filter
-     chips; Auto Sync's readout opens; the release ledger; then one panel per section. */
-  --ground: #1C1C1E;
-  --card: #2C2C2E;
-  --well: #3A3A3C;
-  --divider: #404043;
-  --line: rgba(255, 255, 255, 0.09);
-  --ink: #FFFFFF;
-  --caption: #CCCCCC;
-  --quiet: #9E9EA5;
-  --secondary: rgba(255, 255, 255, 0.66);
-  --chevron: #656569;
-  --accent: #FF3347;
-  --accent-soft: #FF8A95;
-  --accent-wash: rgba(255, 51, 71, 0.14);
-  --positive: #3DDC84;
-  --positive-wash: rgba(61, 220, 132, 0.14);
-  --warning: #FFB224;
+  color-scheme: light dark;
+  --bg: light-dark(#f2f0e9, #0b0b0c);
+  --surface: light-dark(#fbfaf6, #141416);
+  --surface-2: light-dark(#e8e5dc, #1c1c1f);
+  --ink: light-dark(#141413, #f0efe9);
+  --ink-2: light-dark(#3a3935, #c8c6bf);
+  --muted: light-dark(#6a6861, #8f8d86);
+  --faint: light-dark(#98958c, #5f5e5a);
+  --line: light-dark(rgb(20 20 19 / .09), rgb(255 255 255 / .075));
+  --line-2: light-dark(rgb(20 20 19 / .16), rgb(255 255 255 / .13));
+  --glass: light-dark(rgb(242 240 233 / .78), rgb(11 11 12 / .72));
+  --shadow: light-dark(rgb(40 36 20 / .16), rgb(0 0 0 / .5));
 
-  --t-blue: #0A84FF;
-  --t-green: #30D158;
-  --t-teal: #30B0C7;
-  --t-indigo: #5E5CE6;
-  --t-orange: #FF9F0A;
+  --lime: #d6f64f;
+  --lav: #c9bbff;
+  --lime-ink: light-dark(#4b6c00, #d6f64f);
+  --lime-dot: light-dark(#97c20a, #d6f64f);
+  --lav-dot: light-dark(#8f78f2, #c9bbff);
+  --lav-ink: light-dark(#5a43c8, #c9bbff);
+  --paper-ink: #121212;
 
-  --bug: rgba(10, 10, 12, 0.94);
-  --field-a: #15211B;
-  --field-b: #0B110E;
-  --chalk: rgba(255, 255, 255, 0.07);
-  --kc: #E31837;
-  --buf: #2A63E0;
+  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --dots: "Doto", var(--mono);
 
-  /* The app's face is SF Pro Rounded. Apple devices draw it from ui-rounded; elsewhere, Nunito is
-     the nearest rounded face that may be served. */
-  --font: ui-rounded, "SF Pro Rounded", "Nunito", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --radius: 24px;
-  --inset: 20px;
-  --gap: 14px;
-
-  color-scheme: dark;
+  --max: 1160px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --bar-h: 62px;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+@supports not (color: light-dark(#000, #fff)) {
+  :root {
+    --bg: #0b0b0c; --surface: #141416; --surface-2: #1c1c1f; --ink: #f0efe9; --ink-2: #c8c6bf;
+    --muted: #8f8d86; --faint: #5f5e5a; --line: rgb(255 255 255 / .075); --line-2: rgb(255 255 255 / .13);
+    --glass: rgb(11 11 12 / .72); --shadow: rgb(0 0 0 / .5); --lime-ink: #d6f64f; --lav-ink: #c9bbff; --lime-dot: #d6f64f; --lav-dot: #c9bbff;
+  }
 }
 
-html { -webkit-text-size-adjust: 100%; }
-:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
-* { box-sizing: border-box; }
-body { margin: 0; }
-img { max-width: 100%; }
+*, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; padding: 0; }
-ol, ul { list-style: none; }
-
+html { -webkit-text-size-adjust: 100%; }
+#releases, #changes { scroll-margin-top: calc(var(--bar-h) + 8px); }
 body {
-  background: var(--ground);
-  color: var(--caption);
-  font: 400 16px/1.55 var(--font);
+  margin: 0;
+  min-height: 100dvh;
+  overflow-x: clip;
+  font: 400 16px/1.6 var(--sans);
+  color: var(--ink);
+  background:
+    radial-gradient(1100px 620px at 92% -8%, color-mix(in oklab, var(--lav) 13%, transparent), transparent 62%),
+    radial-gradient(900px 520px at -12% 4%, color-mix(in oklab, var(--lime) 9%, transparent), transparent 60%),
+    var(--bg);
+  background-repeat: no-repeat;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
-body::before {
+/* A little paper grain over everything. */
+body::after {
   content: "";
   position: fixed;
-  inset: 0 0 auto;
-  height: env(safe-area-inset-top, 0px);
-  z-index: 10;
-  background: var(--ground);
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: .05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-
+::selection { background: var(--lime); color: var(--paper-ink); }
 a { color: inherit; }
-button { font: inherit; color: inherit; cursor: pointer; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-.num, .rel, .log, .shas, .rels, .tick span, .n { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid var(--lime-ink); outline-offset: 3px; }
+button { font: inherit; color: inherit; }
+kbd {
+  font: 500 11px/1 var(--mono);
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--line-2);
+  border-bottom-width: 2px;
+  color: var(--ink-2);
+  background: var(--surface);
+}
+.wrap { width: min(100%, var(--max)); margin-inline: auto; padding-inline: var(--gutter); }
 
-.gutter {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-}
-
-/* ---------- masthead ---------- */
-.bar {
-  position: sticky;
-  top: env(safe-area-inset-top, 0px);
-  z-index: 9;
-  background: var(--ground);
-  background: color-mix(in srgb, var(--ground) 88%, transparent);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--line);
-}
-.bar .gutter {
-  display: flex;
-  align-items: center;
-  gap: 12px 24px;
-  flex-wrap: wrap;
-  padding-block: 12px;
-}
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-}
-.brand .mark { width: 3px; height: 31px; background: var(--accent); border-radius: 1px; }
-.brand-words { display: grid; gap: 3px; }
-.brand-name { font: 900 20px/1 var(--font); letter-spacing: -0.5px; color: var(--ink); }
-.brand-sub { font: 700 8px/1 var(--font); letter-spacing: 2.2px; color: var(--secondary); }
-.jump {
-  display: flex;
-  gap: 18px;
-  font: 700 11px/1 var(--font);
-  letter-spacing: 1px;
+/* ---------------- nav ---------------- */
+.site-nav .wrap { display: flex; align-items: center; gap: 14px; height: 72px; }
+.logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-mark { width: 30px; height: 30px; flex: none; }
+.logo-mark rect { fill: var(--lime); }
+.logo-mark circle { fill: var(--paper-ink); }
+.logo-word { font: 700 20px/1 var(--sans); letter-spacing: -.045em; }
+.logo-tag {
+  font: 500 10.5px/1 var(--mono);
+  letter-spacing: .12em;
   text-transform: uppercase;
-}
-.jump a { color: var(--secondary); text-decoration: none; padding-block: 6px; }
-.jump a:hover { color: var(--ink); }
-.filters {
-  margin-left: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.filters button {
-  min-height: 32px;
-  padding: 0 14px;
+  color: var(--muted);
+  padding: 5px 8px;
+  border: 1px solid var(--line-2);
   border-radius: 999px;
-  border: 1.5px solid var(--accent);
-  background: transparent;
-  color: var(--accent);
-  font: 700 14px/1 var(--font);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
 }
-.filters button .n { opacity: 0.75; font-weight: 600; }
-.filters button[aria-pressed="true"] { background: var(--accent); color: #FFFFFF; }
-.filters button[aria-pressed="true"] .n { opacity: 0.85; }
-@media (max-width: 720px) {
-  .jump { display: none; }
+.nav-links { margin-left: auto; display: flex; gap: 2px; }
+.nav-links a {
+  padding: 8px 13px;
+  border-radius: 999px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 500;
+  transition: color .2s, background-color .2s;
+}
+.nav-links a:hover { color: var(--ink); background: var(--surface); }
+.theme-btn {
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color .2s, transform .3s var(--ease);
+}
+.theme-btn:hover { background: var(--surface); }
+.theme-btn:active { transform: rotate(-25deg) scale(.94); }
+.theme-btn svg { width: 17px; height: 17px; display: none; }
+.theme-btn[data-mode="auto"] .i-auto, .theme-btn[data-mode="dark"] .i-dark, .theme-btn[data-mode="light"] .i-light { display: block; }
+@media (max-width: 680px) {
+  .nav-links { display: none; }
+  .theme-btn { margin-left: auto; }
 }
 
-/* ---------- hero ---------- */
-.hero {
-  padding-block: 56px 32px;
-  display: grid;
-  gap: 18px;
+/* ---------------- hero ---------------- */
+.hero { display: grid; gap: 44px; padding-top: clamp(32px, 7vw, 92px); }
+@media (min-width: 940px) { .hero { grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); align-items: end; } }
+.eyebrow {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+  margin: 0;
+  font: 500 11.5px/1.4 var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.eyebrow .sep { color: var(--faint); }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); flex: none; animation: pulse 2.4s ease-out infinite; }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--lime) 70%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 9px transparent; }
 }
 h1 {
-  font: 900 clamp(44px, 8.4vw, 96px)/0.95 var(--font);
-  letter-spacing: -0.025em;
-  text-transform: uppercase;
-  color: var(--ink);
-  text-wrap: balance;
+  margin: 20px 0 0;
+  font: 700 clamp(54px, 9vw, 112px)/.9 var(--sans);
+  letter-spacing: -.058em;
 }
-h1 .thin { font-weight: 300; color: var(--quiet); letter-spacing: -0.03em; }
+h1 .s {
+  display: block;
+  margin-top: .04em;
+  font: italic 400 1.1em/.92 var(--serif);
+  letter-spacing: -.025em;
+  color: var(--lime-ink);
+}
+.intro { margin: 26px 0 0; max-width: 34ch; font-size: clamp(17px, 1.55vw, 20px); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  height: 48px; padding: 0 20px;
+  border-radius: 999px;
+  font: 600 15px/1 var(--sans);
+  letter-spacing: -.01em;
+  text-decoration: none;
+  transition: transform .25s var(--ease), background-color .2s, border-color .2s;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0) scale(.98); }
+.btn svg { width: 16px; height: 16px; }
+.btn-solid { background: var(--ink); color: var(--bg); }
+.btn-line { border: 1px solid var(--line-2); }
+.btn-line:hover { border-color: var(--ink); }
 
-/* ---------- panels ---------- */
-.panel + .panel { margin-top: 16px; }
-.panel {
-  background: var(--card);
-  border-radius: var(--radius);
+/* The scoreboard: real counts from this page, in LED dots. */
+.board {
+  margin: 0;
+  position: relative;
+  padding: 18px 18px 16px;
+  border-radius: 22px;
+  color: #ecebe4;
+  background:
+    radial-gradient(rgb(255 255 255 / .06) 1px, transparent 1.4px) 0 0 / 6px 6px,
+    linear-gradient(180deg, #121314, #08090a);
+  border: 1px solid rgb(255 255 255 / .08);
+  box-shadow: 0 30px 60px -20px var(--shadow), inset 0 1px 0 rgb(255 255 255 / .06), inset 0 -10px 30px rgb(0 0 0 / .5);
 }
-.panel-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 15px var(--inset) 11px;
-  color: var(--caption);
+.board::before, .board::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #5c5d5f, #1b1c1d);
 }
-.panel-head h2 {
-  flex: 1;
-  min-width: 0;
-  font: 800 15px/1.25 var(--font);
-  letter-spacing: 0.4px;
+.board::before { left: 10px; }
+.board::after { right: 10px; }
+.board-top {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  padding: 0 10px 12px;
+  font: 500 10.5px/1 var(--mono);
+  letter-spacing: .18em;
   text-transform: uppercase;
-  color: var(--caption);
+  color: #8b8a84;
 }
-.panel-rule { height: 1px; background: var(--divider); margin-inline: var(--inset); }
-.acc { font: 600 13px/1.2 var(--font); color: var(--quiet); white-space: nowrap; }
-.tile {
-  width: 24px; height: 24px;
-  border-radius: 6.25px;
-  display: grid;
-  place-items: center;
-  flex: none;
+.board-top span:last-child { text-align: right; }
+.board-live { display: inline-flex; align-items: center; gap: 7px; color: #ff6a55; }
+.board-live i { width: 6px; height: 6px; border-radius: 50%; background: #ff4d3d; box-shadow: 0 0 10px #ff4d3d; animation: blink 1.6s steps(2) infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+.board-main {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px;
+  padding: 16px 10px 14px;
+  border-radius: 14px;
+  background: rgb(0 0 0 / .35);
+  border: 1px solid rgb(255 255 255 / .05);
 }
-.tile svg { width: 13px; height: 13px; }
-.tile.blue { background: var(--t-blue); }
-.tile.green { background: var(--t-green); }
-.tile.teal { background: var(--t-teal); }
-.tile.indigo { background: var(--t-indigo); }
-.tile.orange { background: var(--t-orange); }
+.team { display: grid; justify-items: center; gap: 6px; }
+.team-name { font: 600 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: #a9a8a1; }
+.digits {
+  font: 800 clamp(64px, 15vw, 96px)/.9 var(--dots);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+}
+.team-iphone .digits { color: var(--lime); text-shadow: 0 0 18px color-mix(in oklab, var(--lime) 55%, transparent); }
+.team-tv .digits { color: var(--lav); text-shadow: 0 0 18px color-mix(in oklab, var(--lav) 55%, transparent); }
+.board-mid { display: grid; justify-items: center; gap: 4px; padding-inline: 4px; }
+.board-mid .k { font: 500 9.5px/1 var(--mono); letter-spacing: .2em; color: #77766f; }
+.board-mid .digits { font-size: clamp(30px, 6vw, 40px); color: #f4f3ec; text-shadow: 0 0 12px rgb(255 255 255 / .35); }
+.board-mid .new { font: 600 10px/1 var(--mono); letter-spacing: .12em; color: var(--lime); text-transform: uppercase; margin-top: 2px; }
+.board figcaption {
+  display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  padding: 12px 10px 0;
+  font: 500 10.5px/1.4 var(--mono);
+  letter-spacing: .06em;
+  color: #74736d;
+}
 
-/* ---------- downloads ---------- */
-.dl-body { padding: 16px var(--inset) 18px; display: grid; gap: 14px; }
-.dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; }
-.dl {
+/* ---------------- download ---------------- */
+.block { margin-top: clamp(72px, 11vw, 128px); }
+.block-head { display: grid; gap: 12px; max-width: 660px; margin-bottom: 30px; }
+.kicker { margin: 0; font: 500 11.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+.kicker::before { content: ""; width: 22px; height: 1px; background: var(--line-2); }
+.block-head h2 { margin: 0; font: 700 clamp(38px, 5.4vw, 60px)/1 var(--sans); letter-spacing: -.05em; text-wrap: balance; }
+.block-head h2 em { font: italic 400 1.12em/1 var(--serif); letter-spacing: -.015em; }
+.block-head p { margin: 0; font-size: 17px; color: var(--ink-2); text-wrap: pretty; }
+.block-head code { font: 500 .88em var(--mono); padding: 2px 6px; border-radius: 6px; background: var(--surface-2); }
+
+.passes { display: grid; gap: 26px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); }
+.pass { container-type: inline-size; display: grid; gap: 12px; min-width: 0; }
+.pass[data-app="iphone"] { --paper: var(--lime); }
+.pass[data-app="tv"] { --paper: var(--lav); }
+.pass.is-soon { --paper: #cfcdc5; }
+
+.ticket-shell { filter: drop-shadow(0 22px 26px var(--shadow)) drop-shadow(0 2px 3px rgb(0 0 0 / .18)); }
+.ticket {
+  --stub: 92px;
+  --notch: 11px;
+  position: relative;
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) var(--stub);
+  min-height: 244px;
+  color: var(--paper-ink);
+  text-decoration: none;
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
+  transition: transform .6s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.ticket:hover { --lift: -4px; transition-duration: .18s; }
+.ticket:active { --lift: 0px; }
+.ticket { border-radius: 20px; }
+.ticket:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
+.t-main, .t-stub { position: relative; background: var(--paper); }
+/* Two pieces of one ticket, each with half of the punched notch. */
+.t-main {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 14px;
+  padding: 18px 20px 16px 22px;
+  border-radius: 20px 0 0 20px;
+  overflow: hidden;
+  -webkit-mask: radial-gradient(circle at 100% 0, #0000 var(--notch), #000 calc(var(--notch) + .5px)) top / 100% 51% no-repeat,
+                radial-gradient(circle at 100% 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px)) bottom / 100% 51% no-repeat;
+          mask: radial-gradient(circle at 100% 0, #0000 var(--notch), #000 calc(var(--notch) + .5px)) top / 100% 51% no-repeat,
+                radial-gradient(circle at 100% 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px)) bottom / 100% 51% no-repeat;
+}
+.t-stub {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  justify-items: center;
   align-items: center;
   gap: 14px;
-  padding: 14px 16px;
-  background: var(--ground);
-  border-radius: 18px;
+  padding: 20px 0 18px;
+  border-radius: 0 20px 20px 0;
+  border-left: 2px dashed rgb(0 0 0 / .26);
+  -webkit-mask: radial-gradient(circle at 0 0, #0000 var(--notch), #000 calc(var(--notch) + .5px)) top / 100% 51% no-repeat,
+                radial-gradient(circle at 0 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px)) bottom / 100% 51% no-repeat;
+          mask: radial-gradient(circle at 0 0, #0000 var(--notch), #000 calc(var(--notch) + .5px)) top / 100% 51% no-repeat,
+                radial-gradient(circle at 0 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px)) bottom / 100% 51% no-repeat;
+  transform-origin: 0 100%;
+  transition: transform .7s cubic-bezier(.3, 1.5, .4, 1);
 }
-.dl-device {
+.t-top { display: flex; justify-content: space-between; gap: 10px; font: 500 10px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; }
+.t-top b { font-weight: 700; letter-spacing: .2em; }
+.t-top span { opacity: .6; }
+.t-device { align-self: center; font: italic 400 clamp(46px, 13cqi, 64px)/.9 var(--serif); letter-spacing: -.02em; position: relative; z-index: 1; }
+.t-glyph { position: absolute; right: 16px; top: 40px; width: 58px; height: 74px; opacity: .1; }
+@container (min-width: 440px) { .t-glyph { width: 76px; height: 96px; } }
+.t-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+@container (min-width: 440px) { .t-fields { grid-template-columns: repeat(4, auto); justify-content: space-between; } }
+.f { display: grid; gap: 4px; min-width: 0; }
+.f .k { font: 500 9px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; opacity: .55; }
+.f .v { font: 600 15px/1.1 var(--mono); letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pass.is-loading .f .v { color: transparent; border-radius: 4px; background: linear-gradient(90deg, rgb(0 0 0 / .08), rgb(0 0 0 / .16), rgb(0 0 0 / .08)) 0 0 / 200% 100%; animation: shimmer 1.2s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.t-code { display: grid; gap: 6px; }
+.barcode { display: block; width: 100%; height: 34px; fill: var(--paper-ink); }
+.t-hash { display: flex; justify-content: space-between; gap: 10px; font: 500 9.5px/1 var(--mono); letter-spacing: .06em; opacity: .62; }
+.t-hash span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* A strip of foil, like the hologram on a real ticket. */
+.t-holo {
+  position: absolute; left: 0; right: 0; top: 0; height: 5px;
+  background: linear-gradient(90deg, #ff9ad6, #93d5ff, #a8ffb3, #ffe489, #ff9ad6, #93d5ff) 0 0 / 200% 100%;
+  opacity: .9;
+  animation: holo 6s linear infinite;
+}
+@keyframes holo { to { background-position: -200% 0; } }
+.t-foil {
+  position: absolute; inset: 0; z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: soft-light;
+  background:
+    radial-gradient(circle at var(--mx, 30%) var(--my, 20%), rgb(255 255 255 / .9), transparent 42%),
+    conic-gradient(from var(--angle) at var(--mx, 30%) var(--my, 20%), #ff7ccf, #7cc8ff, #8dffa0, #ffd86b, #ff7ccf);
+  transition: opacity .4s;
+}
+.ticket:hover .t-foil, .ticket:focus-visible .t-foil { opacity: 1; animation: spin 5s linear infinite; }
+@keyframes spin { to { --angle: 360deg; } }
+.t-arrow {
+  align-self: center;
   width: 48px; height: 48px;
-  border-radius: 12px;
-  background: var(--well);
-  display: grid;
-  place-items: center;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--paper-ink);
+  color: var(--paper);
+  transition: transform .35s var(--ease);
 }
-.dl-device svg { width: 24px; height: 24px; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.dl-text { min-width: 0; }
-.dl h3 { font: 800 18px/1.2 var(--font); letter-spacing: -0.01em; color: var(--ink); }
-.dl-meta { font: 500 13px/1.4 var(--font); color: var(--quiet); font-variant-numeric: tabular-nums; margin-top: 2px; }
-.dl-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-height: 36px;
-  padding: 0 16px;
-  border-radius: 999px;
-  background: var(--accent);
-  color: #FFFFFF;
-  font: 800 15px/1 var(--font);
-  text-decoration: none;
+.t-arrow svg { width: 20px; height: 20px; }
+.ticket:hover .t-arrow { transform: translateY(3px); }
+.t-say {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font: 600 10.5px/1 var(--mono);
+  letter-spacing: .18em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
-.dl-btn:hover { filter: brightness(1.08); }
-.dl-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
-.dl-btn[aria-disabled="true"] { background: var(--well); color: var(--quiet); pointer-events: none; }
-@media (max-width: 400px) {
-  .dl { grid-template-columns: 44px minmax(0, 1fr); }
-  .dl-device { width: 44px; height: 44px; }
-  .dl-btn { grid-column: 1 / -1; }
-}
-
-/* ---------- shared ---------- */
-.note { font-size: 14px; color: var(--quiet); line-height: 1.5; }
-.replay {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 32px;
-  padding: 0 14px;
-  border: 1.5px solid var(--accent);
+.t-say .busy, .is-torn .t-say .idle { display: none; }
+.is-torn .t-say .busy { display: inline; }
+/* Tapping tears the stub off a little, then it settles back. */
+.ticket.is-torn .t-stub { transform: translate(8px, 4px) rotate(7deg); }
+.pass.is-soon .ticket { cursor: default; }
+.pass.is-soon .t-arrow { background: rgb(0 0 0 / .35); }
+.pass-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-inline: 4px; }
+.pass-meta { font: 500 12px/1.4 var(--mono); color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.copy-link {
+  flex: none;
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 32px; padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
   background: transparent;
-  border-radius: 999px;
-  font: 700 14px/1 var(--font);
-  color: var(--accent);
-  white-space: nowrap;
+  font: 500 12.5px/1 var(--sans);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
 }
-.replay:hover { background: var(--accent-wash); }
+.copy-link:hover { border-color: var(--ink); color: var(--ink); }
+.copy-link svg { width: 14px; height: 14px; }
+.copy-link .done, .copy-link[data-state="done"] .idle { display: none; }
+.copy-link[data-state="done"] .done { display: inline; }
+.copy-link[data-state="done"] { color: var(--lime-ink); border-color: var(--lime-ink); }
+.install-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 26px; font-size: 14px; color: var(--muted); }
+.link-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 600 14px/1.4 var(--sans);
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--line-2);
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.link-btn:hover { text-decoration-color: var(--ink); }
+.pop {
+  width: min(460px, calc(100vw - 32px));
+  margin: auto;
+  padding: 26px 26px 22px;
+  border: 1px solid var(--line-2);
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 40px 100px -20px rgb(0 0 0 / .55);
+}
+.pop::backdrop { background: rgb(0 0 0 / .45); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.pop h3 { margin: 0 0 14px; font: italic 400 34px/1 var(--serif); letter-spacing: -.01em; }
+.pop ol { margin: 0; padding: 0; list-style: none; counter-reset: p; display: grid; gap: 12px; }
+.pop li { counter-increment: p; display: grid; grid-template-columns: 30px 1fr; color: var(--ink-2); }
+.pop li::before { content: counter(p, decimal-leading-zero); font: 500 12px/1.9 var(--mono); color: var(--lime-ink); }
+.pop .fine { margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13.5px; color: var(--muted); }
+.pop-close { margin-top: 18px; height: 40px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--ink); color: var(--bg); font: 600 14px/1 var(--sans); cursor: pointer; }
 
-/* ---------- ledger ---------- */
-.ledger { overflow: hidden; }
-.ledger-list { display: grid; padding-block: 4px; }
+/* ---------------- toolbar ---------------- */
+.toolbar {
+  position: sticky; top: 0; z-index: 30;
+  margin-top: clamp(80px, 11vw, 132px);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+          backdrop-filter: blur(20px) saturate(1.5);
+  border-block: 1px solid var(--line);
+  view-transition-name: toolbar;
+}
+.toolbar .wrap { display: flex; align-items: center; gap: 10px; min-height: var(--bar-h); }
+.seg {
+  position: relative;
+  display: inline-grid; grid-auto-flow: column;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  isolation: isolate;
+}
+.seg-thumb {
+  position: absolute; z-index: -1;
+  top: 4px; bottom: 4px; left: 0;
+  width: var(--w, 0px);
+  transform: translateX(var(--x, 0px));
+  border-radius: 999px;
+  background: var(--ink);
+  transition: transform .45s cubic-bezier(.3, 1.3, .5, 1), width .45s cubic-bezier(.3, 1.3, .5, 1), background-color .3s;
+}
+.seg[data-plat="iphone"] .seg-thumb { background: var(--lime); }
+.seg[data-plat="tv"] .seg-thumb { background: var(--lav); }
+.seg button {
+  display: inline-flex; align-items: baseline; gap: 7px;
+  padding: 10px 14px;
+  border: 0; border-radius: 999px;
+  background: transparent;
+  font: 600 14px/1 var(--sans);
+  letter-spacing: -.01em;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color .3s;
+}
+.seg button:hover { color: var(--ink); }
+.seg button .n { font: 500 11px/1 var(--mono); opacity: .7; }
+.seg button[aria-pressed="true"] { color: var(--bg); }
+.seg[data-plat="iphone"] button[aria-pressed="true"], .seg[data-plat="tv"] button[aria-pressed="true"] { color: var(--paper-ink); }
+.seg:not([data-plat]) button[aria-pressed="true"] { background: var(--ink); }
+.rel-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 36px; padding: 0 8px 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--lime-ink);
+  background: color-mix(in oklab, var(--lime) 14%, transparent);
+  color: var(--ink);
+  font: 500 12.5px/1 var(--mono);
+  cursor: pointer;
+}
+.rel-chip i { font-style: normal; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 12px; }
+.rel-chip .w { color: var(--muted); }
+.kbd-hint { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--muted); }
+.kbd-hint span { margin-left: 4px; }
+@media (max-width: 860px), (hover: none) { .kbd-hint { display: none; } }
+@media (max-width: 400px) {
+  .seg button { padding-inline: 11px; gap: 5px; }
+  .rel-chip .w { display: none; }
+}
+
+/* ---------------- notes: releases + features ---------------- */
+.notes { display: grid; grid-template-columns: minmax(0, 1fr); }
+.side, .feed { min-width: 0; }
+@media (min-width: 1040px) {
+  .notes { grid-template-columns: 286px minmax(0, 1fr); gap: 64px; }
+  .side {
+    position: sticky; top: calc(var(--bar-h) + 8px);
+    align-self: start;
+    max-height: calc(100dvh - var(--bar-h) - 16px);
+    overflow-y: auto;
+    padding: 48px 4px 24px 0;
+    scrollbar-width: thin;
+  }
+}
+.side-h { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 14px; font: italic 400 30px/1 var(--serif); }
+.side-h span { font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); font-style: normal; }
+.ledger-list { position: relative; display: grid; gap: 2px; }
+.ledger-list::before { content: ""; position: absolute; left: 14px; top: 20px; bottom: 20px; width: 1px; background: var(--line-2); }
 .rel {
   position: relative;
   display: grid;
-  grid-template-columns: 3.4em 10.5em minmax(0, 1fr) auto 8px;
-  gap: 4px 18px;
-  align-items: center;
-  text-align: left;
+  grid-template-columns: 14px auto 1fr;
+  grid-template-areas: "dot pr when" ". what what" ". n n";
+  column-gap: 12px; row-gap: 4px;
+  width: 100%;
+  padding: 12px 12px 12px 10px;
+  border: 0; border-radius: 14px;
   background: transparent;
-  border: 0;
-  padding: 14px var(--inset);
-  transition: background 0.2s ease;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color .2s;
 }
-.rel:not([hidden]) ~ .rel:not([hidden])::before {
+.rel::before {
   content: "";
-  position: absolute;
-  top: 0; left: var(--inset); right: 0;
-  height: 1px;
-  background: var(--divider);
+  grid-area: dot;
+  width: 9px; height: 9px;
+  margin: 5px 0 0 0;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid var(--faint);
+  z-index: 1;
+  transition: background-color .25s, border-color .25s, box-shadow .25s;
 }
-.rel:hover { background: rgba(255, 255, 255, 0.03); }
-.rel[aria-pressed="true"] { background: var(--well); }
-.rel .pr { font: 800 15px/1.4 var(--font); color: var(--accent); }
-.rel .when { font: 500 13px/1.4 var(--font); color: var(--quiet); }
-.rel .what { color: var(--ink); font: 500 15px/1.4 var(--font); min-width: 0; }
-.rel .n { font: 500 13px/1.4 var(--font); color: var(--quiet); white-space: nowrap; }
-.rel .chev { width: 8px; height: 14px; fill: none; stroke: var(--chevron); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-@media (max-width: 640px) {
-  .rel { grid-template-columns: auto minmax(0, 1fr) auto 8px; }
-  .rel .what { grid-column: 1 / -2; grid-row: 2; }
-  .rel .chev { grid-row: 1 / 3; grid-column: 4; }
+.rel .pr { grid-area: pr; font: 600 13px/1.5 var(--mono); }
+.rel .when { grid-area: when; justify-self: end; font: 400 11px/1.75 var(--mono); color: var(--faint); white-space: nowrap; }
+.rel .what { grid-area: what; font-size: 14.5px; line-height: 1.42; color: var(--ink-2); text-wrap: pretty; }
+.rel .n { grid-area: n; font: 500 11px/1.4 var(--mono); color: var(--muted); }
+.rel .chev { display: none; }
+.rel:hover { background: var(--surface); }
+.rel[aria-pressed="true"] { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-2); }
+.rel[aria-pressed="true"]::before { background: var(--lime); border-color: var(--lime); box-shadow: 0 0 0 4px color-mix(in oklab, var(--lime) 22%, transparent); }
+.rel:first-child .pr::after { content: "latest"; margin-left: 8px; padding: 2px 6px; border-radius: 999px; font: 600 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; vertical-align: 2px; color: var(--paper-ink); background: var(--lime); }
+.toc { display: grid; gap: 2px; margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--line); }
+.toc a {
+  display: grid; grid-template-columns: 30px 1fr auto; align-items: baseline;
+  padding: 8px 12px;
+  border-radius: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14.5px; font-weight: 500;
+  transition: color .2s, background-color .2s;
+}
+.toc a span, .toc a i { font: 500 11px/1 var(--mono); font-style: normal; color: var(--faint); }
+.toc a:hover { color: var(--ink); }
+.toc a.is-current { color: var(--ink); background: var(--surface); }
+@media (max-width: 1039.98px) {
+  .side { padding-top: 40px; }
+  .ledger-list {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(250px, 76%);
+    gap: 10px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    margin-inline: calc(-1 * var(--gutter));
+    padding: 2px var(--gutter) 10px;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+  .ledger-list::-webkit-scrollbar { display: none; }
+  .ledger-list::before { display: none; }
+  .rel { grid-template-columns: auto 1fr; grid-template-areas: "pr when" "what what" "n n"; padding: 14px 16px; scroll-snap-align: start; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+  .rel::before { display: none; }
+  .rel[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px var(--lime-ink); }
+  .toc { display: none; }
 }
 
-/* ---------- sections and entries ---------- */
+/* sections */
+.section { scroll-margin-top: calc(var(--bar-h) + 8px); }
+.sec-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 8px 16px;
+  padding: 64px 0 20px;
+  border-bottom: 1px solid var(--line-2);
+}
+.sec-no { font: 500 12px/1 var(--mono); color: var(--faint); }
+.sec-head h2 { margin: 0; font: italic 400 clamp(44px, 6.4vw, 72px)/.95 var(--serif); letter-spacing: -.02em; }
+.sec-count { font: 500 11.5px/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.sec-sub { grid-column: 2 / -1; margin: 0; font-size: 15px; color: var(--muted); text-wrap: pretty; }
+
+/* entries: the markup each merge round copies */
+.entries { container-type: inline-size; }
 .entry {
-  position: relative;
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
-  gap: 12px 36px;
-  padding: 26px var(--inset);
-  scroll-margin-top: 80px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  padding: 34px 0 38px;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: calc(var(--bar-h) + 16px);
 }
-.entry:not([hidden]) ~ .entry:not([hidden])::before {
-  content: "";
-  position: absolute;
-  top: 0; left: var(--inset); right: var(--inset);
-  height: 1px;
-  background: var(--divider);
-}
-.meta {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font: 500 12px/1.4 var(--font);
-  color: var(--quiet);
-  padding-top: 3px;
-}
-.plats { display: flex; gap: 6px; flex-wrap: wrap; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.plats { display: flex; gap: 6px; }
 .chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 10px;
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 24px; padding: 0 10px 0 8px;
   border-radius: 999px;
-  background: var(--well);
-  font: 800 10.5px/1 var(--font);
-  letter-spacing: 0.08em;
+  background: var(--surface-2);
+  font: 600 10.5px/1 var(--mono);
+  letter-spacing: .07em;
   text-transform: uppercase;
+  color: var(--ink-2);
+}
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--lime-dot); box-shadow: 0 0 0 2px color-mix(in oklab, var(--lime-dot) 25%, transparent); }
+.entry[data-platform="tv"] .chip::before, .entry[data-platform="iphone tv"] .chip:nth-child(2)::before { background: var(--lav-dot); box-shadow: 0 0 0 2px color-mix(in oklab, var(--lav-dot) 25%, transparent); }
+.rels { font: 500 12px/1.5 var(--mono); color: var(--ink-2); }
+.shas { display: flex; flex-wrap: wrap; gap: 2px 8px; font: 400 11px/1.6 var(--mono); color: var(--faint); }
+.shas span::before { content: "@"; opacity: .6; }
+@container (min-width: 660px) {
+  .entry { grid-template-columns: 184px minmax(0, 1fr); gap: 30px; }
+  .meta { position: sticky; top: calc(var(--bar-h) + 28px); align-self: start; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .plats { flex-direction: column; align-items: flex-start; }
+}
+.entry .copy { min-width: 0; }
+.entry h3 { margin: 0 0 10px; font: 600 clamp(23px, 2.5vw, 29px)/1.15 var(--sans); letter-spacing: -.03em; text-wrap: balance; }
+.lede { margin: 0; max-width: 62ch; font-size: 17.5px; line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
+.ui {
+  font-weight: 600;
   color: var(--ink);
+  padding: 1px 7px;
+  border-radius: 7px;
+  background: var(--surface-2);
+  box-shadow: inset 0 -1px 0 var(--line-2);
+  white-space: nowrap;
 }
-.rels { color: var(--accent-soft); font-weight: 700; font-size: 13px; }
-.shas { display: flex; flex-wrap: wrap; gap: 4px 8px; color: var(--chevron); }
-@media (max-width: 760px) {
-  .entry { grid-template-columns: minmax(0, 1fr); padding-block: 22px; }
-  .meta { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding-top: 0; }
-}
-.copy { min-width: 0; display: grid; gap: 14px; }
-.entry h3 {
-  font: 700 21px/1.25 var(--font);
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  text-wrap: balance;
-}
-.lede { font-size: 16.5px; line-height: 1.55; max-width: 64ch; color: var(--caption); }
-.how { display: grid; gap: 10px; max-width: 76ch; }
-.how > div {
-  display: grid;
-  grid-template-columns: 9.5em minmax(0, 1fr);
-  gap: 18px;
-}
-.how dt {
-  font: 800 11px/2.2 var(--font);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--quiet);
-}
-.how dd { line-height: 1.6; color: var(--caption); }
-@media (max-width: 560px) {
-  .how > div { grid-template-columns: minmax(0, 1fr); gap: 0; }
-}
-.steps { display: grid; gap: 12px; max-width: 76ch; counter-reset: s; }
-.steps li {
-  display: grid;
-  grid-template-columns: 2.4em minmax(0, 1fr);
-  gap: 10px;
-  counter-increment: s;
-}
-.steps li::before {
-  content: counter(s, decimal-leading-zero);
-  font: 800 13px/1.85 var(--font);
-  font-variant-numeric: tabular-nums;
-  color: var(--accent);
-}
-.steps b { color: var(--ink); font-weight: 700; }
-.stack { display: flex; flex-wrap: wrap; gap: 6px; }
+.how { margin: 22px 0 0; display: grid; border-top: 1px solid var(--line); max-width: 70ch; }
+.how > div { display: grid; grid-template-columns: 1fr; gap: 3px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.how dt { font: 500 10.5px/1.9 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.how dd { margin: 0; font-size: 15.5px; line-height: 1.6; color: var(--ink-2); text-wrap: pretty; }
+@container (min-width: 520px) { .how > div { grid-template-columns: 128px minmax(0, 1fr); gap: 18px; } }
+.steps { list-style: none; counter-reset: s; margin: 22px 0 0; padding: 0; display: grid; gap: 14px; max-width: 70ch; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 32px minmax(0, 1fr); font-size: 15.5px; line-height: 1.6; color: var(--ink-2); }
+.steps li::before { content: counter(s, decimal-leading-zero); font: 500 12px/2.1 var(--mono); color: var(--lime-ink); }
+.steps b { color: var(--ink); font-weight: 600; }
+.stack { display: flex; flex-wrap: wrap; gap: 6px; margin: 22px 0 0; }
 .stack span {
-  font: 500 12.5px/1.3 var(--font);
-  color: var(--caption);
-  background: var(--well);
+  font: 500 11.5px/1 var(--mono);
+  padding: 7px 10px;
   border-radius: 999px;
-  padding: 6px 11px;
+  border: 1px solid var(--line-2);
+  color: var(--muted);
 }
-.entry b.ui { color: var(--ink); font-weight: 600; }
+.empty { display: grid; justify-items: start; gap: 14px; padding: 64px 0; }
+.empty p { margin: 0; font: italic 400 34px/1.1 var(--serif); color: var(--muted); }
+.empty button { height: 42px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line-2); background: transparent; font-weight: 600; cursor: pointer; }
 
-.empty {
-  padding: 28px var(--inset);
-  display: grid;
-  gap: 12px;
-  justify-items: start;
+/* ---------------- footer ---------------- */
+.site-foot { margin-top: 110px; border-top: 1px solid var(--line); overflow: hidden; }
+.foot-big {
+  margin: 28px 0 -0.12em;
+  font: 800 clamp(92px, 25vw, 330px)/.82 var(--sans);
+  letter-spacing: -.075em;
+  white-space: nowrap;
+  background: linear-gradient(180deg, var(--line-2), transparent 92%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  user-select: none;
 }
-.empty p { color: var(--quiet); }
+.foot-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 22px; padding: 22px 0 calc(34px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); font: 500 11.5px/1.5 var(--mono); color: var(--muted); }
+.foot-row a { text-decoration: none; }
+.foot-row a:hover { color: var(--ink); }
 
-footer { margin-top: 56px; border-top: 1px solid var(--line); }
-footer .gutter {
-  padding-block: 24px 44px;
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  font: 500 12px/1.5 var(--font);
-  color: var(--chevron);
+/* ---------------- motion ---------------- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .entry, .sec-head { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 38%; }
+  }
 }
-
+@keyframes rise { from { opacity: 0; transform: translateY(26px); } }
+@media (prefers-reduced-motion: no-preference) {
+  .hero > * { animation: arrive .9s var(--ease) both; }
+  .hero > :nth-child(2) { animation-delay: .12s; }
+}
+@keyframes arrive { from { opacity: 0; transform: translateY(18px); } }
+::view-transition-group(*) { animation-duration: .38s; animation-timing-function: var(--ease); }
+::view-transition-group(toolbar) { animation: none; }
+::view-transition-old(toolbar) { display: none; }
+::view-transition-new(toolbar) { animation: none; }
 @media (prefers-reduced-motion: reduce) {
-  .rel { transition: none; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 </style>
 </head>
 <body>
 
-<header class="bar">
-  <div class="gutter">
-    <a class="brand" href="#top"><span class="mark" aria-hidden="true"></span><span class="brand-words"><span class="brand-name">LINEUP</span><span class="brand-sub">WHAT'S NEW</span></span></a>
-    <nav class="jump" aria-label="Sections">
-      <a href="#sports">Sports</a>
-      <a href="#library">Library</a>
-      <a href="#player">Player</a>
-      <a href="#hood">Under the hood</a>
+<header class="site-nav" id="top">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Lineup tester notes">
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9"/><circle cx="10" cy="8" r="2"/><circle cx="10" cy="13" r="2"/><circle cx="10" cy="18" r="2"/><circle cx="10" cy="23" r="2"/><circle cx="15" cy="23" r="2"/><circle cx="20" cy="23" r="2"/></svg>
+      <span class="logo-word">lineup</span>
+      <span class="logo-tag">Tester notes</span>
+    </a>
+    <nav class="nav-links" aria-label="Page">
+      <a href="#download">Download</a>
+      <a href="#releases">Releases</a>
+      <a href="#changes">Features</a>
     </nav>
-    <div class="filters" role="group" aria-label="Show features for">
-      <button type="button" id="f-all" data-plat="all" aria-pressed="true">All <span class="n">25</span></button>
-      <button type="button" id="f-iphone" data-plat="iphone" aria-pressed="false">iPhone <span class="n">23</span></button>
-      <button type="button" id="f-tv" data-plat="tv" aria-pressed="false">Apple TV <span class="n">22</span></button>
-    </div>
+    <button type="button" class="theme-btn" id="theme" data-mode="auto" aria-label="Theme: auto. Change theme">
+      <svg class="i-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg>
+      <svg class="i-dark" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+      <svg class="i-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>
+    </button>
   </div>
 </header>
 
-<main class="gutter">
+<main>
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <p class="eyebrow"><span class="pulse" aria-hidden="true"></span><span>Tester notes</span><span class="sep">/</span><span id="eyebrow-rel">Release #93</span></p>
+        <h1>What's new <span class="s">in Lineup</span></h1>
+        <p class="intro">A focused sports player for iPhone and Apple TV. Your channels, your games, your library. Here's what landed in each release, how it works, and the newest build of each app.</p>
+        <div class="hero-actions">
+          <a class="btn btn-solid" href="#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg>Get the builds</a>
+          <a class="btn btn-line" href="#changes">Read the notes</a>
+        </div>
+      </div>
+      <figure class="board" aria-label="Features on this page for each app">
+        <div class="board-top"><span>Home</span><span class="board-live"><i></i>Testing</span><span>Away</span></div>
+        <div class="board-main">
+          <div class="team team-iphone"><span class="team-name">iPhone</span><span class="digits" id="sb-iphone">23</span></div>
+          <div class="board-mid"><span class="k">REL</span><span class="digits" id="sb-rel">93</span><span class="new"><span id="sb-new">15</span> new</span></div>
+          <div class="team team-tv"><span class="team-name">Apple TV</span><span class="digits" id="sb-tv">22</span></div>
+        </div>
+        <figcaption><span>Features per app, counted from this page</span><span id="sb-date"></span></figcaption>
+      </figure>
+    </section>
 
-  <section class="hero" id="top">
-    <h1>What's new <span class="thin">in</span> Lineup</h1>
-  </section>
-
-  <section class="downloads panel" id="downloads" aria-labelledby="downloads-h">
-    <div class="panel-head">
-      <span class="tile green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg></span>
-      <h2 id="downloads-h">Download</h2>
-      <span class="acc">Latest build</span>
-    </div>
-    <div class="panel-rule"></div>
-    <div class="dl-body">
-      <div class="dl-grid">
-        <article class="dl" data-only="iphone">
-          <span class="dl-device" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.6"/><path d="M10.5 5.2h3"/></svg></span>
-          <div class="dl-text">
-            <h3>iPhone</h3>
-            <p class="dl-meta" id="dl-iphone-meta">Latest official build</p>
+    <!-- ================= DOWNLOAD ================= -->
+    <section class="block" id="download" aria-labelledby="download-h">
+      <div class="block-head">
+        <p class="kicker">Download</p>
+        <h2 id="download-h">Grab a <em>ticket.</em></h2>
+        <p>The newest official build of each app, straight from <code>main</code> once its checks pass. Tap a ticket to download the IPA.</p>
+      </div>
+      <div class="passes">
+        <article class="pass is-loading" data-app="iphone">
+          <div class="ticket-shell">
+            <a class="ticket" id="dl-iphone" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-iPhone.ipa" aria-label="Download Lineup for iPhone">
+              <span class="t-main">
+                <span class="t-holo" aria-hidden="true"></span>
+                <span class="t-foil" aria-hidden="true"></span>
+                <span class="t-top"><b>Lineup</b><span>Admit one · sideload</span></span>
+                <span class="t-device">iPhone</span>
+                <svg class="t-glyph" viewBox="0 0 76 96" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><rect x="16" y="4" width="44" height="88" rx="10"/><path d="M32 12h12"/></svg>
+                <span class="t-fields">
+                  <span class="f"><span class="k">Version</span><span class="v" data-f="version">0.0.0</span></span>
+                  <span class="f"><span class="k">Build</span><span class="v" data-f="build">000</span></span>
+                  <span class="f"><span class="k">Size</span><span class="v" data-f="size">00 MB</span></span>
+                  <span class="f"><span class="k">Date</span><span class="v" data-f="date">Oct 00</span></span>
+                </span>
+                <span class="t-code"><svg class="barcode" aria-hidden="true"></svg><span class="t-hash"><span>SHA-256</span><span data-f="hash">checking</span></span></span>
+              </span>
+              <span class="t-stub">
+                <span class="t-say"><span class="idle">Download .ipa</span><span class="busy">Downloading</span></span>
+                <span class="t-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg></span>
+              </span>
+            </a>
           </div>
-          <a class="dl-btn" id="dl-iphone" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-iPhone.ipa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg><span>Download</span></a>
+          <div class="pass-foot">
+            <span class="pass-meta" id="dl-iphone-meta">Latest official build</span>
+            <button type="button" class="copy-link" data-copy="dl-iphone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
+          </div>
         </article>
-        <article class="dl" data-only="tv">
-          <span class="dl-device" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="12.5" rx="2"/><path d="M8.5 20.5h7M12 16.5v4"/></svg></span>
-          <div class="dl-text">
-            <h3>Apple TV</h3>
-            <p class="dl-meta" id="dl-tv-meta">Latest official build</p>
+
+        <article class="pass is-loading" data-app="tv">
+          <div class="ticket-shell">
+            <a class="ticket" id="dl-tv" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-AppleTV.ipa" aria-label="Download Lineup for Apple TV">
+              <span class="t-main">
+                <span class="t-holo" aria-hidden="true"></span>
+                <span class="t-foil" aria-hidden="true"></span>
+                <span class="t-top"><b>Lineup</b><span>Admit one · sideload</span></span>
+                <span class="t-device">Apple TV</span>
+                <svg class="t-glyph" viewBox="0 0 76 96" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><rect x="4" y="18" width="68" height="44" rx="6"/><path d="M26 78h24M38 62v16"/></svg>
+                <span class="t-fields">
+                  <span class="f"><span class="k">Version</span><span class="v" data-f="version">0.0.0</span></span>
+                  <span class="f"><span class="k">Build</span><span class="v" data-f="build">000</span></span>
+                  <span class="f"><span class="k">Size</span><span class="v" data-f="size">00 MB</span></span>
+                  <span class="f"><span class="k">Date</span><span class="v" data-f="date">Oct 00</span></span>
+                </span>
+                <span class="t-code"><svg class="barcode" aria-hidden="true"></svg><span class="t-hash"><span>SHA-256</span><span data-f="hash">checking</span></span></span>
+              </span>
+              <span class="t-stub">
+                <span class="t-say"><span class="idle">Download .ipa</span><span class="busy">Downloading</span></span>
+                <span class="t-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg></span>
+              </span>
+            </a>
           </div>
-          <a class="dl-btn" id="dl-tv" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-AppleTV.ipa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg><span>Download</span></a>
+          <div class="pass-foot">
+            <span class="pass-meta" id="dl-tv-meta">Latest official build</span>
+            <button type="button" class="copy-link" data-copy="dl-tv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
+          </div>
         </article>
       </div>
-      <p class="note">Unsigned IPAs: install them with the sideloading app you already use. Every official build replaces these on its own.</p>
-    </div>
-  </section>
-
-  <section class="ledger panel" aria-labelledby="ledger-h">
-    <div class="panel-head">
-      <span class="tile teal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></span>
-      <h2 id="ledger-h">Releases</h2>
-      <span class="acc">Tap one to filter</span>
-    </div>
-    <div class="panel-rule"></div>
-    <div class="ledger-list">
-      <button type="button" class="rel" data-release="93" aria-pressed="false"><span class="pr">#93</span><span class="when">Oct 19 · 11:49 PM PT</span><span class="what">Apple TV gets the iPhone's features; Auto Sync reads small scoreboards and late plays</span><span class="n">15 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
-      <button type="button" class="rel" data-release="91" aria-pressed="false"><span class="pr">#91</span><span class="when">Oct 19 · 1:40 PM PT</span><span class="what">Auto Sync, team pages, more ratings, per-show tracks, performance sweep</span><span class="n">7 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
-      <button type="button" class="rel" data-release="89" aria-pressed="false"><span class="pr">#89</span><span class="when">Oct 19 · 1:56 AM PT</span><span class="what">Live stats for soccer, tennis, UFC and racing; AetherEngine 7.40.1; engine logos</span><span class="n">3 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
-      <button type="button" class="rel" data-release="87" aria-pressed="false"><span class="pr">#87</span><span class="when">Oct 18 · 8:51 PM PT</span><span class="what">Skip Intro on Apple TV, live stats and Multiview on iPhone</span><span class="n">4 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
-      <button type="button" class="rel" data-release="84" aria-pressed="false"><span class="pr">#84</span><span class="when">Oct 18 · 2:56 PM PT</span><span class="what">Library collections, subtitles, seek previews, replays and playback controls</span><span class="n">11 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
-    </div>
-  </section>
-
-  <!-- ================= SPORTS ================= -->
-  <section class="section panel" id="sports" aria-labelledby="sports-h">
-    <div class="panel-head"><span class="tile green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14"/><circle cx="12" cy="12" r="2.6"/></svg></span><h2 id="sports-h">Sports</h2><span class="acc" data-count></span></div>
-    <div class="panel-rule"></div>
-
-    <article class="entry" id="auto-sync" data-platform="iphone tv" data-release="91 93" data-release-iphone="91 93" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91, #93 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>8c42937</span><span>6767e77</span><span>4b3d7c5</span><span>b66c0e8</span></div>
+      <div class="install-row">
+        <button type="button" class="link-btn" popovertarget="install">How do I install these?</button>
+        <span>Unsigned IPAs. Every official build replaces these on its own.</span>
       </div>
-      <div class="copy">
-        <h3>Auto Sync</h3>
-        <p class="lede">Live stats line up with your stream by reading the scoreboard on your screen. Nothing to press.</p>
-        <ol class="steps">
-          <li><span><b>It takes a frame.</b> About once a second, the app grabs the frame on screen from whichever player engine is running.</span></li>
-          <li><span><b>It finds the scoreboard.</b> A corner scoreboard can be a few percent of the picture, too small to read in one look at the whole frame. Until it finds a clock, the app reads the top and bottom thirds in turn, zoomed in, and the whole frame every third time. Once found, it reads only a band across the clock's line. Baseball finds its scoreboard by the line naming a team.</span></li>
-          <li><span><b>It reads the scoreboard.</b> Apple's text recognition reads the broadcast's clock and score on the device itself. Nothing is uploaded.</span></li>
-          <li><span><b>It compares with ESPN.</b> ESPN records the real time of every play, with the game clock and score at that moment. When your screen first shows 4:52 and ESPN logged a play at 4:52 thirty seconds ago, your stream is 30 seconds behind.</span></li>
-          <li><span><b>It waits for late plays.</b> ESPN posts some plays minutes after they happen. In one NHL game a hit reached the feed 208 seconds late, so a stream only a little behind showed it first. Every clock and score the app sees is kept for ten minutes and checked again as plays arrive, so it still locks.</span></li>
-          <li><span><b>It follows each sport's clock.</b> Football and basketball count down, as ESPN does. Hockey broadcasts count down while ESPN counts up within the period, so the app converts. Soccer's clock never stops, so every reading gives an answer, which is why soccer locks fastest. Baseball has no clock, so it waits for the score to change.</span></li>
-          <li><span><b>It throws out bad readings.</b> A misread digit or a clock frozen at 45:00 in stoppage time can mislead. The app waits until several estimates agree within 2.5 seconds, then adds a little on the late side so stats never run ahead of the picture.</span></li>
-          <li><span><b>It keeps watching.</b> Once locked it checks every 4 seconds in case the stream reconnects. It rests when the device runs hot or the app is in the background, and it can be switched off where you sync by hand.</span></li>
-          <li><span><b>It says what it sees.</b> The sync line says how far it has got: no picture from the player, looking for the scoreboard, or the clock it reads and how many plays agree.</span></li>
+      <div class="pop" id="install" popover>
+        <h3>Installing a build</h3>
+        <ol>
+          <li><span>Download the IPA for your device. The iPhone build goes on iPhone, the Apple TV build on Apple TV.</span></li>
+          <li><span>Open it in the sideloading app you already use. It signs the app for your device.</span></li>
+          <li><span>Come back for the next one. Each official build replaces the one here, so the tickets always hold the newest.</span></li>
         </ol>
-        <p class="stack"><span>Vision text recognition</span><span>region of interest</span><span>AVPlayerItemVideoOutput</span><span>Aether displayed frame</span><span>libvlc snapshot</span><span>ESPN play wallclock</span></p>
+        <p class="fine">Builds come from Lineup's <code>main</code> branch once its checks pass and are published to this site's GitHub releases. The SHA-256 on each ticket is the file's own.</p>
+        <button type="button" class="pop-close" popovertarget="install" popovertargetaction="hide">Got it</button>
       </div>
-    </article>
+    </section>
+  </div>
 
-    <article class="entry" id="live-stats" data-platform="iphone tv" data-release="87 93" data-release-iphone="87" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#87 iPhone · #93 Apple TV</span><span data-when="iphone">#87 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>ffd595d</span><span>ef88db0</span><span>b66c0e8</span></div>
+  <!-- ================= FILTER BAR ================= -->
+  <div class="toolbar">
+    <div class="wrap">
+      <div class="seg" role="group" aria-label="Show features for">
+        <span class="seg-thumb" aria-hidden="true"></span>
+        <button type="button" id="f-all" data-plat="all" aria-pressed="true">All <span class="n">25</span></button>
+        <button type="button" id="f-iphone" data-plat="iphone" aria-pressed="false">iPhone <span class="n">23</span></button>
+        <button type="button" id="f-tv" data-plat="tv" aria-pressed="false">Apple TV <span class="n">22</span></button>
       </div>
-      <div class="copy">
-        <h3>Live stats while you watch</h3>
-        <p class="lede">A Stats button on the player opens the game's score, win probability, play-by-play, box score and leaders.<span data-only="iphone"> On iPhone they sit under the picture upright, and beside it turned sideways.</span><span data-only="tv"> On Apple TV they sit beside the picture, which narrows to make room.</span></p>
-        <dl class="how">
-          <div><dt>Source</dt><dd>ESPN's game feed, every 10 seconds. NFL, college football, NBA, NHL and MLB.</dd></div>
-          <div><dt>No spoilers</dt><dd>ESPN stamps each play with the moment it happened. A play shows only once that moment plus your stream's delay has passed. The box score waits for the latest play that came with it, and the game's score on the Sports tab is held the same way.</dd></div>
-          <div><dt>Pausing</dt><dd>Holds everything back by as long as you paused.</dd></div>
-          <div><dt>Sync by hand</dt><dd>The sync steps show the latest play and ask if it's on your screen: <b class="ui">It Just Happened</b>, <b class="ui">Not Yet</b> or <b class="ui">Already Saw It</b>. Until a sync, everything is held a minute.</dd></div>
-          <div data-only="tv"><dt>On Apple TV</dt><dd>Stats is a button in the full-screen controls. Every row takes focus, so the lists scroll. Select on a play syncs to it, and the sync chip opens the sync steps inside the panel. Back leaves the steps, then closes the panel. It stays open from one game to the next.</dd></div>
-        </dl>
-        <p class="stack"><span>ESPN summary feed</span><span>play time + stream delay</span><span>delay kept per channel</span><span data-only="tv">1280 × 720 picture, 640 pt panel</span></p>
-      </div>
-    </article>
+      <button type="button" class="rel-chip" id="rel-chip" hidden aria-label="Stop filtering by release"><span class="w">Release</span><b>#</b><i aria-hidden="true">✕</i></button>
+      <span class="kbd-hint"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><span>to filter,</span><kbd>esc</kbd><span>to clear</span></span>
+    </div>
+  </div>
 
-    <article class="entry" id="more-sports" data-platform="iphone tv" data-release="89 93" data-release-iphone="89" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#89 iPhone · #93 Apple TV</span><span data-when="iphone">#89 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>83bc555</span><span>6fade34</span><span>a2ec372</span><span>2518198</span><span>b66c0e8</span></div>
-      </div>
-      <div class="copy">
-        <h3>Soccer, tennis, UFC and racing stats</h3>
-        <p class="lede">The same stats panel for four more sports, with the same rule: nothing shows before your picture does.</p>
-        <dl class="how">
-          <div><dt>Soccer</dt><dd>ESPN's match commentary logs every shot, corner, card and substitution with its moment. Goals carry no running score, so the app counts it from the commentary.</dd></div>
-          <div><dt>Scoreboards</dt><dd>For tennis, UFC, F1 and NASCAR, ESPN only has a scoreboard. The app compares each scoreboard with the last one to work out what happened in between (a break of serve, a takedown, a new leader) and times each change between the two fetches, so it never shows early.</dd></div>
-          <div><dt>Tennis</dt><dd>The match with the server marked, and a Courts tab with every court of the day. Other courts update live. Only the match on your screen is held.</dd></div>
-          <div><dt>UFC</dt><dd>The fight on now and the whole card, with results and how each fight ended.</dd></div>
-          <div><dt>Racing</dt><dd>The session, the lap and the running order, with places gained and lost.</dd></div>
-        </dl>
-        <p class="stack"><span>ESPN soccer commentary</span><span>scoreboards compared fetch to fetch</span><span>5 s polling</span></p>
-      </div>
-    </article>
+  <div class="wrap notes" id="changes">
+    <aside class="side">
+      <!-- ================= RELEASES ================= -->
+      <section class="releases" id="releases" aria-labelledby="releases-h">
+        <h2 class="side-h" id="releases-h">Releases <span>Tap to filter</span></h2>
+        <div class="ledger-list">
+          <button type="button" class="rel" data-release="93" aria-pressed="false"><span class="pr">#93</span><span class="when">Oct 19 · 11:49 PM PT</span><span class="what">Apple TV gets the iPhone's features; Auto Sync reads small scoreboards and late plays</span><span class="n">15 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
+          <button type="button" class="rel" data-release="91" aria-pressed="false"><span class="pr">#91</span><span class="when">Oct 19 · 1:40 PM PT</span><span class="what">Auto Sync, team pages, more ratings, per-show tracks, performance sweep</span><span class="n">7 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
+          <button type="button" class="rel" data-release="89" aria-pressed="false"><span class="pr">#89</span><span class="when">Oct 19 · 1:56 AM PT</span><span class="what">Live stats for soccer, tennis, UFC and racing; AetherEngine 7.40.1; engine logos</span><span class="n">3 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
+          <button type="button" class="rel" data-release="87" aria-pressed="false"><span class="pr">#87</span><span class="when">Oct 18 · 8:51 PM PT</span><span class="what">Skip Intro on Apple TV, live stats and Multiview on iPhone</span><span class="n">4 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
+          <button type="button" class="rel" data-release="84" aria-pressed="false"><span class="pr">#84</span><span class="when">Oct 18 · 2:56 PM PT</span><span class="what">Library collections, subtitles, seek previews, replays and playback controls</span><span class="n">11 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
+        </div>
+      </section>
+      <nav class="toc" aria-label="Sections">
+        <a href="#sports"><span>01</span>Sports<i></i></a>
+        <a href="#library"><span>02</span>Library<i></i></a>
+        <a href="#player"><span>03</span>Player<i></i></a>
+        <a href="#hood"><span>04</span>Under the hood<i></i></a>
+      </nav>
+    </aside>
 
-    <article class="entry" id="multiview" data-platform="iphone" data-release="87">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#87 · Oct 18</div>
-        <div class="shas"><span>5aa7f90</span></div>
-      </div>
-      <div class="copy">
-        <h3>Multiview</h3>
-        <p class="lede">Two live channels on one screen. While one plays, touch and hold another game or TV Guide channel and pick <b class="ui">Watch Side by Side</b>.</p>
-        <dl class="how">
-          <div><dt>Layouts</dt><dd>Sideways: side by side, or one large with one small. Upright: one over the other. Swap moves them around.</dd></div>
-          <div><dt>Sound</dt><dd>Tap a picture to hear it. The other is muted and keeps playing. Double-tap a picture to make it the large one.</dd></div>
-          <div><dt>Under it</dt><dd>Each player has its own mute that survives reconnects, and the phone's audio stays on until the last player lets go.</dd></div>
-        </dl>
-        <p class="stack"><span>per-player mute</span><span>shared audio session</span><span>failover per picture</span></p>
-      </div>
-    </article>
+    <div class="feed">
+      <!-- ================= SPORTS ================= -->
+      <section class="section" id="sports" aria-labelledby="sports-h">
+        <header class="sec-head"><span class="sec-no">01</span><h2 id="sports-h">Sports</h2><span class="sec-count" data-count></span><p class="sec-sub">Live games, live stats and the channels that carry them.</p></header>
+        <div class="entries">
 
-    <article class="entry" id="team-pages" data-platform="iphone tv" data-release="91 93" data-release-iphone="91" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>b58cad2</span><span>2fad50a</span><span>3bbf753</span><span>d553ae7</span></div>
-      </div>
-      <div class="copy">
-        <h3>Team pages</h3>
-        <p class="lede">Schedule, standings, roster, injuries and news for any team.<span data-only="iphone"> On iPhone, touch and hold a game and pick a team, or tap the arrow beside a team in <b class="ui">Settings › My Teams</b>.</span><span data-only="tv"> On Apple TV, hold Select on a game and pick a team.</span> Follow the team from its header.</p>
-        <dl class="how">
-          <div><dt>Source</dt><dd>ESPN, loaded one tab at a time and kept for five minutes.</dd></div>
-          <div><dt>Standings</dt><dd>The team's own conference, division or league table, sorted the way the league ranks it.</dd></div>
-          <div><dt>Injuries</dt><dd>From the roster, as each player's status.</dd></div>
-          <div><dt>Off-season</dt><dd>By then ESPN's "1st in NL West" line already belongs to next season, so it shows only while the team's next game is within two weeks.</dd></div>
-        </dl>
-        <p class="stack"><span>ESPN team, schedule, standings, roster, news</span><span>5 min cache</span></p>
-      </div>
-    </article>
+        <article class="entry" id="auto-sync" data-platform="iphone tv" data-release="91 93" data-release-iphone="91 93" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91, #93 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>8c42937</span><span>6767e77</span><span>4b3d7c5</span><span>b66c0e8</span></div>
+          </div>
+          <div class="copy">
+            <h3>Auto Sync</h3>
+            <p class="lede">Live stats line up with your stream by reading the scoreboard on your screen. Nothing to press.</p>
+            <ol class="steps">
+              <li><span><b>It takes a frame.</b> About once a second, the app grabs the frame on screen from whichever player engine is running.</span></li>
+              <li><span><b>It finds the scoreboard.</b> A corner scoreboard can be a few percent of the picture, too small to read in one look at the whole frame. Until it finds a clock, the app reads the top and bottom thirds in turn, zoomed in, and the whole frame every third time. Once found, it reads only a band across the clock's line. Baseball finds its scoreboard by the line naming a team.</span></li>
+              <li><span><b>It reads the scoreboard.</b> Apple's text recognition reads the broadcast's clock and score on the device itself. Nothing is uploaded.</span></li>
+              <li><span><b>It compares with ESPN.</b> ESPN records the real time of every play, with the game clock and score at that moment. When your screen first shows 4:52 and ESPN logged a play at 4:52 thirty seconds ago, your stream is 30 seconds behind.</span></li>
+              <li><span><b>It waits for late plays.</b> ESPN posts some plays minutes after they happen. In one NHL game a hit reached the feed 208 seconds late, so a stream only a little behind showed it first. Every clock and score the app sees is kept for ten minutes and checked again as plays arrive, so it still locks.</span></li>
+              <li><span><b>It follows each sport's clock.</b> Football and basketball count down, as ESPN does. Hockey broadcasts count down while ESPN counts up within the period, so the app converts. Soccer's clock never stops, so every reading gives an answer, which is why soccer locks fastest. Baseball has no clock, so it waits for the score to change.</span></li>
+              <li><span><b>It throws out bad readings.</b> A misread digit or a clock frozen at 45:00 in stoppage time can mislead. The app waits until several estimates agree within 2.5 seconds, then adds a little on the late side so stats never run ahead of the picture.</span></li>
+              <li><span><b>It keeps watching.</b> Once locked it checks every 4 seconds in case the stream reconnects. It rests when the device runs hot or the app is in the background, and it can be switched off where you sync by hand.</span></li>
+              <li><span><b>It says what it sees.</b> The sync line says how far it has got: no picture from the player, looking for the scoreboard, or the clock it reads and how many plays agree.</span></li>
+            </ol>
+            <p class="stack"><span>Vision text recognition</span><span>region of interest</span><span>AVPlayerItemVideoOutput</span><span>Aether displayed frame</span><span>libvlc snapshot</span><span>ESPN play wallclock</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="game-replays" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>465195d</span><span>3bbf753</span></div>
-      </div>
-      <div class="copy">
-        <h3>Game Replays in My Teams</h3>
-        <p class="lede">Recordings of your followed NFL teams' games, in a Game Replays section under My Teams on the Sports tab.</p>
-        <dl class="how">
-          <div><dt>Source</dt><dd>Your provider's own catch-up archive.</dd></div>
-          <div><dt>Matching</dt><dd>Only channels that keep recordings are checked. A recording counts only if it has ended, is still inside the provider's keep window and names a matchup with one of your teams. RedZone, highlights and news are left out.</dd></div>
-          <div><dt>Opening</dt><dd>The app checks again that the recording is still there. If it's gone you get Retry, never a live feed.</dd></div>
-        </dl>
-        <p class="stack"><span>Xtream catch-up archive</span><span>3 requests at a time</span><span>5 min cache</span></p>
-      </div>
-    </article>
+        <article class="entry" id="live-stats" data-platform="iphone tv" data-release="87 93" data-release-iphone="87" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#87 iPhone · #93 Apple TV</span><span data-when="iphone">#87 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>ffd595d</span><span>ef88db0</span><span>b66c0e8</span></div>
+          </div>
+          <div class="copy">
+            <h3>Live stats while you watch</h3>
+            <p class="lede">A Stats button on the player opens the game's score, win probability, play-by-play, box score and leaders.<span data-only="iphone"> On iPhone they sit under the picture upright, and beside it turned sideways.</span><span data-only="tv"> On Apple TV they sit beside the picture, which narrows to make room.</span></p>
+            <dl class="how">
+              <div><dt>Source</dt><dd>ESPN's game feed, every 10 seconds. NFL, college football, NBA, NHL and MLB.</dd></div>
+              <div><dt>No spoilers</dt><dd>ESPN stamps each play with the moment it happened. A play shows only once that moment plus your stream's delay has passed. The box score waits for the latest play that came with it, and the game's score on the Sports tab is held the same way.</dd></div>
+              <div><dt>Pausing</dt><dd>Holds everything back by as long as you paused.</dd></div>
+              <div><dt>Sync by hand</dt><dd>The sync steps show the latest play and ask if it's on your screen: <b class="ui">It Just Happened</b>, <b class="ui">Not Yet</b> or <b class="ui">Already Saw It</b>. Until a sync, everything is held a minute.</dd></div>
+              <div data-only="tv"><dt>On Apple TV</dt><dd>Stats is a button in the full-screen controls. Every row takes focus, so the lists scroll. Select on a play syncs to it, and the sync chip opens the sync steps inside the panel. Back leaves the steps, then closes the panel. It stays open from one game to the next.</dd></div>
+            </dl>
+            <p class="stack"><span>ESPN summary feed</span><span>play time + stream delay</span><span>delay kept per channel</span><span data-only="tv">1280 × 720 picture, 640 pt panel</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="catch-up" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>0b0accb</span><span>3bbf753</span></div>
-      </div>
-      <div class="copy">
-        <h3>Catch Up from a live game</h3>
-        <p class="lede">Hold any live game<span data-only="iphone"> (touch and hold on iPhone)</span><span data-only="tv"> (hold Select on Apple TV)</span> and pick <b class="ui">Catch Up</b> to open that channel's recordings. You can start the current game over while it's still on.</p>
-        <dl class="how">
-          <div><dt>Works for</dt><dd>Any sport whose matched channel keeps recordings, including a backup channel when the main one doesn't.</dd></div>
-          <div data-only="tv"><dt>Recordings only</dt><dd>On Apple TV, a recording that can't be found says so. It never falls back to the live channel.</dd></div>
-        </dl>
-        <p class="stack"><span>matched event channels</span><span>TV Guide catch-up list</span></p>
-      </div>
-    </article>
+        <article class="entry" id="more-sports" data-platform="iphone tv" data-release="89 93" data-release-iphone="89" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#89 iPhone · #93 Apple TV</span><span data-when="iphone">#89 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>83bc555</span><span>6fade34</span><span>a2ec372</span><span>2518198</span><span>b66c0e8</span></div>
+          </div>
+          <div class="copy">
+            <h3>Soccer, tennis, UFC and racing stats</h3>
+            <p class="lede">The same stats panel for four more sports, with the same rule: nothing shows before your picture does.</p>
+            <dl class="how">
+              <div><dt>Soccer</dt><dd>ESPN's match commentary logs every shot, corner, card and substitution with its moment. Goals carry no running score, so the app counts it from the commentary.</dd></div>
+              <div><dt>Scoreboards</dt><dd>For tennis, UFC, F1 and NASCAR, ESPN only has a scoreboard. The app compares each scoreboard with the last one to work out what happened in between (a break of serve, a takedown, a new leader) and times each change between the two fetches, so it never shows early.</dd></div>
+              <div><dt>Tennis</dt><dd>The match with the server marked, and a Courts tab with every court of the day. Other courts update live. Only the match on your screen is held.</dd></div>
+              <div><dt>UFC</dt><dd>The fight on now and the whole card, with results and how each fight ended.</dd></div>
+              <div><dt>Racing</dt><dd>The session, the lap and the running order, with places gained and lost.</dd></div>
+            </dl>
+            <p class="stack"><span>ESPN soccer commentary</span><span>scoreboards compared fetch to fetch</span><span>5 s polling</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="game-channels" data-platform="tv" data-release="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">Apple TV</span></div>
-        <div class="rels">#93 · Oct 19</div>
-        <div class="shas"><span>3bbf753</span><span>d553ae7</span></div>
-      </div>
-      <div class="copy">
-        <h3>Channels for a live game</h3>
-        <p class="lede">Hold Select on a live game and pick <b class="ui">Channels</b> to see every channel carrying it, as on iPhone.</p>
-        <dl class="how">
-          <div><dt>Checked</dt><dd>Every channel listed is one Lineup checked against the guide for this game. The one playing is marked.</dd></div>
-          <div><dt>Searching</dt><dd><b class="ui">Choose Another Channel</b> in the same menu still searches your provider yourself.</dd></div>
-        </dl>
-        <p class="stack"><span>matched event channels</span><span>guide-checked</span></p>
-      </div>
-    </article>
+        <article class="entry" id="multiview" data-platform="iphone" data-release="87">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span></div>
+            <div class="rels">#87 · Oct 18</div>
+            <div class="shas"><span>5aa7f90</span></div>
+          </div>
+          <div class="copy">
+            <h3>Multiview</h3>
+            <p class="lede">Two live channels on one screen. While one plays, touch and hold another game or TV Guide channel and pick <b class="ui">Watch Side by Side</b>.</p>
+            <dl class="how">
+              <div><dt>Layouts</dt><dd>Sideways: side by side, or one large with one small. Upright: one over the other. Swap moves them around.</dd></div>
+              <div><dt>Sound</dt><dd>Tap a picture to hear it. The other is muted and keeps playing. Double-tap a picture to make it the large one.</dd></div>
+              <div><dt>Under it</dt><dd>Each player has its own mute that survives reconnects, and the phone's audio stays on until the last player lets go.</dd></div>
+            </dl>
+            <p class="stack"><span>per-player mute</span><span>shared audio session</span><span>failover per picture</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="tennis-channels" data-platform="iphone tv" data-release="91">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels">#91 · Oct 19</div>
-        <div class="shas"><span>b633a05</span></div>
-      </div>
-      <div class="copy">
-        <h3>Shared tennis channels</h3>
-        <p class="lede">Channels like Tennis Channel's "Center Court Live" switch between several tournaments.</p>
-        <dl class="how">
-          <div><dt>Ranking</dt><dd>A guide entry that names several tournaments ranks behind a channel showing only yours.</dd></div>
-          <div><dt>Labels</dt><dd>A Multiview tile on a shared channel reads "Center Court Live · 5 tournaments" instead of the wrong tournament's name.</dd></div>
-        </dl>
-        <p class="stack"><span>guide title parsing</span><span>shared ranks behind dedicated</span></p>
-      </div>
-    </article>
+        <article class="entry" id="team-pages" data-platform="iphone tv" data-release="91 93" data-release-iphone="91" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>b58cad2</span><span>2fad50a</span><span>3bbf753</span><span>d553ae7</span></div>
+          </div>
+          <div class="copy">
+            <h3>Team pages</h3>
+            <p class="lede">Schedule, standings, roster, injuries and news for any team.<span data-only="iphone"> On iPhone, touch and hold a game and pick a team, or tap the arrow beside a team in <b class="ui">Settings › My Teams</b>.</span><span data-only="tv"> On Apple TV, hold Select on a game and pick a team.</span> Follow the team from its header.</p>
+            <dl class="how">
+              <div><dt>Source</dt><dd>ESPN, loaded one tab at a time and kept for five minutes.</dd></div>
+              <div><dt>Standings</dt><dd>The team's own conference, division or league table, sorted the way the league ranks it.</dd></div>
+              <div><dt>Injuries</dt><dd>From the roster, as each player's status.</dd></div>
+              <div><dt>Off-season</dt><dd>By then ESPN's "1st in NL West" line already belongs to next season, so it shows only while the team's next game is within two weeks.</dd></div>
+            </dl>
+            <p class="stack"><span>ESPN team, schedule, standings, roster, news</span><span>5 min cache</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="matching" data-platform="iphone tv" data-release="91">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels">#91 · Oct 19</div>
-        <div class="shas"><span>6533827</span></div>
-      </div>
-      <div class="copy">
-        <h3>Faster channel matching</h3>
-        <p class="lede">Once a game has its channel, the app stops looking.</p>
-        <dl class="how">
-          <div><dt>Kept games</dt><dd>A game that already has a channel isn't searched again. Each check reads only that one channel's guide.</dd></div>
-          <div data-only="iphone"><dt>Shortlists</dt><dd>On iPhone, each game's shortlist of possible channels carries over between checks. A full scan runs only when your channels or guide change.</dd></div>
-          <div><dt>College</dt><dd>College games keep their matches like every other league.</dd></div>
-          <div><dt>Launch</dt><dd>Matches from your last session are recognized right away instead of searched for again.</dd></div>
-        </dl>
-        <p class="stack"><span>match signatures</span><span>carried shortlists</span><span>rebuild on guide change</span></p>
-      </div>
-    </article>
-  </section>
+        <article class="entry" id="game-replays" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>465195d</span><span>3bbf753</span></div>
+          </div>
+          <div class="copy">
+            <h3>Game Replays in My Teams</h3>
+            <p class="lede">Recordings of your followed NFL teams' games, in a Game Replays section under My Teams on the Sports tab.</p>
+            <dl class="how">
+              <div><dt>Source</dt><dd>Your provider's own catch-up archive.</dd></div>
+              <div><dt>Matching</dt><dd>Only channels that keep recordings are checked. A recording counts only if it has ended, is still inside the provider's keep window and names a matchup with one of your teams. RedZone, highlights and news are left out.</dd></div>
+              <div><dt>Opening</dt><dd>The app checks again that the recording is still there. If it's gone you get Retry, never a live feed.</dd></div>
+            </dl>
+            <p class="stack"><span>Xtream catch-up archive</span><span>3 requests at a time</span><span>5 min cache</span></p>
+          </div>
+        </article>
 
-  <!-- ================= LIBRARY ================= -->
-  <section class="section panel" id="library" aria-labelledby="library-h">
-    <div class="panel-head"><span class="tile indigo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#fff"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></span><h2 id="library-h">Library</h2><span class="acc" data-count></span></div>
-    <div class="panel-rule"></div>
+        <article class="entry" id="catch-up" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>0b0accb</span><span>3bbf753</span></div>
+          </div>
+          <div class="copy">
+            <h3>Catch Up from a live game</h3>
+            <p class="lede">Hold any live game<span data-only="iphone"> (touch and hold on iPhone)</span><span data-only="tv"> (hold Select on Apple TV)</span> and pick <b class="ui">Catch Up</b> to open that channel's recordings. You can start the current game over while it's still on.</p>
+            <dl class="how">
+              <div><dt>Works for</dt><dd>Any sport whose matched channel keeps recordings, including a backup channel when the main one doesn't.</dd></div>
+              <div data-only="tv"><dt>Recordings only</dt><dd>On Apple TV, a recording that can't be found says so. It never falls back to the live channel.</dd></div>
+            </dl>
+            <p class="stack"><span>matched event channels</span><span>TV Guide catch-up list</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="collections" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>5a803b2</span><span>46d4f04</span><span>6ea8eb6</span><span>948a031</span></div>
-      </div>
-      <div class="copy">
-        <h3>Collections</h3>
-        <p class="lede">Your own collections of movies and shows.<span data-only="iphone"> On iPhone they're on a Collections shelf.</span><span data-only="tv"> On Apple TV they're under <b class="ui">Collections</b> in the Library menu.</span></p>
-        <dl class="how">
-          <div data-only="iphone"><dt>Making them</dt><dd>Create, rename and delete. Add a title by touching and holding its poster, or with the collection button on its page. Each card previews up to three posters.</dd></div>
-          <div data-only="tv"><dt>Making them</dt><dd>Hold Select on a movie or show and pick <b class="ui">Collections</b>. Select adds it to or takes it out of each one, and a new one is named with the TV's keyboard. Hold Select on a collection to rename or delete it.</dd></div>
-          <div><dt>Server ones</dt><dd>Your media servers' own collections are listed too, to browse. They aren't changed.</dd></div>
-          <div><dt>Storage</dt><dd>On the device. Each title is saved with its server, so the same title on two servers stays separate.</dd></div>
-          <div data-only="iphone"><dt>Order</dt><dd>Move Collections like any other shelf in <b class="ui">Edit Shelves</b>.</dd></div>
-        </dl>
-        <p class="stack"><span>on-device store</span><span>server + item ID keys</span></p>
-      </div>
-    </article>
+        <article class="entry" id="game-channels" data-platform="tv" data-release="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">Apple TV</span></div>
+            <div class="rels">#93 · Oct 19</div>
+            <div class="shas"><span>3bbf753</span><span>d553ae7</span></div>
+          </div>
+          <div class="copy">
+            <h3>Channels for a live game</h3>
+            <p class="lede">Hold Select on a live game and pick <b class="ui">Channels</b> to see every channel carrying it, as on iPhone.</p>
+            <dl class="how">
+              <div><dt>Checked</dt><dd>Every channel listed is one Lineup checked against the guide for this game. The one playing is marked.</dd></div>
+              <div><dt>Searching</dt><dd><b class="ui">Choose Another Channel</b> in the same menu still searches your provider yourself.</dd></div>
+            </dl>
+            <p class="stack"><span>matched event channels</span><span>guide-checked</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="shelves" data-platform="iphone" data-release="84">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#84 · Oct 18</div>
-        <div class="shas"><span>a8c1e91</span></div>
-      </div>
-      <div class="copy">
-        <h3>Smoother shelves</h3>
-        <p class="lede">Poster rows were rebuilt on UIKit's recycled-cell lists with fixed card sizes.</p>
-        <dl class="how">
-          <div><dt>Scrolling</dt><dd>Posters and titles no longer jump.</dd></div>
-          <div><dt>Position</dt><dd>Each row remembers its place by the first poster you were looking at.</dd></div>
-          <div><dt>Loading</dt><dd>Posters load just before they scroll into view.</dd></div>
-        </dl>
-        <p class="stack"><span>UICollectionView</span><span>recycled cells</span><span>nearby prefetch</span></p>
-      </div>
-    </article>
+        <article class="entry" id="tennis-channels" data-platform="iphone tv" data-release="91">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels">#91 · Oct 19</div>
+            <div class="shas"><span>b633a05</span></div>
+          </div>
+          <div class="copy">
+            <h3>Shared tennis channels</h3>
+            <p class="lede">Channels like Tennis Channel's "Center Court Live" switch between several tournaments.</p>
+            <dl class="how">
+              <div><dt>Ranking</dt><dd>A guide entry that names several tournaments ranks behind a channel showing only yours.</dd></div>
+              <div><dt>Labels</dt><dd>A Multiview tile on a shared channel reads "Center Court Live · 5 tournaments" instead of the wrong tournament's name.</dd></div>
+            </dl>
+            <p class="stack"><span>guide title parsing</span><span>shared ranks behind dedicated</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="ratings" data-platform="iphone tv" data-release="91 93" data-release-iphone="91" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>55760f6</span><span>6ea8eb6</span></div>
-      </div>
-      <div class="copy">
-        <h3>Metacritic and Letterboxd</h3>
-        <p class="lede">The Metascore and Letterboxd's star average, beside IMDb, TMDB and Rotten Tomatoes.</p>
-        <dl class="how">
-          <div><dt>Source</dt><dd>MDBList.</dd></div>
-          <div><dt>Look</dt><dd>The Metascore sits in Metacritic's own green, yellow or red box.</dd></div>
-          <div data-only="iphone"><dt>Small screens</dt><dd>Five chips tighten up before they wrap to a second line.</dd></div>
-        </dl>
-        <p class="stack"><span>MDBList</span><span>Metascore out of 100</span><span>Letterboxd out of 5</span></p>
-      </div>
-    </article>
+        <article class="entry" id="matching" data-platform="iphone tv" data-release="91">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels">#91 · Oct 19</div>
+            <div class="shas"><span>6533827</span></div>
+          </div>
+          <div class="copy">
+            <h3>Faster channel matching</h3>
+            <p class="lede">Once a game has its channel, the app stops looking.</p>
+            <dl class="how">
+              <div><dt>Kept games</dt><dd>A game that already has a channel isn't searched again. Each check reads only that one channel's guide.</dd></div>
+              <div data-only="iphone"><dt>Shortlists</dt><dd>On iPhone, each game's shortlist of possible channels carries over between checks. A full scan runs only when your channels or guide change.</dd></div>
+              <div><dt>College</dt><dd>College games keep their matches like every other league.</dd></div>
+              <div><dt>Launch</dt><dd>Matches from your last session are recognized right away instead of searched for again.</dd></div>
+            </dl>
+            <p class="stack"><span>match signatures</span><span>carried shortlists</span><span>rebuild on guide change</span></p>
+          </div>
+        </article>
+        </div>
+      </section>
 
-    <article class="entry" id="betterposters" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>5a803b2</span><span>6ea8eb6</span></div>
-      </div>
-      <div class="copy">
-        <h3>BetterPosters</h3>
-        <p class="lede">An opt-in switch in <b class="ui">Settings › Metadata</b> that swaps movie and show posters for BetterPosters versions, with ratings printed on them.</p>
-        <dl class="how">
-          <div><dt>Matching</dt><dd>By IMDb ID. Titles without one keep their art.</dd></div>
-          <div data-only="iphone"><dt>Style</dt><dd><b class="ui">Poster Style</b> opens BetterPosters' own designer.</dd></div>
-          <div data-only="tv"><dt>Style</dt><dd>On Apple TV, BetterPosters' default style, on movie and show cards. The switch is under <b class="ui">Artwork</b>.</dd></div>
-          <div><dt>Loading</dt><dd>Your normal poster stays up until the new one loads, and stays if it fails.</dd></div>
-        </dl>
-        <p class="stack"><span>btttr.cc</span><span>IMDb ID</span></p>
-      </div>
-    </article>
+      <!-- ================= LIBRARY ================= -->
+      <section class="section" id="library" aria-labelledby="library-h">
+        <header class="sec-head"><span class="sec-no">02</span><h2 id="library-h">Library</h2><span class="sec-count" data-count></span><p class="sec-sub">Your media servers, with better posters and more to go on.</p></header>
+        <div class="entries">
 
-    <article class="entry" id="title-logos" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>b8e66dc</span><span>6ea8eb6</span></div>
-      </div>
-      <div class="copy">
-        <h3>Title logos</h3>
-        <p class="lede">The Library hero and title pages show the movie's or show's own logo in place of plain text.</p>
-        <dl class="how">
-          <div><dt>Source</dt><dd>Fanart.tv. English first, then logos with no language, HD first, then the most liked.</dd></div>
-          <div><dt>Loading</dt><dd>The text holds the logo's space until it arrives, so nothing shifts.</dd></div>
-          <div data-only="tv"><dt>Server first</dt><dd>On Apple TV your server's own logo comes first. Fanart.tv fills in where it has none.</dd></div>
-          <div><dt>Setting</dt><dd><b class="ui">Settings › Metadata › Title Logos</b>.</dd></div>
-        </dl>
-        <p class="stack"><span>Fanart.tv API</span><span>TMDB, IMDb and TVDB IDs</span></p>
-      </div>
-    </article>
-  </section>
+        <article class="entry" id="collections" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>5a803b2</span><span>46d4f04</span><span>6ea8eb6</span><span>948a031</span></div>
+          </div>
+          <div class="copy">
+            <h3>Collections</h3>
+            <p class="lede">Your own collections of movies and shows.<span data-only="iphone"> On iPhone they're on a Collections shelf.</span><span data-only="tv"> On Apple TV they're under <b class="ui">Collections</b> in the Library menu.</span></p>
+            <dl class="how">
+              <div data-only="iphone"><dt>Making them</dt><dd>Create, rename and delete. Add a title by touching and holding its poster, or with the collection button on its page. Each card previews up to three posters.</dd></div>
+              <div data-only="tv"><dt>Making them</dt><dd>Hold Select on a movie or show and pick <b class="ui">Collections</b>. Select adds it to or takes it out of each one, and a new one is named with the TV's keyboard. Hold Select on a collection to rename or delete it.</dd></div>
+              <div><dt>Server ones</dt><dd>Your media servers' own collections are listed too, to browse. They aren't changed.</dd></div>
+              <div><dt>Storage</dt><dd>On the device. Each title is saved with its server, so the same title on two servers stays separate.</dd></div>
+              <div data-only="iphone"><dt>Order</dt><dd>Move Collections like any other shelf in <b class="ui">Edit Shelves</b>.</dd></div>
+            </dl>
+            <p class="stack"><span>on-device store</span><span>server + item ID keys</span></p>
+          </div>
+        </article>
 
-  <!-- ================= PLAYER ================= -->
-  <section class="section panel" id="player" aria-labelledby="player-h">
-    <div class="panel-head"><span class="tile blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg></span><h2 id="player-h">Player</h2><span class="acc" data-count></span></div>
-    <div class="panel-rule"></div>
+        <article class="entry" id="shelves" data-platform="iphone" data-release="84">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span></div>
+            <div class="rels">#84 · Oct 18</div>
+            <div class="shas"><span>a8c1e91</span></div>
+          </div>
+          <div class="copy">
+            <h3>Smoother shelves</h3>
+            <p class="lede">Poster rows were rebuilt on UIKit's recycled-cell lists with fixed card sizes.</p>
+            <dl class="how">
+              <div><dt>Scrolling</dt><dd>Posters and titles no longer jump.</dd></div>
+              <div><dt>Position</dt><dd>Each row remembers its place by the first poster you were looking at.</dd></div>
+              <div><dt>Loading</dt><dd>Posters load just before they scroll into view.</dd></div>
+            </dl>
+            <p class="stack"><span>UICollectionView</span><span>recycled cells</span><span>nearby prefetch</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="skip-intro" data-platform="iphone tv" data-release="84 87" data-release-iphone="84" data-release-tv="87">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#84 iPhone · #87 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#87 · Oct 18</span></div>
-        <div class="shas"><span>5a803b2</span><span>b8e66dc</span><span>27314bd</span></div>
-      </div>
-      <div class="copy">
-        <h3>Skip Intro, Skip Recap and credits</h3>
-        <p class="lede">Buttons to skip an episode's intro or recap, and Next Episode right as the credits start.</p>
-        <dl class="how">
-          <div><dt>Source</dt><dd>IntroDB, a community database of intro, recap and credit times, looked up by the show's IMDb ID and the episode number. Only high-confidence times are used.</dd></div>
-          <div><dt>Skipping</dt><dd>The buttons appear only inside an intro or recap. Nothing skips by itself.<span data-only="tv"> On Apple TV one press of Select skips, and Back dismisses it.</span></dd></div>
-          <div><dt>Next Episode</dt><dd>At the start of the credits when IntroDB knows them. Otherwise the last 30 seconds, as before.</dd></div>
-          <div><dt>After credits</dt><dd>Movies with a scene after the credits show a small notice while the credits run.</dd></div>
-          <div><dt>Settings</dt><dd>Four separate switches in <b class="ui">Settings › Metadata</b>.</dd></div>
-        </dl>
-        <p class="stack"><span>IntroDB segments</span><span>confidence ≥ 0.8</span><span>cached a day</span></p>
-      </div>
-    </article>
+        <article class="entry" id="ratings" data-platform="iphone tv" data-release="91 93" data-release-iphone="91" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>55760f6</span><span>6ea8eb6</span></div>
+          </div>
+          <div class="copy">
+            <h3>Metacritic and Letterboxd</h3>
+            <p class="lede">The Metascore and Letterboxd's star average, beside IMDb, TMDB and Rotten Tomatoes.</p>
+            <dl class="how">
+              <div><dt>Source</dt><dd>MDBList.</dd></div>
+              <div><dt>Look</dt><dd>The Metascore sits in Metacritic's own green, yellow or red box.</dd></div>
+              <div data-only="iphone"><dt>Small screens</dt><dd>Five chips tighten up before they wrap to a second line.</dd></div>
+            </dl>
+            <p class="stack"><span>MDBList</span><span>Metascore out of 100</span><span>Letterboxd out of 5</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="subtitles-online" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>709a2f0</span><span>b0bbcb7</span></div>
-      </div>
-      <div class="copy">
-        <h3>Find Subtitles Online</h3>
-        <p class="lede"><b class="ui">Subtitles › Find Subtitles Online</b> searches OpenSubtitles. No account needed.</p>
-        <dl class="how">
-          <div><dt>Matching</dt><dd>The title's IMDb ID, or for an episode the show's ID plus season and episode.</dd></div>
-          <div data-only="iphone"><dt>Searching</dt><dd>Pick a language, then narrow the releases with the filter box. Filtering runs on the phone without searching again.</dd></div>
-          <div data-only="tv"><dt>Searching</dt><dd>Pick a language, then the release that matches your video.</dd></div>
-          <div><dt>Adding it</dt><dd>The file is checked, then added to the playing video without a restart.</dd></div>
-          <div data-only="iphone"><dt>Limits</dt><dd>AetherEngine and VLC only, and not in Picture in Picture.</dd></div>
-          <div data-only="tv"><dt>Engines</dt><dd>Both of Apple TV's engines. If the stream reconnects, the subtitle is added again.</dd></div>
-        </dl>
-        <p class="stack"><span>OpenSubtitles API</span><span>SubRip sidecar</span></p>
-      </div>
-    </article>
+        <article class="entry" id="betterposters" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>5a803b2</span><span>6ea8eb6</span></div>
+          </div>
+          <div class="copy">
+            <h3>BetterPosters</h3>
+            <p class="lede">An opt-in switch in <b class="ui">Settings › Metadata</b> that swaps movie and show posters for BetterPosters versions, with ratings printed on them.</p>
+            <dl class="how">
+              <div><dt>Matching</dt><dd>By IMDb ID. Titles without one keep their art.</dd></div>
+              <div data-only="iphone"><dt>Style</dt><dd><b class="ui">Poster Style</b> opens BetterPosters' own designer.</dd></div>
+              <div data-only="tv"><dt>Style</dt><dd>On Apple TV, BetterPosters' default style, on movie and show cards. The switch is under <b class="ui">Artwork</b>.</dd></div>
+              <div><dt>Loading</dt><dd>Your normal poster stays up until the new one loads, and stays if it fails.</dd></div>
+            </dl>
+            <p class="stack"><span>btttr.cc</span><span>IMDb ID</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="subtitle-settings" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>a6c8069</span><span>b0bbcb7</span></div>
-      </div>
-      <div class="copy">
-        <h3>Subtitle Settings</h3>
-        <p class="lede">Language, size, background and timing for subtitles, under the Subtitles menu.</p>
-        <dl class="how">
-          <div><dt>Language</dt><dd>A preferred subtitle language, also used by Find Subtitles Online.</dd></div>
-          <div><dt>Look</dt><dd>Four text sizes and an optional background.</dd></div>
-          <div><dt>Timing</dt><dd>Earlier or later in quarter-second steps, up to 30 seconds either way.</dd></div>
-          <div><dt>Engines</dt><dd>AetherEngine changes the look live. VLC changes it on the next video.</dd></div>
-        </dl>
-        <p class="stack"><span>0.25 s steps</span><span>±30 s</span></p>
-      </div>
-    </article>
+        <article class="entry" id="title-logos" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>b8e66dc</span><span>6ea8eb6</span></div>
+          </div>
+          <div class="copy">
+            <h3>Title logos</h3>
+            <p class="lede">The Library hero and title pages show the movie's or show's own logo in place of plain text.</p>
+            <dl class="how">
+              <div><dt>Source</dt><dd>Fanart.tv. English first, then logos with no language, HD first, then the most liked.</dd></div>
+              <div><dt>Loading</dt><dd>The text holds the logo's space until it arrives, so nothing shifts.</dd></div>
+              <div data-only="tv"><dt>Server first</dt><dd>On Apple TV your server's own logo comes first. Fanart.tv fills in where it has none.</dd></div>
+              <div><dt>Setting</dt><dd><b class="ui">Settings › Metadata › Title Logos</b>.</dd></div>
+            </dl>
+            <p class="stack"><span>Fanart.tv API</span><span>TMDB, IMDb and TVDB IDs</span></p>
+          </div>
+        </article>
+        </div>
+      </section>
 
-    <article class="entry" id="seek-previews" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>a6c8069</span><span>b0bbcb7</span></div>
-      </div>
-      <div class="copy">
-        <h3>Seek previews</h3>
-        <p class="lede">Moving along the seek bar shows a thumbnail of that moment.</p>
-        <dl class="how">
-          <div><dt>Source</dt><dd>Jellyfin's Trickplay sheets: grids of thumbnails your server already made.</dd></div>
-          <div><dt>How</dt><dd>The app downloads a sheet, cuts out the frame it needs and keeps it. Seeking never waits on a thumbnail.</dd></div>
-          <div><dt>Works with</dt><dd>Jellyfin servers with Trickplay turned on.</dd></div>
-        </dl>
-        <p class="stack"><span>Jellyfin Trickplay</span><span>cropped and cached on device</span></p>
-      </div>
-    </article>
+      <!-- ================= PLAYER ================= -->
+      <section class="section" id="player" aria-labelledby="player-h">
+        <header class="sec-head"><span class="sec-no">03</span><h2 id="player-h">Player</h2><span class="sec-count" data-count></span><p class="sec-sub">Subtitles, sound, seeking and the engines underneath.</p></header>
+        <div class="entries">
 
-    <article class="entry" id="audio-memory" data-platform="iphone tv" data-release="91 93" data-release-iphone="91" data-release-tv="93">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
-        <div class="shas"><span>d090b3a</span><span>b0bbcb7</span></div>
-      </div>
-      <div class="copy">
-        <h3>Audio menu and per-show memory</h3>
-        <p class="lede">Each show remembers the sound and subtitles you pick.<span data-only="iphone"> On iPhone there's also a new Audio menu for a title's sound tracks (languages, commentary) on all three player engines.</span></p>
-        <dl class="how">
-          <div><dt>What it keeps</dt><dd>The audio and subtitles you pick, including subtitles off, are saved for that show.</dd></div>
-          <div><dt>Next episode</dt><dd>The app finds the same track by name, then by language code, then by the language written in the track's name, like "Track 2 – [Spanish]".</dd></div>
-          <div><dt>Smooth start</dt><dd>Where it can, the player opens already on that language, so you don't hear it switch.</dd></div>
-          <div data-only="tv"><dt>On Apple TV</dt><dd>The Subtitles menu says when your choice is kept for the show.</dd></div>
-        </dl>
-        <p class="stack"><span>name → language code → language in title</span><span>up to 200 shows</span></p>
-      </div>
-    </article>
+        <article class="entry" id="skip-intro" data-platform="iphone tv" data-release="84 87" data-release-iphone="84" data-release-tv="87">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#84 iPhone · #87 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#87 · Oct 18</span></div>
+            <div class="shas"><span>5a803b2</span><span>b8e66dc</span><span>27314bd</span></div>
+          </div>
+          <div class="copy">
+            <h3>Skip Intro, Skip Recap and credits</h3>
+            <p class="lede">Buttons to skip an episode's intro or recap, and Next Episode right as the credits start.</p>
+            <dl class="how">
+              <div><dt>Source</dt><dd>IntroDB, a community database of intro, recap and credit times, looked up by the show's IMDb ID and the episode number. Only high-confidence times are used.</dd></div>
+              <div><dt>Skipping</dt><dd>The buttons appear only inside an intro or recap. Nothing skips by itself.<span data-only="tv"> On Apple TV one press of Select skips, and Back dismisses it.</span></dd></div>
+              <div><dt>Next Episode</dt><dd>At the start of the credits when IntroDB knows them. Otherwise the last 30 seconds, as before.</dd></div>
+              <div><dt>After credits</dt><dd>Movies with a scene after the credits show a small notice while the credits run.</dd></div>
+              <div><dt>Settings</dt><dd>Four separate switches in <b class="ui">Settings › Metadata</b>.</dd></div>
+            </dl>
+            <p class="stack"><span>IntroDB segments</span><span>confidence ≥ 0.8</span><span>cached a day</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="replay-seeking" data-platform="iphone" data-release="84">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#84 · Oct 18</div>
-        <div class="shas"><span>0f3b794</span><span>f0fbbee</span><span>a49cc62</span></div>
-      </div>
-      <div class="copy">
-        <h3>Replay seeking fixes</h3>
-        <p class="lede">Recordings now seek like Library videos.</p>
-        <dl class="how">
-          <div><dt>Seek bar</dt><dd>The same one Library videos use.</dd></div>
-          <div><dt>Skipping</dt><dd>AetherEngine and AVPlayer used to reopen the recording for a 10-second skip, which could jump back to the start of the minute. All three engines now seek inside the recording.</dd></div>
-          <div><dt>VLC paused</dt><dd>Pausing holds, and the position comes straight from VLC's own clock, so a paused seek lands where you put it.</dd></div>
-        </dl>
-        <p class="stack"><span>in-stream seeking</span><span>libvlc_media_player_get_time</span></p>
-      </div>
-    </article>
+        <article class="entry" id="subtitles-online" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>709a2f0</span><span>b0bbcb7</span></div>
+          </div>
+          <div class="copy">
+            <h3>Find Subtitles Online</h3>
+            <p class="lede"><b class="ui">Subtitles › Find Subtitles Online</b> searches OpenSubtitles. No account needed.</p>
+            <dl class="how">
+              <div><dt>Matching</dt><dd>The title's IMDb ID, or for an episode the show's ID plus season and episode.</dd></div>
+              <div data-only="iphone"><dt>Searching</dt><dd>Pick a language, then narrow the releases with the filter box. Filtering runs on the phone without searching again.</dd></div>
+              <div data-only="tv"><dt>Searching</dt><dd>Pick a language, then the release that matches your video.</dd></div>
+              <div><dt>Adding it</dt><dd>The file is checked, then added to the playing video without a restart.</dd></div>
+              <div data-only="iphone"><dt>Limits</dt><dd>AetherEngine and VLC only, and not in Picture in Picture.</dd></div>
+              <div data-only="tv"><dt>Engines</dt><dd>Both of Apple TV's engines. If the stream reconnects, the subtitle is added again.</dd></div>
+            </dl>
+            <p class="stack"><span>OpenSubtitles API</span><span>SubRip sidecar</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="info-tags" data-platform="tv" data-release="87">
-      <div class="meta">
-        <div class="plats"><span class="chip">Apple TV</span></div>
-        <div class="rels">#87 · Oct 18</div>
-        <div class="shas"><span>df8e775</span></div>
-      </div>
-      <div class="copy">
-        <h3>Info tags on the seek bar</h3>
-        <p class="lede">The engine, resolution and format badges (HDR, Dolby Vision, Atmos) moved from under the title to just above the seek bar, at half again the size.</p>
-        <p class="stack"><span>21 pt badges</span><span>above the seek bar or channel timeline</span></p>
-      </div>
-    </article>
+        <article class="entry" id="subtitle-settings" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>a6c8069</span><span>b0bbcb7</span></div>
+          </div>
+          <div class="copy">
+            <h3>Subtitle Settings</h3>
+            <p class="lede">Language, size, background and timing for subtitles, under the Subtitles menu.</p>
+            <dl class="how">
+              <div><dt>Language</dt><dd>A preferred subtitle language, also used by Find Subtitles Online.</dd></div>
+              <div><dt>Look</dt><dd>Four text sizes and an optional background.</dd></div>
+              <div><dt>Timing</dt><dd>Earlier or later in quarter-second steps, up to 30 seconds either way.</dd></div>
+              <div><dt>Engines</dt><dd>AetherEngine changes the look live. VLC changes it on the next video.</dd></div>
+            </dl>
+            <p class="stack"><span>0.25 s steps</span><span>±30 s</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="engine-logos" data-platform="iphone tv" data-release="89">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels">#89 · Oct 19</div>
-        <div class="shas"><span>4284136</span><span>f9eec01</span></div>
-      </div>
-      <div class="copy">
-        <h3>Engine logos</h3>
-        <p class="lede">AetherEngine's logo and VLC's cone sit beside the engine's name everywhere it's shown: player badges, Settings, the engine picker and the acknowledgements.</p>
-        <p class="stack"><span>inline, sized to the text</span></p>
-      </div>
-    </article>
+        <article class="entry" id="seek-previews" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>a6c8069</span><span>b0bbcb7</span></div>
+          </div>
+          <div class="copy">
+            <h3>Seek previews</h3>
+            <p class="lede">Moving along the seek bar shows a thumbnail of that moment.</p>
+            <dl class="how">
+              <div><dt>Source</dt><dd>Jellyfin's Trickplay sheets: grids of thumbnails your server already made.</dd></div>
+              <div><dt>How</dt><dd>The app downloads a sheet, cuts out the frame it needs and keeps it. Seeking never waits on a thumbnail.</dd></div>
+              <div><dt>Works with</dt><dd>Jellyfin servers with Trickplay turned on.</dd></div>
+            </dl>
+            <p class="stack"><span>Jellyfin Trickplay</span><span>cropped and cached on device</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="aether" data-platform="iphone tv" data-release="89">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels">#89 · Oct 19</div>
-        <div class="shas"><span>bfd33d7</span></div>
-      </div>
-      <div class="copy">
-        <h3>AetherEngine 7.40.1</h3>
-        <p class="lede">The main player engine moved up from 7.36.0.</p>
-        <dl class="how">
-          <div><dt>Live streams</dt><dd>Start near the newest video.</dd></div>
-          <div><dt>Reconnects</dt><dd>No longer show the same picture twice.</dd></div>
-          <div><dt>Slow servers</dt><dd>Large video segments no longer fail.</dd></div>
-          <div><dt>Starts, seeks</dt><dd>The clock waits for the picture.</dd></div>
-        </dl>
-        <p class="stack"><span>7.36.0 → 7.40.1</span></p>
-      </div>
-    </article>
-  </section>
+        <article class="entry" id="audio-memory" data-platform="iphone tv" data-release="91 93" data-release-iphone="91" data-release-tv="93">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
+            <div class="shas"><span>d090b3a</span><span>b0bbcb7</span></div>
+          </div>
+          <div class="copy">
+            <h3>Audio menu and per-show memory</h3>
+            <p class="lede">Each show remembers the sound and subtitles you pick.<span data-only="iphone"> On iPhone there's also a new Audio menu for a title's sound tracks (languages, commentary) on all three player engines.</span></p>
+            <dl class="how">
+              <div><dt>What it keeps</dt><dd>The audio and subtitles you pick, including subtitles off, are saved for that show.</dd></div>
+              <div><dt>Next episode</dt><dd>The app finds the same track by name, then by language code, then by the language written in the track's name, like "Track 2 – [Spanish]".</dd></div>
+              <div><dt>Smooth start</dt><dd>Where it can, the player opens already on that language, so you don't hear it switch.</dd></div>
+              <div data-only="tv"><dt>On Apple TV</dt><dd>The Subtitles menu says when your choice is kept for the show.</dd></div>
+            </dl>
+            <p class="stack"><span>name → language code → language in title</span><span>up to 200 shows</span></p>
+          </div>
+        </article>
 
-  <!-- ================= UNDER THE HOOD ================= -->
-  <section class="section panel" id="hood" aria-labelledby="hood-h">
-    <div class="panel-head"><span class="tile orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-5"/></svg></span><h2 id="hood-h">Under the hood</h2><span class="acc" data-count></span></div>
-    <div class="panel-rule"></div>
+        <article class="entry" id="replay-seeking" data-platform="iphone" data-release="84">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span></div>
+            <div class="rels">#84 · Oct 18</div>
+            <div class="shas"><span>0f3b794</span><span>f0fbbee</span><span>a49cc62</span></div>
+          </div>
+          <div class="copy">
+            <h3>Replay seeking fixes</h3>
+            <p class="lede">Recordings now seek like Library videos.</p>
+            <dl class="how">
+              <div><dt>Seek bar</dt><dd>The same one Library videos use.</dd></div>
+              <div><dt>Skipping</dt><dd>AetherEngine and AVPlayer used to reopen the recording for a 10-second skip, which could jump back to the start of the minute. All three engines now seek inside the recording.</dd></div>
+              <div><dt>VLC paused</dt><dd>Pausing holds, and the position comes straight from VLC's own clock, so a paused seek lands where you put it.</dd></div>
+            </dl>
+            <p class="stack"><span>in-stream seeking</span><span>libvlc_media_player_get_time</span></p>
+          </div>
+        </article>
 
-    <article class="entry" id="performance" data-platform="iphone tv" data-release="91">
-      <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-        <div class="rels">#91 · Oct 19</div>
-        <div class="shas"><span>0ab6fce</span><span>f574f13</span></div>
-      </div>
-      <div class="copy">
-        <h3>Performance sweep</h3>
-        <p class="lede">Less work on every screen, every refresh and every launch.</p>
-        <dl class="how">
-          <div><dt>Redrawing</dt><dd>The app moved to Swift's newer change tracking (Observation), so a screen redraws only when what it shows changes.</dd></div>
-          <div><dt>Guide</dt><dd>The app asks your provider whether the guide changed, and skips the download if it didn't.</dd></div>
-          <div><dt>Opening</dt><dd>The schedule is saved to a file, so the app opens with it already filled in.</dd></div>
-          <div><dt>Re-checks</dt><dd>Refreshes where only scores changed re-check channels at most every 5 minutes.</dd></div>
-          <div data-only="iphone"><dt>Heat</dt><dd>In Multiview, when the phone runs hot, the muted picture drops its quality.</dd></div>
-          <div data-only="iphone"><dt>Reports</dt><dd>On iPhone, a Device Reports screen in Settings shows Apple's own performance reports for the app.</dd></div>
-        </dl>
-        <p class="stack"><span>Swift Observation</span><span>ETag / If-Modified-Since</span><span>MetricKit</span></p>
-      </div>
-    </article>
-  </section>
+        <article class="entry" id="info-tags" data-platform="tv" data-release="87">
+          <div class="meta">
+            <div class="plats"><span class="chip">Apple TV</span></div>
+            <div class="rels">#87 · Oct 18</div>
+            <div class="shas"><span>df8e775</span></div>
+          </div>
+          <div class="copy">
+            <h3>Info tags on the seek bar</h3>
+            <p class="lede">The engine, resolution and format badges (HDR, Dolby Vision, Atmos) moved from under the title to just above the seek bar, at half again the size.</p>
+            <p class="stack"><span>21 pt badges</span><span>above the seek bar or channel timeline</span></p>
+          </div>
+        </article>
 
-  <div class="empty panel" id="empty" hidden>
-    <p>No features match these filters.</p>
-    <button type="button" class="replay" id="clear">Show everything</button>
+        <article class="entry" id="engine-logos" data-platform="iphone tv" data-release="89">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels">#89 · Oct 19</div>
+            <div class="shas"><span>4284136</span><span>f9eec01</span></div>
+          </div>
+          <div class="copy">
+            <h3>Engine logos</h3>
+            <p class="lede">AetherEngine's logo and VLC's cone sit beside the engine's name everywhere it's shown: player badges, Settings, the engine picker and the acknowledgements.</p>
+            <p class="stack"><span>inline, sized to the text</span></p>
+          </div>
+        </article>
+
+        <article class="entry" id="aether" data-platform="iphone tv" data-release="89">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels">#89 · Oct 19</div>
+            <div class="shas"><span>bfd33d7</span></div>
+          </div>
+          <div class="copy">
+            <h3>AetherEngine 7.40.1</h3>
+            <p class="lede">The main player engine moved up from 7.36.0.</p>
+            <dl class="how">
+              <div><dt>Live streams</dt><dd>Start near the newest video.</dd></div>
+              <div><dt>Reconnects</dt><dd>No longer show the same picture twice.</dd></div>
+              <div><dt>Slow servers</dt><dd>Large video segments no longer fail.</dd></div>
+              <div><dt>Starts, seeks</dt><dd>The clock waits for the picture.</dd></div>
+            </dl>
+            <p class="stack"><span>7.36.0 → 7.40.1</span></p>
+          </div>
+        </article>
+        </div>
+      </section>
+
+      <!-- ================= UNDER THE HOOD ================= -->
+      <section class="section" id="hood" aria-labelledby="hood-h">
+        <header class="sec-head"><span class="sec-no">04</span><h2 id="hood-h">Under the hood</h2><span class="sec-count" data-count></span><p class="sec-sub">Less work on every screen.</p></header>
+        <div class="entries">
+
+        <article class="entry" id="performance" data-platform="iphone tv" data-release="91">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels">#91 · Oct 19</div>
+            <div class="shas"><span>0ab6fce</span><span>f574f13</span></div>
+          </div>
+          <div class="copy">
+            <h3>Performance sweep</h3>
+            <p class="lede">Less work on every screen, every refresh and every launch.</p>
+            <dl class="how">
+              <div><dt>Redrawing</dt><dd>The app moved to Swift's newer change tracking (Observation), so a screen redraws only when what it shows changes.</dd></div>
+              <div><dt>Guide</dt><dd>The app asks your provider whether the guide changed, and skips the download if it didn't.</dd></div>
+              <div><dt>Opening</dt><dd>The schedule is saved to a file, so the app opens with it already filled in.</dd></div>
+              <div><dt>Re-checks</dt><dd>Refreshes where only scores changed re-check channels at most every 5 minutes.</dd></div>
+              <div data-only="iphone"><dt>Heat</dt><dd>In Multiview, when the phone runs hot, the muted picture drops its quality.</dd></div>
+              <div data-only="iphone"><dt>Reports</dt><dd>On iPhone, a Device Reports screen in Settings shows Apple's own performance reports for the app.</dd></div>
+            </dl>
+            <p class="stack"><span>Swift Observation</span><span>ETag / If-Modified-Since</span><span>MetricKit</span></p>
+          </div>
+        </article>
+        </div>
+      </section>
+
+      <div class="empty" id="empty" hidden>
+        <p>Nothing matches these filters.</p>
+        <button type="button" id="clear">Show everything</button>
+      </div>
+    </div>
   </div>
 </main>
 
-<footer>
-  <div class="gutter">
-    <span>Lineup for iPhone and Apple TV · tester notes</span>
-    <span>Updated Oct 20, 2026</span>
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-big" aria-hidden="true">lineup</div>
+    <div class="foot-row">
+      <span>Lineup for iPhone and Apple TV · tester notes</span>
+      <span id="updated">Updated Oct 20, 2026</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
   </div>
 </footer>
 
 <script>
 (() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const motion = matchMedia("(prefers-reduced-motion: no-preference)");
+  const store = {
+    set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+  };
+
+  // ---------- theme: auto, dark, light ----------
+  const root = document.documentElement;
+  const themeButton = $("#theme");
+  const showTheme = mode => {
+    if (mode === "auto") delete root.dataset.theme; else root.dataset.theme = mode;
+    themeButton.dataset.mode = mode;
+    themeButton.setAttribute("aria-label", "Theme: " + mode + ". Change theme");
+    themeButton.title = mode === "auto" ? "Theme follows your device" : "Theme: " + mode;
+  };
+  showTheme(root.dataset.theme || "auto");
+  themeButton.addEventListener("click", () => {
+    const order = ["auto", "dark", "light"];
+    const next = order[(order.indexOf(themeButton.dataset.mode) + 1) % order.length];
+    showTheme(next);
+    store.set("lineup-notes-theme", next === "auto" ? null : next);
+  });
+
   // ---------- filters ----------
   const state = { plat: "all", rel: null };
-  const entries = [...document.querySelectorAll(".entry")];
-  const sections = [...document.querySelectorAll(".section")];
-  const platButtons = [...document.querySelectorAll(".filters button")];
-  const relButtons = [...document.querySelectorAll(".rel")];
-  const empty = document.getElementById("empty");
+  const entries = $$(".entry");
+  const sections = $$(".section");
+  const seg = $(".seg");
+  const platButtons = $$(".seg button[data-plat]");
+  const relButtons = $$(".rel");
+  const relChip = $("#rel-chip");
+  const empty = $("#empty");
+  const tocLinks = $$(".toc a");
   // Lines inside a card that are true of one app only, and labels that read
   // differently under each filter.
-  const onlyLines = [...document.querySelectorAll("[data-only]")];
-  const whenLines = [...document.querySelectorAll("[data-when]")];
+  const onlyLines = $$(".feed [data-only]");
+  const whenLines = $$(".feed [data-when]");
 
   const matches = (el, plat, rel) => {
     const p = el.dataset.platform.split(" ");
@@ -1009,14 +1443,26 @@ footer .gutter {
     const r = (own || el.dataset.release).split(" ");
     return (plat === "all" || p.includes(plat)) && (!rel || r.includes(rel));
   };
+  const count = (plat, rel) => entries.filter(el => matches(el, plat, rel)).length;
+  const plural = n => n + (n === 1 ? " feature" : " features");
+
+  // A filtered view is a link: ?app=tv&release=93.
+  const query = new URLSearchParams(location.search);
+  if (["iphone", "tv"].includes(query.get("app"))) state.plat = query.get("app");
+  if (relButtons.some(b => b.dataset.release === query.get("release"))) state.rel = query.get("release");
+
+  function placeThumb() {
+    const on = platButtons.find(b => b.dataset.plat === state.plat);
+    if (!on || !on.offsetWidth) return;
+    seg.style.setProperty("--x", on.offsetLeft + "px");
+    seg.style.setProperty("--w", on.offsetWidth + "px");
+    seg.dataset.plat = state.plat;
+  }
 
   function apply() {
     // A release with nothing for the chosen app drops out of the list, and
     // stops being the filter if it was.
-    if (state.rel) {
-      const left = entries.filter(el => matches(el, state.plat, state.rel)).length;
-      if (left === 0) state.rel = null;
-    }
+    if (state.rel && count(state.plat, state.rel) === 0) state.rel = null;
     let shown = 0;
     entries.forEach(el => {
       const on = matches(el, state.plat, state.rel);
@@ -1027,64 +1473,198 @@ footer .gutter {
       const n = sec.querySelectorAll(".entry:not([hidden])").length;
       sec.hidden = n === 0;
       const c = sec.querySelector("[data-count]");
-      if (c) c.textContent = n + (n === 1 ? " feature" : " features");
+      if (c) c.textContent = plural(n);
+      const link = tocLinks.find(a => a.hash === "#" + sec.id);
+      if (link) { link.hidden = n === 0; link.querySelector("i").textContent = n; }
     });
     platButtons.forEach(b => {
       b.setAttribute("aria-pressed", String(b.dataset.plat === state.plat));
-      b.querySelector(".n").textContent = entries.filter(el => matches(el, b.dataset.plat, state.rel)).length;
+      b.querySelector(".n").textContent = count(b.dataset.plat, state.rel);
     });
     relButtons.forEach(b => {
       b.setAttribute("aria-pressed", String(b.dataset.release === state.rel));
-      const n = entries.filter(el => matches(el, state.plat, b.dataset.release)).length;
-      b.querySelector(".n").textContent = n + (n === 1 ? " feature" : " features");
+      const n = count(state.plat, b.dataset.release);
+      b.querySelector(".n").textContent = plural(n);
       b.hidden = n === 0;
     });
     onlyLines.forEach(el => { el.hidden = state.plat !== "all" && el.dataset.only !== state.plat; });
     whenLines.forEach(el => { el.hidden = el.dataset.when !== state.plat; });
     empty.hidden = shown !== 0;
+    relChip.hidden = !state.rel;
+    relChip.querySelector("b").textContent = "#" + (state.rel || "");
+    placeThumb();
+    const url = new URL(location.href);
+    state.plat === "all" ? url.searchParams.delete("app") : url.searchParams.set("app", state.plat);
+    state.rel ? url.searchParams.set("release", state.rel) : url.searchParams.delete("release");
+    history.replaceState(null, "", url);
   }
 
-  platButtons.forEach(b => b.addEventListener("click", () => { state.plat = b.dataset.plat; apply(); }));
-  relButtons.forEach(b => b.addEventListener("click", () => {
-    state.rel = state.rel === b.dataset.release ? null : b.dataset.release;
-    apply();
-    const first = document.querySelector(".section:not([hidden])");
-    if (state.rel && first) first.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
-  }));
-  document.getElementById("clear").addEventListener("click", () => { state.plat = "all"; state.rel = null; apply(); });
+  // Filtering morphs the cards on screen into place where the browser can.
+  const nearView = el => { const r = el.getBoundingClientRect(); return r.bottom > -160 && r.top < innerHeight + 160; };
+  function change(mutate, after) {
+    const run = () => { mutate(); apply(); };
+    if (!document.startViewTransition || !motion.matches) { run(); if (after) after(); return; }
+    const named = [];
+    const name = () => entries.forEach(el => {
+      if (!el.hidden && !el.style.viewTransitionName && nearView(el)) { el.style.viewTransitionName = "e-" + el.id; named.push(el); }
+    });
+    name();
+    const t = document.startViewTransition(() => { run(); name(); });
+    t.finished.finally(() => { named.forEach(el => { el.style.viewTransitionName = ""; }); if (after) after(); });
+  }
+  const toFeed = () => {
+    const first = $(".section:not([hidden])");
+    if (first) first.scrollIntoView({ behavior: motion.matches ? "smooth" : "auto", block: "start" });
+  };
+  const setPlat = plat => { if (state.plat !== plat) change(() => { state.plat = plat; }); };
+
+  platButtons.forEach(b => b.addEventListener("click", () => setPlat(b.dataset.plat)));
+  relButtons.forEach(b => b.addEventListener("click", () => change(
+    () => { state.rel = state.rel === b.dataset.release ? null : b.dataset.release; },
+    () => { if (state.rel) toFeed(); }
+  )));
+  relChip.addEventListener("click", () => change(() => { state.rel = null; }));
+  $("#clear").addEventListener("click", () => change(() => { state.plat = "all"; state.rel = null; }));
+  const popoverOpen = () => { try { return !!document.querySelector(":popover-open"); } catch (e) { return false; } };
+  document.addEventListener("keydown", e => {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.isComposing || popoverOpen()) return;
+    if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
+    const plat = { "1": "all", "2": "iphone", "3": "tv" }[e.key];
+    if (plat) { setPlat(plat); return; }
+    if (e.key === "Escape" && (state.rel || state.plat !== "all")) change(() => { if (state.rel) state.rel = null; else state.plat = "all"; });
+  });
   apply();
+  if (document.fonts) document.fonts.ready.then(placeThumb);
+  addEventListener("resize", placeThumb);
+
+  // The section list follows the reading position.
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(items => items.forEach(it => {
+      if (it.isIntersecting) tocLinks.forEach(a => a.classList.toggle("is-current", a.hash === "#" + it.target.id));
+    }), { rootMargin: "-35% 0px -60% 0px" });
+    sections.forEach(s => io.observe(s));
+  }
+
+  // ---------- scoreboard ----------
+  const tally = (el, to) => {
+    if (!el) return;
+    const pad = n => String(n).padStart(2, "0");
+    if (!motion.matches) { el.textContent = pad(to); return; }
+    const start = performance.now();
+    const tick = now => {
+      const p = Math.min(1, (now - start) / 1100);
+      el.textContent = pad(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+  tally($("#sb-iphone"), count("iphone", null));
+  tally($("#sb-tv"), count("tv", null));
+  const latest = relButtons[0];
+  if (latest) {
+    $("#sb-new").textContent = count("all", latest.dataset.release);
+    const when = (latest.querySelector(".when") || {}).textContent || "";
+    $("#eyebrow-rel").textContent = "Release #" + latest.dataset.release + (when ? " · " + when.split(" · ")[0] : "");
+  }
+  $("#sb-date").textContent = $("#updated").textContent.trim();
 
   // ---------- downloads ----------
-  // Each official build is a release on this site's repo. An app's download
-  // is the newest release holding its IPA; until the list answers, the
-  // buttons point at the latest release.
+  // Each official build is a release on this site's repo. An app's ticket is
+  // the newest release holding its IPA; until the list answers, the tickets
+  // point at the latest release.
   const downloads = [
-    { key: "iphone", asset: "Lineup-iPhone.ipa" },
-    { key: "tv", asset: "Lineup-AppleTV.ipa" }
+    { key: "iphone", asset: "Lineup-iPhone.ipa", device: "iPhone" },
+    { key: "tv", asset: "Lineup-AppleTV.ipa", device: "Apple TV" }
   ];
-  const day = iso => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const day = iso => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  // Bars drawn from the file's own hash, so every build's ticket differs.
+  function barcode(svg, seed) {
+    const hex = (seed || "").toLowerCase().replace(/[^0-9a-f]/g, "") || "1f0e7a9c4b3d2e18";
+    let x = 0;
+    const bars = [];
+    const put = (w, ink) => { if (ink) bars.push('<rect x="' + x + '" width="' + w + '" height="40"/>'); x += w; };
+    put(1, 1); put(1, 0); put(1, 1); put(2, 0);
+    for (const ch of hex) { const v = parseInt(ch, 16); put(1 + (v & 3), 1); put(1 + ((v >> 2) % 3), 0); }
+    put(1, 1); put(1, 0); put(1, 1);
+    svg.setAttribute("viewBox", "0 0 " + x + " 40");
+    svg.setAttribute("preserveAspectRatio", "none");
+    svg.innerHTML = bars.join("");
+  }
+  const passes = downloads.map(d => ({ ...d, pass: $('.pass[data-app="' + d.key + '"]') }));
+  passes.forEach(({ pass }) => barcode($(".barcode", pass), ""));
+  const settle = (pass, values) => {
+    pass.classList.remove("is-loading");
+    Object.entries(values).forEach(([k, v]) => { const el = $('[data-f="' + k + '"]', pass); if (el) el.textContent = v; });
+  };
   fetch("https://api.github.com/repos/nulldev85/nulldev85.github.io/releases?per_page=30",
         { headers: { Accept: "application/vnd.github+json" } })
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(releases => downloads.forEach(({ key, asset }) => {
-      const button = document.getElementById("dl-" + key);
-      const meta = document.getElementById("dl-" + key + "-meta");
-      const file = releases.filter(r => !r.draft)
-        .map(r => (r.assets || []).find(a => a.name === asset && a.state === "uploaded"))
-        .find(Boolean);
-      if (!file) {
-        button.removeAttribute("href");
-        button.setAttribute("aria-disabled", "true");
-        button.querySelector("span").textContent = "Soon";
+    .then(releases => passes.forEach(({ key, asset, device, pass }) => {
+      const ticket = $(".ticket", pass);
+      const meta = $("#dl-" + key + "-meta");
+      let hit = null;
+      for (const release of releases) {
+        if (release.draft) continue;
+        const file = (release.assets || []).find(a => a.name === asset && a.state === "uploaded");
+        if (file) { hit = { release, file }; break; }
+      }
+      if (!hit) {
+        pass.classList.add("is-soon");
+        ticket.removeAttribute("href");
+        ticket.setAttribute("aria-disabled", "true");
+        $(".t-say .idle", pass).textContent = "Soon";
+        settle(pass, { version: "Soon", build: "—", size: "—", date: "—", hash: "no build yet" });
         meta.textContent = "Arrives with the next official build";
         return;
       }
-      button.href = file.browser_download_url;
-      const version = (file.label || "").replace(/^(iPhone|Apple TV)\s*/, "");
-      meta.textContent = [version, day(file.updated_at), Math.round(file.size / 1e6) + " MB"].filter(Boolean).join(" · ");
+      const { release, file } = hit;
+      ticket.href = file.browser_download_url;
+      const label = (file.label || "").replace(/^(iPhone|Apple TV)\s*/, "");
+      const parts = label.match(/^(\S+)\s*\((\d+)\)$/);
+      const digest = (file.digest || "").replace(/^sha256:/, "");
+      const commit = (release.tag_name || "").replace(/^build-/, "");
+      const size = Math.round(file.size / 1e6) + " MB";
+      settle(pass, {
+        version: parts ? parts[1] : (label || "—"),
+        build: parts ? parts[2] : "—",
+        size,
+        date: day(file.updated_at),
+        hash: digest ? digest.slice(0, 10) + "…" + digest.slice(-6) : "—"
+      });
+      barcode($(".barcode", pass), digest || commit);
+      ticket.setAttribute("aria-label", "Download Lineup for " + device + (label ? ", version " + label : "") + ", " + size);
+      meta.textContent = (commit ? "From commit " + commit : "Latest official build") + " · " + day(release.published_at || file.updated_at);
     }))
-    .catch(() => {});
+    .catch(() => passes.forEach(({ pass }) => settle(pass, { version: "Latest", build: "—", size: "—", date: "—", hash: "offline" })));
 
+  // Tilt and foil follow the pointer; a tap tears the stub.
+  const fine = matchMedia("(hover: hover) and (pointer: fine)");
+  $$(".ticket").forEach(ticket => {
+    const main = $(".t-main", ticket);
+    ticket.addEventListener("pointermove", e => {
+      if (!fine.matches || !motion.matches) return;
+      const r = ticket.getBoundingClientRect();
+      const m = main.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      ticket.style.setProperty("--rx", ((0.5 - y) * 7).toFixed(2) + "deg");
+      ticket.style.setProperty("--ry", ((x - 0.5) * 9).toFixed(2) + "deg");
+      main.style.setProperty("--mx", ((e.clientX - m.left) / m.width * 100).toFixed(1) + "%");
+      main.style.setProperty("--my", ((e.clientY - m.top) / m.height * 100).toFixed(1) + "%");
+    });
+    ticket.addEventListener("pointerleave", () => { ticket.style.removeProperty("--rx"); ticket.style.removeProperty("--ry"); });
+    ticket.addEventListener("click", e => {
+      if (ticket.getAttribute("aria-disabled") === "true") { e.preventDefault(); return; }
+      ticket.classList.add("is-torn");
+      clearTimeout(ticket.settle);
+      ticket.settle = setTimeout(() => ticket.classList.remove("is-torn"), 1700);
+    });
+  });
+  $$(".copy-link").forEach(button => button.addEventListener("click", async () => {
+    const link = document.getElementById(button.dataset.copy).href;
+    try { await navigator.clipboard.writeText(link); button.dataset.state = "done"; } catch (e) { return; }
+    clearTimeout(button.reset);
+    button.reset = setTimeout(() => { delete button.dataset.state; }, 1800);
+  }));
 })();
 </script>
 
