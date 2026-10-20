@@ -103,16 +103,11 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 .mark { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
 .mark-icon { display: block; width: 26px; height: 26px; border-radius: 6px; box-shadow: 0 0 0 1px rgb(255 255 255 / .12); }
 .mark b { font: 800 15px/1 var(--wide); font-stretch: 125%; letter-spacing: .02em; text-transform: uppercase; }
-.status { display: inline-flex; align-items: center; gap: 9px; }
-.status i { position: relative; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); }
-.status i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid var(--ink); opacity: 0; animation: ping 2.8s var(--expo) infinite; }
-@keyframes ping { 0% { transform: scale(.4); opacity: .7; } 70%, 100% { transform: scale(1.6); opacity: 0; } }
 .nav { margin-left: auto; display: flex; gap: 2px; }
 .nav a { padding: 7px 11px; border-radius: 6px; text-decoration: none; transition: color .2s, background-color .2s; }
 .nav a:hover { color: var(--ink); background: var(--panel); }
 .tb-build { padding-left: 18px; border-left: 1px solid var(--line-2); color: var(--ink-2); white-space: nowrap; }
 @media (max-width: 760px) { .nav { display: none; } .tb-build { margin-left: auto; border-left: 0; padding-left: 0; } }
-@media (max-width: 420px) { .status { display: none; } }
 
 /* Read out, not shown. */
 .vh { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -574,7 +569,6 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
       <img class="mark-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAIAAABt+uBvAAAEpUlEQVR42u3bz08bRxQH8PdmxzT2WsVWkibiUEW9cCgE0Uj8A43Uv6BVOfZQYSTMsZEKxjg4zR/AjyiK1L+gkZpLJf6CnrlBzw11VdWUYC+yPTOvhzGGBjdSyuzuOH3vbHntz74331nvGqem7gLXv5dgAga6UkkiYgXuIAZiIAZiIE4x7iAG4mIgBmIgTjHuIAZiIAbiYiBOsXehg4QQQggGGlKIiIjtdjuKIp+NUvtkWutOp3Pv3idTUx+3Wi3rxUDn7aOUevz4u+fPf3jx4scHD745Pj720yi4ceNm8utOFEUzMzMbGw9tRMzNzYVhuLu7m81mOcWAiLQ2+XzeHhoRldKl0gIA1GoPi8Wifc3/fQ0yxtiBQkQpA611qbRQra4dHR15NWvSl1EP+ka+9ZH0Z9r9NPIIyE8jv4A8NEonxYjMG44bBIHNNSKo1WrpGnm6x7e5tri4sL6ecq45HjH7JcjlrJWI0pw14VanA2TOmJwYKaUWF0srK9+m1UfCoY4C+FBkJGDP3ftKKbXW5fJSWkbClU4X6DqKn8KJzexNDaTcGdlZs0bNZjNhIzcphgAaaBzFNcBPM+FT+GAh+p0AJYAZnmL0VscdGAFAvf4oyfXIzWkmAAToAWkgTeazTP5p7paKp49WV1eazeRmzeUibU9oANAjHYeREBeNEpq1WPZBElCdGTlcjxD7fbS8vFSprCbTRy6BzIUd0MDoWe52TGt2pZLErDkeMbrUR/czoTXqAY3irDm7FiMYEkwXjb5uN7pAmbMUu8p+++KsAVC9/qhQKMQUak5HbNhnPDcKbxmgnuN9tl5eLlcqq+12O6Z7Ry530gbADDuNElCRuZ/Jfx/eDgAI0J2RMMaUy0uTk5Onp6dxGCV0NY8AQHQ3eC+LwvS3TaNRMS7Sg9IAAWKD9Oetw7+MloDk5oIftNZCiK2t7YODg2w2a4zxfsSG6FCA2DBqvnW4r7s5RONIRyklpdzZebKxUQ/DMA4d1ynW/+Y46CQNEKBoGDV/crivO+MYKCLx9tdiw3S01alW14vF4tXfMIURO++dgY7L3gkS0AGHvygigAEy/9ARDaO+PDk8cK8jk9GJK8UGOvPudXSSOrGMGAHJ19adEZysOICQAHpAeDZZ+7ozjqI3mpPlPsUAoAPmGuAfRn3x6tdfdHccgx4RXNoc/YcQs5O1vf2kWq0Wi0VjTGK3N6Sr4QoAIjJftX770yir43pV3km4dxynGAGMAf7ciyTi+yicZ9baWgo64PbGIQHkUdj9oUOdwWQlrwPO76w63O1fWJVT0wFv780P1p21tTR1IL2nO970hc8mq6+TZGaNQAe9ppNi7/gI5JuOX0Ae6ngE5KcOpPiMohDCGEK0z5VrP3VSSzFEPDl5JQRaCynl1ta2D5l1uYJCoZg80NjY2MuXhxMTE9PT00S0ublVrdZ8653+bxR37nyUwlERtdZKqdnZ2W63u7e3F4Yh+PQXjZSBrBEARFGEiLlcLqZ7EiO8SNtmsY3jrQ6k/qS9zzSppdhoFf9vnoEYiIEYiFOMO4iBGIiLgRiIU4w7iIEYiIEYiItTjDuIgZKqvwHjco7YoePdvgAAAABJRU5ErkJggg==" width="26" height="26" alt="">
       <b>Lineup</b>
     </a>
-    <span class="cap status"><i aria-hidden="true"></i>Tester notes</span>
     <nav class="nav cap" aria-label="Page">
       <a href="#download">Download</a>
       <a href="#releases">Releases</a>
