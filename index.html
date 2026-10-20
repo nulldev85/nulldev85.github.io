@@ -231,7 +231,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 .dl-art .draw { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .dl-art .glow { opacity: .55; }
 .js .dl-card:not(.is-in) .draw { stroke-dasharray: 1; stroke-dashoffset: 1; }
-.js .dl-card:not(.is-in) .fade { opacity: 0; }
+.js .dl-card:not(.is-in) .fade, .js .dl-card:not(.is-in) .led { opacity: 0; }
 .js .dl-card:not(.is-in) .mark-in { opacity: 0; transform: scale(.85); }
 .dl-card .mark-in { transform-box: fill-box; transform-origin: center; }
 @media (prefers-reduced-motion: no-preference) {
@@ -239,10 +239,13 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
   .js .dl-card.is-in .draw.late { animation-delay: .35s; }
   .js .dl-card.is-in .fade { animation: fade 1.2s .55s var(--ease) both; }
   .js .dl-card.is-in .mark-in { animation: pop 1s .9s var(--expo) both; }
+  /* The Apple TV's light comes on once it is drawn. */
+  .js .dl-card.is-in .led { animation: led-on .9s 1.5s var(--ease) both; }
 }
 @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @keyframes fade { from { opacity: 0; } }
 @keyframes pop { from { opacity: 0; transform: scale(.85); } }
+@keyframes led-on { 0% { opacity: 0; } 35% { opacity: 1; } 60% { opacity: .7; } 100% { opacity: 1; } }
 
 .dl-body { display: grid; gap: 20px; padding: 22px 24px 22px; align-content: start; }
 .dl-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
@@ -672,6 +675,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
                 <linearGradient id="edge-t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity=".22"/></linearGradient>
                 <linearGradient id="screen-t" x1="0" y1="0" x2=".7" y2="1"><stop offset="0" stop-color="#1c1c1b"/><stop offset="1" stop-color="#090909"/></linearGradient>
                 <radialGradient id="glow-t" cx=".5" cy=".45" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+                <radialGradient id="led-t"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
               </defs>
               <rect class="fade" x="16" y="26" width="288" height="160" rx="6" fill="url(#screen-t)"/>
               <rect class="fade glow" x="16" y="26" width="288" height="160" rx="6" fill="url(#glow-t)"/>
@@ -679,6 +683,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
               <path class="draw late" pathLength="1" d="M128 192l-6 14h76l-6-14" stroke="#fff" stroke-opacity=".3" stroke-width="1.2"/>
               <rect class="draw late" pathLength="1" x="112" y="232" width="96" height="28" rx="9" stroke="#fff" stroke-opacity=".55" stroke-width="1.2"/>
               <path class="draw late" pathLength="1" d="M120 260.5h80" stroke="#fff" stroke-opacity=".18" stroke-width="1"/>
+              <g class="led"><circle cx="199" cy="241" r="8" fill="url(#led-t)"/><circle cx="199" cy="241" r="2.1" fill="#fff"/></g>
               <rect class="draw late" pathLength="1" x="252" y="214" width="26" height="80" rx="13" stroke="#fff" stroke-opacity=".55" stroke-width="1.2"/>
               <circle class="draw late" pathLength="1" cx="265" cy="232" r="8.5" stroke="#fff" stroke-opacity=".35" stroke-width="1"/>
               <circle class="fade" cx="265" cy="252" r="2.4" fill="#fff" fill-opacity=".3"/>
