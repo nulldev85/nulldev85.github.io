@@ -114,9 +114,12 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 @media (max-width: 760px) { .nav { display: none; } .tb-build { margin-left: auto; border-left: 0; padding-left: 0; } }
 @media (max-width: 420px) { .status { display: none; } }
 
+/* Read out, not shown. */
+.vh { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
 /* ---------------- hero ---------------- */
-.hero { position: relative; padding: clamp(56px, 10vw, 136px) 0 8px; }
-/* A field of dots behind the words, lit by slow light and the pointer. */
+.hero { position: relative; padding: clamp(40px, 7vw, 96px) 0 8px; }
+/* A field of dots behind the intro, lit by slow light and the pointer. */
 .field {
   position: absolute;
   z-index: -1;
@@ -129,34 +132,13 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
           mask: radial-gradient(120% 90% at 50% 30%, #000 25%, transparent 78%);
 }
 .field canvas { display: block; width: 100%; height: 100%; }
-.hero-h {
-  margin: 20px 0 0;
-  font: 800 clamp(38px, 8.6vw, 118px)/.88 var(--wide);
-  font-stretch: 125%;
-  letter-spacing: -.015em;
-  text-transform: uppercase;
-}
-.hero-h .ln { display: block; overflow: hidden; padding-bottom: .05em; margin-bottom: -.05em; }
-.hero-h .ln > span { display: block; }
-.hero-h .l2 > span {
-  color: transparent;
-  background:
-    linear-gradient(100deg, transparent 40%, rgb(255 255 255 / .85) 50%, transparent 60%) 120% 0 / 260% 100% no-repeat,
-    linear-gradient(180deg, #3d3d3b, #232322);
-  -webkit-background-clip: text;
-          background-clip: text;
-}
 @media (prefers-reduced-motion: no-preference) {
-  .hero-h .ln > span { animation: rise-in 1.2s var(--expo) both; }
-  .hero-h .l2 > span { animation: rise-in 1.2s .1s var(--expo) both, sweep 2.4s 1s var(--ease) both; }
   .hero .cap, .hero-foot { animation: fade-up 1s .35s var(--expo) both; }
   .hero-foot { animation-delay: .5s; }
 }
-@keyframes rise-in { from { transform: translateY(105%); } }
 @keyframes fade-up { from { opacity: 0; transform: translateY(14px); } }
-@keyframes sweep { from { background-position: 120% 0, 0 0; } to { background-position: -40% 0, 0 0; } }
 
-.hero-foot { display: grid; gap: 32px; margin-top: clamp(36px, 5vw, 64px); }
+.hero-foot { display: grid; gap: 32px; margin-top: clamp(20px, 3vw, 36px); }
 @media (min-width: 900px) { .hero-foot { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 64px; align-items: start; } }
 .intro { margin: 0; max-width: 40ch; font-size: clamp(17px, 1.5vw, 19px); line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
 .intro-links { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 22px; }
@@ -598,7 +580,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
       <a href="#releases">Releases</a>
       <a href="#changes">Features</a>
     </nav>
-    <span class="cap tb-build" id="tb-build">Release 93</span>
+    <span class="cap tb-build" id="tb-build">Release 95</span>
   </div>
 </header>
 
@@ -607,7 +589,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
     <section class="hero">
       <div class="field" aria-hidden="true"><canvas id="field"></canvas></div>
       <p class="cap">Tester notes · iPhone and Apple TV</p>
-      <h1 class="hero-h"><span class="ln"><span>What's new</span></span><span class="ln l2"><span>in Lineup</span></span></h1>
+      <h1 class="vh">Lineup tester notes</h1>
       <div class="hero-foot">
         <div>
           <p class="intro">Lineup is a focused sports player for iPhone and Apple TV: your channels, your games, your library. This page is where testers find out what changed in each release, how it works, and where to get the newest build.</p>
