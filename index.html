@@ -14,15 +14,15 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ecebe6'/%3E%3Cg fill='%230a0a0a'%3E%3Ccircle cx='10' cy='8' r='2'/%3E%3Ccircle cx='10' cy='13' r='2'/%3E%3Ccircle cx='10' cy='18' r='2'/%3E%3Ccircle cx='10' cy='23' r='2'/%3E%3Ccircle cx='15' cy='23' r='2'/%3E%3Ccircle cx='20' cy='23' r='2'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Doto:wght@500..900&family=Geist+Mono:wght@400..600&family=Geist:wght@300..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geist+Mono:wght@400..600&family=Geist:wght@300..800&display=swap">
 <script>document.documentElement.classList.add("js");</script>
 <style>
 /* ------------------------------------------------------------------
-   Lineup tester notes, as a stadium after dark.
+   Lineup tester notes. Dark only, one ink: warm white on near-black.
    Archivo at full width for the loud words, Geist for reading,
-   Geist Mono for anything a machine wrote, Doto for lit dots.
-   One ink, warm white, on near-black. The only colour is the
-   on-air light.
+   Geist Mono for anything a machine wrote. Motion is quiet and eased:
+   things rise into place, lines draw themselves, light follows the
+   pointer.
    ------------------------------------------------------------------ */
 :root {
   color-scheme: dark;
@@ -37,18 +37,16 @@
   --ink-2: #b9b7b0;
   --muted: #84827c;
   --faint: #54534f;
-  --led: #f6f2e7;
-  --onair: #e2493b;
 
   --wide: "Archivo", "Geist", ui-sans-serif, system-ui, sans-serif;
   --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --dots: "Doto", var(--mono);
 
   --max: 1160px;
   --gutter: clamp(16px, 4vw, 40px);
   --bar-h: 60px;
   --ease: cubic-bezier(.2, .8, .2, 1);
+  --expo: cubic-bezier(.16, 1, .3, 1);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -60,10 +58,7 @@ body {
   overflow-x: clip;
   font: 400 16px/1.6 var(--sans);
   color: var(--ink);
-  background:
-    radial-gradient(1200px 700px at 50% -260px, rgb(255 250 235 / .06), transparent 70%),
-    var(--bg);
-  background-repeat: no-repeat;
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -73,7 +68,7 @@ body::after {
   inset: 0;
   z-index: 90;
   pointer-events: none;
-  opacity: .06;
+  opacity: .05;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 /* The layout grid's own edges, drawn faintly down the page. */
@@ -103,73 +98,65 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 .cap { font: 500 10.5px/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
 
 /* ---------------- top bar ---------------- */
-.topbar { position: relative; z-index: 1; border-bottom: 1px solid var(--line); }
+.topbar { position: relative; z-index: 2; border-bottom: 1px solid var(--line); }
 .topbar .wrap { display: flex; align-items: center; gap: 22px; height: 56px; }
 .mark { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
 .mark svg { width: 26px; height: 26px; }
 .mark b { font: 800 15px/1 var(--wide); font-stretch: 125%; letter-spacing: .02em; text-transform: uppercase; }
-.onair { display: inline-flex; align-items: center; gap: 8px; }
-.onair i { width: 6px; height: 6px; border-radius: 50%; background: var(--onair); box-shadow: 0 0 10px var(--onair); animation: onair 2.4s ease-in-out infinite; }
-@keyframes onair { 50% { opacity: .35; } }
-.tb-rel { margin-left: auto; }
-.tb-clock { min-width: 11ch; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
-@media (max-width: 620px) { .tb-rel { display: none; } .tb-clock { margin-left: auto; } }
+.status { display: inline-flex; align-items: center; gap: 9px; }
+.status i { position: relative; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); }
+.status i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid var(--ink); opacity: 0; animation: ping 2.8s var(--expo) infinite; }
+@keyframes ping { 0% { transform: scale(.4); opacity: .7; } 70%, 100% { transform: scale(1.6); opacity: 0; } }
+.nav { margin-left: auto; display: flex; gap: 2px; }
+.nav a { padding: 7px 11px; border-radius: 6px; text-decoration: none; transition: color .2s, background-color .2s; }
+.nav a:hover { color: var(--ink); background: var(--panel); }
+.tb-build { padding-left: 18px; border-left: 1px solid var(--line-2); color: var(--ink-2); white-space: nowrap; }
+@media (max-width: 760px) { .nav { display: none; } .tb-build { margin-left: auto; border-left: 0; padding-left: 0; } }
+@media (max-width: 420px) { .status { display: none; } }
 
 /* ---------------- hero ---------------- */
-.hero { padding-top: clamp(40px, 8vw, 96px); }
+.hero { position: relative; padding: clamp(56px, 10vw, 136px) 0 8px; }
+/* A field of dots behind the words, lit by slow light and the pointer. */
+.field {
+  position: absolute;
+  z-index: -1;
+  top: 0; bottom: -40px;
+  left: 50%;
+  width: 100vw;
+  translate: -50% 0;
+  pointer-events: none;
+  -webkit-mask: radial-gradient(120% 90% at 50% 30%, #000 25%, transparent 78%);
+          mask: radial-gradient(120% 90% at 50% 30%, #000 25%, transparent 78%);
+}
+.field canvas { display: block; width: 100%; height: 100%; }
 .hero-h {
-  margin: 18px 0 0;
-  font: 800 clamp(38px, 8.6vw, 118px)/.86 var(--wide);
+  margin: 20px 0 0;
+  font: 800 clamp(38px, 8.6vw, 118px)/.88 var(--wide);
   font-stretch: 125%;
   letter-spacing: -.015em;
   text-transform: uppercase;
 }
-.hero-h span { display: block; }
-.hero-h .l2 {
+.hero-h .ln { display: block; overflow: hidden; padding-bottom: .05em; margin-bottom: -.05em; }
+.hero-h .ln > span { display: block; }
+.hero-h .l2 > span {
   color: transparent;
   background:
-    linear-gradient(100deg, transparent 40%, rgb(255 255 255 / .9) 50%, transparent 60%) 120% 0 / 260% 100% no-repeat,
-    linear-gradient(180deg, #3b3b39, #222221);
+    linear-gradient(100deg, transparent 40%, rgb(255 255 255 / .85) 50%, transparent 60%) 120% 0 / 260% 100% no-repeat,
+    linear-gradient(180deg, #3d3d3b, #232322);
   -webkit-background-clip: text;
           background-clip: text;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .hero-h .l2 { animation: sweep 2.6s .5s var(--ease) both; }
+  .hero-h .ln > span { animation: rise-in 1.2s var(--expo) both; }
+  .hero-h .l2 > span { animation: rise-in 1.2s .1s var(--expo) both, sweep 2.4s 1s var(--ease) both; }
+  .hero .cap, .hero-foot { animation: fade-up 1s .35s var(--expo) both; }
+  .hero-foot { animation-delay: .5s; }
 }
+@keyframes rise-in { from { transform: translateY(105%); } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(14px); } }
 @keyframes sweep { from { background-position: 120% 0, 0 0; } to { background-position: -40% 0, 0 0; } }
 
-/* The board: real numbers from this page, as stadium dots. */
-.board {
-  position: relative;
-  margin: clamp(32px, 5vw, 56px) 0 0;
-  padding: 12px 12px 0;
-  border-radius: 16px;
-  background: linear-gradient(180deg, #1b1b1a, #0e0e0d);
-  border: 1px solid var(--line-2);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / .06), 0 50px 90px -40px #000;
-}
-.board::before, .board::after {
-  content: "";
-  position: absolute;
-  top: 4px;
-  width: 4px; height: 4px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #5a5a58, #191918);
-}
-.board::before { left: 4px; }
-.board::after { right: 4px; }
-.board canvas {
-  display: block;
-  width: 100%;
-  height: 120px;
-  border-radius: 7px;
-  background: #050505;
-  box-shadow: inset 0 0 0 1px #000, inset 0 10px 24px rgb(0 0 0 / .9);
-}
-.board figcaption { display: flex; justify-content: space-between; gap: 12px; padding: 10px 4px 11px; white-space: nowrap; }
-@media (max-width: 520px) { .board figcaption span + span, .hero .cap .more { display: none; } }
-
-.hero-foot { display: grid; gap: 32px; margin-top: 36px; }
+.hero-foot { display: grid; gap: 32px; margin-top: clamp(36px, 5vw, 64px); }
 @media (min-width: 900px) { .hero-foot { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 64px; align-items: start; } }
 .intro { margin: 0; max-width: 40ch; font-size: clamp(17px, 1.5vw, 19px); line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
 .intro-links { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 22px; }
@@ -198,231 +185,147 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 .sec-count { font: 500 11px/1 var(--mono); letter-spacing: .08em; color: var(--muted); white-space: nowrap; }
 .sec-sub { grid-column: 2 / -1; margin: 6px 0 0; max-width: 60ch; font-size: 15px; color: var(--muted); text-wrap: pretty; }
 
-/* ---------------- box office ---------------- */
-.box { margin-top: clamp(48px, 8vw, 96px); }
-.box-body { display: grid; gap: 48px; padding-top: 40px; }
-@media (min-width: 940px) { .box-body { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 72px; align-items: start; } }
-
-.machine { position: relative; width: 100%; max-width: 560px; }
-.m-face {
+/* ---------------- download ---------------- */
+.downloads { margin-top: clamp(56px, 9vw, 112px); }
+.dl-grid { display: grid; gap: 20px; padding-top: 32px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+.dl-card {
+  --mx: 50%; --my: 0%;
   position: relative;
-  z-index: 2;
-  padding: 18px 18px 0;
-  border-radius: 22px 22px 12px 12px;
-  background: linear-gradient(180deg, #1e1e1d 0%, #151514 58%, #101010 100%);
-  border: 1px solid var(--line-2);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), inset 0 -1px 0 rgb(0 0 0 / .7), 0 60px 90px -50px #000;
-}
-.m-face::before, .m-face::after {
-  content: "";
-  position: absolute; top: 7px;
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #5d5d5b, #1a1a19);
-  box-shadow: 0 1px 0 rgb(255 255 255 / .05);
-}
-.m-face::before { left: 7px; }
-.m-face::after { right: 7px; }
-.m-top { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; padding-top: 4px; }
-.m-brand { display: grid; gap: 5px; }
-.m-brand b { font: 800 16px/1 var(--wide); font-stretch: 125%; letter-spacing: .02em; text-transform: uppercase; }
-.m-brand span { font: 500 9px/1.3 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
-.m-screen {
-  height: 48px;
-  display: flex; align-items: center;
-  padding: 0 14px;
-  border-radius: 8px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #131312, #0d0d0d);
+  border: 1px solid var(--line);
   overflow: hidden;
-  white-space: nowrap;
-  background: radial-gradient(rgb(255 255 255 / .045) .8px, transparent 1.1px) 0 0 / 4px 4px, #060606;
-  box-shadow: inset 0 0 0 1px #000, inset 0 8px 16px rgb(0 0 0 / .9), 0 1px 0 rgb(255 255 255 / .05);
-  font: 700 clamp(15px, 4.4vw, 19px)/1 var(--dots);
-  letter-spacing: .04em;
-  color: var(--led);
-  text-shadow: 0 0 8px rgb(255 244 222 / .55);
+  isolation: isolate;
 }
-.m-screen .blink { animation: blink 1s steps(2) infinite; }
-@keyframes blink { 50% { opacity: 0; } }
-.m-keys { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
-.m-key {
-  position: relative;
-  display: grid; gap: 6px;
-  padding: 13px 14px 12px;
-  text-align: left;
-  border-radius: 10px;
-  border: 1px solid rgb(255 255 255 / .08);
-  background: linear-gradient(180deg, #232322, #191918);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), 0 3px 0 #070707, 0 5px 12px rgb(0 0 0 / .55);
-  cursor: pointer;
-  transition: translate .12s, box-shadow .12s;
+/* The border and the surface catch light where the pointer is. */
+.dl-card::before, .dl-card::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .5s var(--ease); }
+.dl-card::before {
+  z-index: 3;
+  padding: 1px;
+  background: radial-gradient(360px circle at var(--mx) var(--my), rgb(255 255 255 / .42), transparent 45%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
 }
-.m-key:hover { background: linear-gradient(180deg, #272726, #1b1b1a); }
-.m-key[aria-checked="true"], .m-key:active { translate: 0 2px; box-shadow: inset 0 1px 0 rgb(255 255 255 / .05), 0 1px 0 #070707, 0 2px 5px rgb(0 0 0 / .5); }
-.m-key .led { position: absolute; top: 13px; right: 13px; width: 6px; height: 6px; border-radius: 50%; background: #2b2b2a; box-shadow: inset 0 1px 1px rgb(0 0 0 / .7); transition: background-color .2s, box-shadow .2s; }
-.m-key[aria-checked="true"] .led { background: var(--led); box-shadow: 0 0 9px rgb(255 244 222 / .85), 0 0 2px #fff; }
-.k-name { font: 800 14px/1 var(--wide); font-stretch: 118%; letter-spacing: .02em; text-transform: uppercase; }
-.k-ver { font: 500 11px/1.2 var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-@media (max-width: 460px) { .k-ver .sz { display: none; } }
-.m-grille { height: 22px; margin-top: 16px; background: radial-gradient(circle, #050505 1.3px, transparent 1.7px) 0 0 / 7px 7px; opacity: .95; }
-.m-slot {
-  height: 16px;
-  margin: 12px 4px 0;
-  border-radius: 8px 8px 0 0;
-  background: linear-gradient(180deg, #000, #0b0b0b);
-  box-shadow: inset 0 4px 6px #000, 0 -1px 0 rgb(255 255 255 / .05);
-}
-/* The ticket comes out of the slot: everything above the slot is clipped. */
-.m-feed { position: relative; z-index: 1; margin-inline: 22px; clip-path: inset(0 -80px -120px -80px); }
-.js .m-feed { display: grid; }
-.js .t-hang { grid-area: 1 / 1; translate: 0 -104%; visibility: hidden; transition: translate .36s cubic-bezier(.55, 0, .8, .2), visibility 0s .36s; }
-.js .t-hang.is-out { translate: 0 0; visibility: visible; transition: none; animation: print 1.3s steps(13, end); }
-.t-hang + .t-hang { margin-top: 18px; }
-.js .t-hang + .t-hang { margin-top: 0; }
-@keyframes print { from { translate: 0 -104%; } }
-.js .t-hang.is-out .ticket { animation: swing 1.5s 1.3s cubic-bezier(.3, 1.4, .45, 1) both; }
-@keyframes swing { 0% { rotate: 0deg; } 22% { rotate: 1.8deg; } 52% { rotate: -1deg; } 78% { rotate: .4deg; } 100% { rotate: 0deg; } }
+.dl-card::after { z-index: -1; background: radial-gradient(520px circle at var(--mx) var(--my), rgb(255 255 255 / .055), transparent 45%); }
+.dl-card:hover::before, .dl-card:hover::after, .dl-card:focus-within::before { opacity: 1; }
 
-.ticket-shell { container: ticket / inline-size; filter: drop-shadow(0 26px 22px rgb(0 0 0 / .65)) drop-shadow(0 2px 2px rgb(0 0 0 / .5)); }
-.ticket {
-  --stub: 86px;
-  --notch: 10px;
+.dl-art {
+  --art-h: clamp(240px, 30vw, 300px);
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--stub);
-  min-height: 232px;
-  color: #dcdad3;
-  text-decoration: none;
-  border-radius: 0 0 16px 16px;
-  transform-origin: 50% 0;
-  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform .6s var(--ease);
-  -webkit-tap-highlight-color: transparent;
-}
-.ticket:hover { transition-duration: .16s; }
-.ticket:focus-visible { outline: 1.5px solid var(--ink); outline-offset: 5px; }
-.t-main, .t-stub {
-  position: relative;
-  background:
-    linear-gradient(168deg, rgb(255 255 255 / .05), transparent 40%),
-    linear-gradient(180deg, #1c1c1b, #121211);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .075);
-}
-.t-main::after, .t-stub::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5; mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='.5'/%3E%3C/svg%3E");
-}
-.t-main {
-  display: grid;
-  grid-template-rows: auto 1fr auto auto;
-  gap: 14px;
-  padding: 20px 18px 15px 20px;
-  border-radius: 0 0 0 16px;
-  overflow: hidden;
-  -webkit-mask: radial-gradient(circle at 100% 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px));
-          mask: radial-gradient(circle at 100% 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px));
-}
-.t-stub {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  justify-items: center;
+  display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px 0 16px;
-  border-radius: 0 0 16px 0;
-  border-left: 1.5px dashed rgb(255 255 255 / .14);
-  -webkit-mask: radial-gradient(circle at 0 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px));
-          mask: radial-gradient(circle at 0 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px));
-  transform-origin: 0 0;
-  transition: transform .7s cubic-bezier(.3, 1.5, .4, 1);
+  justify-content: center;
+  height: var(--art-h);
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(60% 70% at 50% 100%, rgb(255 255 255 / .06), transparent 70%),
+    linear-gradient(rgb(255 255 255 / .025) 1px, transparent 1px) 0 0 / 100% 24px,
+    linear-gradient(90deg, rgb(255 255 255 / .025) 1px, transparent 1px) 0 0 / 24px 100%;
 }
-/* A strip of dull foil along the printed edge. */
-.t-foil-strip {
-  position: absolute; left: 0; right: 0; top: 0; height: 3px;
-  background: linear-gradient(90deg, #4a4a49, #d9d9d6, #76808a, #ececea, #8a7f78, #c4c4c0, #4a4a49) 0 0 / 220% 100%;
-  opacity: .75;
-  animation: foil 7s linear infinite;
+.dl-art svg { display: block; height: calc(var(--art-h) * .78); width: auto; max-width: 88%; overflow: visible; transform: translate(calc(var(--px, 0) * 6px), calc(var(--py, 0) * 4px)); transition: transform .8s var(--expo); }
+.dl-art .draw { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.dl-art .glow { opacity: .55; }
+.js .dl-card:not(.is-in) .draw { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.js .dl-card:not(.is-in) .fade { opacity: 0; }
+.js .dl-card:not(.is-in) .mark-in { opacity: 0; transform: scale(.85); }
+.dl-card .mark-in { transform-box: fill-box; transform-origin: center; }
+@media (prefers-reduced-motion: no-preference) {
+  .js .dl-card.is-in .draw { stroke-dasharray: 1; animation: draw 1.8s var(--expo) both; }
+  .js .dl-card.is-in .draw.late { animation-delay: .35s; }
+  .js .dl-card.is-in .fade { animation: fade 1.2s .55s var(--ease) both; }
+  .js .dl-card.is-in .mark-in { animation: pop 1s .9s var(--expo) both; }
 }
-@keyframes foil { to { background-position: -220% 0; } }
-.t-sheen {
-  position: absolute; inset: 0; z-index: 2;
-  pointer-events: none;
-  opacity: 0;
-  mix-blend-mode: screen;
-  background: radial-gradient(circle at var(--mx, 30%) var(--my, 20%), rgb(255 255 255 / .16), transparent 45%);
-  transition: opacity .4s;
-}
-.ticket:hover .t-sheen, .ticket:focus-visible .t-sheen { opacity: 1; }
-.t-top { display: flex; justify-content: space-between; gap: 10px; font: 500 9px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: #8b8983; white-space: nowrap; }
-@container ticket (max-width: 400px) { .t-top .brand { display: none; } .t-top { letter-spacing: .14em; } }
-.t-top b { font-weight: 600; color: #cfcdc6; }
-.t-device {
-  align-self: center;
-  font: 800 clamp(28px, 8.6cqi, 42px)/.95 var(--wide);
-  font-stretch: 125%;
-  letter-spacing: -.01em;
-  text-transform: uppercase;
-  background: linear-gradient(180deg, #f4f2ec 10%, #8f8d87 95%);
-  -webkit-background-clip: text;
-          background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 1px 0 rgb(0 0 0 / .8));
-}
-.t-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
-@container ticket (min-width: 440px) { .t-fields { grid-template-columns: repeat(4, auto); justify-content: space-between; } }
-.f { display: grid; gap: 5px; min-width: 0; }
-.f .k { font: 500 8.5px/1 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: #75736d; }
-.f .v { font: 600 14.5px/1.1 var(--mono); letter-spacing: -.02em; color: #e7e5df; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.is-loading .f .v { color: transparent; border-radius: 3px; background: linear-gradient(90deg, #222, #2e2e2d, #222) 0 0 / 200% 100%; animation: shimmer 1.2s linear infinite; }
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes fade { from { opacity: 0; } }
+@keyframes pop { from { opacity: 0; transform: scale(.85); } }
+
+.dl-body { display: grid; gap: 20px; padding: 22px 24px 22px; align-content: start; }
+.dl-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.dl-title h3 { margin: 0; font: 800 clamp(22px, 2.6vw, 28px)/1 var(--wide); font-stretch: 125%; letter-spacing: -.005em; text-transform: uppercase; }
+.dl-title .cap { white-space: nowrap; }
+.dl-facts { margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, auto)); justify-content: space-between; gap: 12px 18px; padding: 14px 0; border-block: 1px solid var(--line); }
+@media (max-width: 420px) { .dl-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.dl-facts div { display: grid; gap: 6px; min-width: 0; }
+.dl-facts dt { font: 500 9.5px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.dl-facts dd { margin: 0; font: 500 14px/1.1 var(--mono); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.is-loading .dl-facts dd { color: transparent; border-radius: 3px; background: linear-gradient(90deg, #1b1b1a, #262625, #1b1b1a) 0 0 / 200% 100%; animation: shimmer 1.2s linear infinite; }
 @keyframes shimmer { to { background-position: -200% 0; } }
-.t-code { display: grid; gap: 6px; }
-.barcode { display: block; width: 100%; height: 30px; fill: #cfcdc6; opacity: .82; }
-.t-hash { display: flex; justify-content: space-between; gap: 10px; font: 500 9px/1 var(--mono); letter-spacing: .08em; color: #75736d; }
-.t-hash span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.t-say { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font: 600 9.5px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: #a6a49e; }
-.t-say .busy, .is-torn .t-say .idle { display: none; }
-.is-torn .t-say .busy { display: inline; }
-.t-arrow {
-  width: 44px; height: 44px;
-  display: grid; place-items: center;
-  border-radius: 50%;
+.dl-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.dl-btn {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 10px;
+  height: 46px; padding: 0 20px 0 16px;
+  border-radius: 10px;
+  overflow: hidden;
   background: var(--ink);
   color: #0a0a0a;
-  box-shadow: 0 0 0 4px rgb(255 255 255 / .04), 0 6px 14px rgb(0 0 0 / .6);
-  transition: translate .35s var(--ease);
+  font: 600 14.5px/1 var(--sans);
+  letter-spacing: -.005em;
+  text-decoration: none;
+  transition: transform .2s var(--ease), box-shadow .35s var(--ease), background-color .3s;
 }
-.t-arrow svg { width: 18px; height: 18px; }
-.ticket:hover .t-arrow { translate: 0 3px; }
-.ticket.is-torn .t-stub { transform: translate(7px, 6px) rotate(8deg); }
-.is-soon .ticket { cursor: default; }
-.is-soon .t-arrow { background: #2a2a29; color: #6a6964; }
-
-.box-info { display: grid; gap: 26px; align-content: start; }
-.box-info h3 { margin: 0; font: 800 15px/1.2 var(--wide); font-stretch: 118%; text-transform: uppercase; letter-spacing: .02em; }
-.how-to { list-style: none; counter-reset: h; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--line-2); }
-.how-to li { counter-increment: h; display: grid; grid-template-columns: 44px minmax(0, 1fr); padding: 14px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); font-size: 15.5px; }
-.how-to li::before { content: counter(h, decimal-leading-zero); font: 500 11px/2.2 var(--mono); color: var(--faint); }
-.how-to b { color: var(--ink); font-weight: 600; }
-.fine { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--muted); max-width: 54ch; }
-.box-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.btn {
+.dl-btn:hover { box-shadow: 0 0 0 4px rgb(255 255 255 / .07), 0 14px 34px -14px rgb(255 255 255 / .45); }
+.dl-btn:active { transform: scale(.98); }
+.dl-btn .ico { position: relative; width: 18px; height: 18px; overflow: hidden; }
+.dl-btn .ico svg { position: absolute; inset: 0; width: 18px; height: 18px; }
+.dl-btn .check path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.dl-btn .lbl { min-width: 9.5ch; }
+.dl-btn .bar { position: absolute; left: 0; bottom: 0; width: 100%; height: 2px; background: #0a0a0a; opacity: .45; transform: scaleX(0); transform-origin: 0 50%; }
+.dl-btn.is-busy .arrow { animation: drop .9s var(--ease) infinite; }
+.dl-btn.is-busy .bar { animation: load 1.3s var(--expo) forwards; }
+.dl-btn.is-done .arrow { opacity: 0; }
+.dl-btn.is-done .check path { animation: draw .55s var(--ease) forwards; }
+@keyframes drop { 0% { transform: translateY(-110%); } 45% { transform: none; } 100% { transform: translateY(110%); } }
+@keyframes load { to { transform: scaleX(1); } }
+.is-soon .dl-btn { background: var(--raise); color: var(--muted); pointer-events: none; }
+.ghost {
   display: inline-flex; align-items: center; gap: 8px;
-  height: 38px; padding: 0 14px;
-  border-radius: 6px;
+  height: 46px; padding: 0 16px;
+  border-radius: 10px;
   border: 1px solid var(--line-2);
   background: transparent;
-  font: 500 11.5px/1 var(--mono);
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  text-decoration: none;
+  font: 500 13.5px/1 var(--sans);
   color: var(--ink-2);
   cursor: pointer;
   transition: border-color .2s, color .2s, background-color .2s;
 }
-.btn:hover { border-color: var(--line-3); color: var(--ink); background: var(--panel); }
-.btn svg { width: 14px; height: 14px; }
-.btn .done, .btn[data-state="done"] .idle { display: none; }
-.btn[data-state="done"] .done { display: inline; }
-.btn[data-state="done"] { color: var(--ink); border-color: var(--ink); }
+.ghost:hover { border-color: var(--line-3); color: var(--ink); background: var(--panel-2); }
+.ghost svg { width: 15px; height: 15px; }
+.ghost .done, .ghost[data-state="done"] .idle { display: none; }
+.ghost[data-state="done"] .done { display: inline; }
+.ghost[data-state="done"] { color: var(--ink); border-color: var(--line-3); }
+.dl-hash { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.dl-hash .cap { flex: none; }
+.hash {
+  min-width: 0;
+  padding: 4px 8px;
+  margin-left: -8px;
+  border: 0; border-radius: 6px;
+  background: transparent;
+  font: 400 11.5px/1.4 var(--mono);
+  color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: copy;
+  transition: color .2s, background-color .2s;
+}
+.hash:hover { color: var(--ink); background: var(--panel-2); }
+.hash[data-state="done"] { color: var(--ink); }
+.js .dl-card { opacity: 0; transform: translateY(24px); transition: opacity 1s var(--expo), transform 1.2s var(--expo); }
+.js .dl-card.is-in { opacity: 1; transform: none; }
+.js .dl-card[data-app="tv"] { transition-delay: .12s; }
+
+.install { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); border-top: 1px solid var(--line-2); }
+.install li { display: grid; grid-template-columns: 40px minmax(0, 1fr); padding: 18px 20px 18px 0; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
+.install li + li { border-left: 1px solid var(--line); padding-left: 20px; }
+@media (max-width: 760px) { .install li + li { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); } }
+.install .n { font: 500 11px/2 var(--mono); color: var(--faint); }
+.install b { display: block; color: var(--ink); font-weight: 600; margin-bottom: 2px; }
+.fine { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: var(--faint); }
 
 /* ---------------- filter bar ---------------- */
 .toolbar {
@@ -452,7 +355,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
   border-radius: 5px;
   background: var(--ink);
   box-shadow: 0 1px 0 rgb(255 255 255 / .5) inset, 0 2px 8px rgb(0 0 0 / .4);
-  transition: transform .45s cubic-bezier(.3, 1.25, .5, 1), width .45s cubic-bezier(.3, 1.25, .5, 1);
+  transition: transform .5s var(--expo), width .5s var(--expo);
 }
 .seg button {
   display: inline-flex; align-items: baseline; gap: 7px;
@@ -535,7 +438,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 .rel .chev { display: none; }
 .rel:hover { background: var(--panel); }
 .rel[aria-pressed="true"] { background: var(--panel); box-shadow: inset 0 0 0 1px var(--line-2); }
-.rel[aria-pressed="true"]::before { background: var(--led); border-color: var(--led); box-shadow: 0 0 10px rgb(255 244 222 / .6); }
+.rel[aria-pressed="true"]::before { background: var(--ink); border-color: var(--ink); box-shadow: 0 0 0 4px rgb(255 255 255 / .08); }
 .rel:first-child .pr::after { content: "latest"; margin-left: 8px; padding: 3px 6px; border-radius: 3px; font: 600 8.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; vertical-align: 2px; color: #0a0a0a; background: var(--ink); }
 .toc { display: grid; gap: 2px; margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--line); }
 .toc a {
@@ -640,7 +543,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 .stack { display: flex; flex-wrap: wrap; gap: 6px; margin: 22px 0 0; }
 .stack span { font: 500 11px/1 var(--mono); padding: 7px 9px; border-radius: 4px; border: 1px solid var(--line-2); color: var(--muted); }
 .empty { display: grid; justify-items: start; gap: 16px; padding: 64px 0; }
-.empty p { margin: 0; font: 800 26px/1.1 var(--wide); font-stretch: 125%; text-transform: uppercase; color: var(--faint); }
+.empty p { margin: 0; font: 800 22px/1.15 var(--wide); font-stretch: 125%; text-transform: uppercase; color: var(--faint); }
 
 /* ---------------- footer ---------------- */
 .site-foot { position: relative; z-index: 1; margin-top: 110px; border-top: 1px solid var(--line); overflow: hidden; }
@@ -651,7 +554,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
   letter-spacing: -.03em;
   text-transform: uppercase;
   white-space: nowrap;
-  background: linear-gradient(180deg, #262625, transparent 88%);
+  background: linear-gradient(180deg, #252524, transparent 88%);
   -webkit-background-clip: text;
           background-clip: text;
   color: transparent;
@@ -668,19 +571,12 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
   }
 }
 @keyframes rise { from { opacity: 0; transform: translateY(26px); } }
-@media (prefers-reduced-motion: no-preference) {
-  .hero > * { animation: arrive .9s var(--ease) both; }
-  .hero > :nth-child(2) { animation-delay: .08s; }
-  .hero > :nth-child(3) { animation-delay: .18s; }
-  .hero > :nth-child(4) { animation-delay: .28s; }
-}
-@keyframes arrive { from { opacity: 0; transform: translateY(16px); } }
-::view-transition-group(*) { animation-duration: .38s; animation-timing-function: var(--ease); }
+::view-transition-group(*) { animation-duration: .4s; animation-timing-function: var(--expo); }
 ::view-transition-group(toolbar) { animation: none; }
 ::view-transition-old(toolbar) { display: none; }
 ::view-transition-new(toolbar) { animation: none; }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
 }
 </style>
 </head>
@@ -693,25 +589,26 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#ecebe6"/><g fill="#0a0a0a"><circle cx="10" cy="8" r="2"/><circle cx="10" cy="13" r="2"/><circle cx="10" cy="18" r="2"/><circle cx="10" cy="23" r="2"/><circle cx="15" cy="23" r="2"/><circle cx="20" cy="23" r="2"/></g></svg>
       <b>Lineup</b>
     </a>
-    <span class="cap onair"><i aria-hidden="true"></i>Tester notes</span>
-    <span class="cap tb-rel" id="tb-rel">Release 93</span>
-    <span class="cap tb-clock" id="clock" aria-hidden="true">00:00:00 UTC</span>
+    <span class="cap status"><i aria-hidden="true"></i>Tester notes</span>
+    <nav class="nav cap" aria-label="Page">
+      <a href="#download">Download</a>
+      <a href="#releases">Releases</a>
+      <a href="#changes">Features</a>
+    </nav>
+    <span class="cap tb-build" id="tb-build">Release 93</span>
   </div>
 </header>
 
 <main>
   <div class="wrap">
     <section class="hero">
-      <p class="cap">For iPhone and Apple TV<span class="more"> · what changed, how it works, where to get it</span></p>
-      <h1 class="hero-h"><span class="l1">What's new</span><span class="l2">in Lineup</span></h1>
-      <figure class="board">
-        <canvas id="board" aria-hidden="true"></canvas>
-        <figcaption class="cap"><span>Fig. 01 · The board</span><span>Counted from this page</span></figcaption>
-      </figure>
+      <div class="field" aria-hidden="true"><canvas id="field"></canvas></div>
+      <p class="cap">Tester notes · iPhone and Apple TV</p>
+      <h1 class="hero-h"><span class="ln"><span>What's new</span></span><span class="ln l2"><span>in Lineup</span></span></h1>
       <div class="hero-foot">
         <div>
           <p class="intro">Lineup is a focused sports player for iPhone and Apple TV: your channels, your games, your library. This page is where testers find out what changed in each release, how it works, and where to get the newest build.</p>
-          <div class="intro-links"><a href="#download">Box office ↓</a><a href="#changes">Read the notes ↓</a></div>
+          <div class="intro-links"><a href="#download">Get the builds ↓</a><a href="#changes">Read the notes ↓</a></div>
         </div>
         <dl class="specs">
           <div><dt>iPhone</dt><dd><b id="sp-iphone">23</b>features</dd></div>
@@ -722,88 +619,101 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
       </div>
     </section>
 
-    <!-- ================= BOX OFFICE ================= -->
-    <section class="box" id="download" aria-labelledby="download-h">
-      <header class="sec-head"><span class="sec-no">00</span><h2 id="download-h">Box office</h2><span class="sec-count">Official builds</span><p class="sec-sub">The newest official build of each app, printed fresh from <code>main</code> once its checks pass. Pick a device, then tear off the ticket.</p></header>
-      <div class="box-body">
-        <div class="machine" data-app="">
-          <div class="m-face">
-            <div class="m-top">
-              <div class="m-brand"><b>Lineup</b><span>Box office<br>Builds</span></div>
-              <div class="m-screen" role="status" aria-live="polite" id="m-msg">READY<span class="blink">_</span></div>
-            </div>
-            <div class="m-keys" role="radiogroup" aria-label="Device">
-              <button type="button" class="m-key" role="radio" aria-checked="false" data-app="iphone"><i class="led" aria-hidden="true"></i><span class="k-name">iPhone</span><span class="k-ver" data-key="iphone">checking</span></button>
-              <button type="button" class="m-key" role="radio" aria-checked="false" data-app="tv"><i class="led" aria-hidden="true"></i><span class="k-name">Apple TV</span><span class="k-ver" data-key="tv">checking</span></button>
-            </div>
-            <div class="m-grille" aria-hidden="true"></div>
-            <div class="m-slot" aria-hidden="true"></div>
+    <!-- ================= DOWNLOAD ================= -->
+    <section class="downloads" id="download" aria-labelledby="download-h">
+      <header class="sec-head"><span class="sec-no">00</span><h2 id="download-h">Download</h2><span class="sec-count">Official builds</span><p class="sec-sub">The newest official build of each app, from <code>main</code> once its checks pass.</p></header>
+      <div class="dl-grid">
+        <article class="dl-card is-loading" data-app="iphone">
+          <div class="dl-art" aria-hidden="true">
+            <svg viewBox="0 0 160 300">
+              <defs>
+                <linearGradient id="edge-p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity=".18"/></linearGradient>
+                <linearGradient id="screen-p" x1="0" y1="0" x2=".6" y2="1"><stop offset="0" stop-color="#1c1c1b"/><stop offset="1" stop-color="#090909"/></linearGradient>
+                <radialGradient id="glow-p" cx=".5" cy=".42" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+              </defs>
+              <rect class="fade" x="26" y="16" width="108" height="268" rx="22" fill="url(#screen-p)"/>
+              <rect class="fade glow" x="26" y="16" width="108" height="268" rx="22" fill="url(#glow-p)"/>
+              <rect class="draw" pathLength="1" x="20" y="10" width="120" height="280" rx="28" stroke="url(#edge-p)" stroke-width="1.3"/>
+              <rect class="draw late" pathLength="1" x="26" y="16" width="108" height="268" rx="22" stroke="#fff" stroke-opacity=".1" stroke-width="1"/>
+              <rect class="fade" x="62" y="26" width="36" height="10" rx="5" fill="#000" stroke="#fff" stroke-opacity=".08"/>
+              <path class="draw late" pathLength="1" d="M18.6 74v18M18.6 102v30M18.6 140v30M141.4 104v46" stroke="#fff" stroke-opacity=".35" stroke-width="1.6"/>
+              <path class="draw late" pathLength="1" d="M62 274h36" stroke="#fff" stroke-opacity=".4" stroke-width="2"/>
+              <g class="mark-in">
+                <rect x="58" y="108" width="44" height="44" rx="11" fill="#ecebe6"/>
+                <g fill="#0a0a0a"><circle cx="71.75" cy="119" r="2.75"/><circle cx="71.75" cy="125.9" r="2.75"/><circle cx="71.75" cy="132.8" r="2.75"/><circle cx="71.75" cy="139.6" r="2.75"/><circle cx="78.6" cy="139.6" r="2.75"/><circle cx="85.5" cy="139.6" r="2.75"/></g>
+              </g>
+            </svg>
           </div>
-          <div class="m-feed">
-            <div class="t-hang is-loading" data-app="iphone">
-              <div class="ticket-shell">
-                <a class="ticket" id="dl-iphone" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-iPhone.ipa" aria-label="Download Lineup for iPhone">
-                  <span class="t-main">
-                    <span class="t-foil-strip" aria-hidden="true"></span>
-                    <span class="t-sheen" aria-hidden="true"></span>
-                    <span class="t-top"><b><span class="brand">Lineup · </span>Admit one</b><span data-f="serial">Nº ———</span></span>
-                    <span class="t-device">iPhone</span>
-                    <span class="t-fields">
-                      <span class="f"><span class="k">Version</span><span class="v" data-f="version">0.0.0</span></span>
-                      <span class="f"><span class="k">Build</span><span class="v" data-f="build">000</span></span>
-                      <span class="f"><span class="k">Size</span><span class="v" data-f="size">00 MB</span></span>
-                      <span class="f"><span class="k">Date</span><span class="v" data-f="date">Oct 00</span></span>
-                    </span>
-                    <span class="t-code"><svg class="barcode" aria-hidden="true"></svg><span class="t-hash"><span>SHA-256</span><span data-f="hash">checking</span></span></span>
-                  </span>
-                  <span class="t-stub">
-                    <span class="t-say"><span class="idle">Tear to download</span><span class="busy">Downloading</span></span>
-                    <span class="t-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg></span>
-                  </span>
-                </a>
-              </div>
+          <div class="dl-body">
+            <div class="dl-title"><h3>iPhone</h3><span class="cap" data-f="label">Latest build</span></div>
+            <dl class="dl-facts">
+              <div><dt>Version</dt><dd data-f="version">0.0.0</dd></div>
+              <div><dt>Build</dt><dd data-f="build">000</dd></div>
+              <div><dt>Size</dt><dd data-f="size">00 MB</dd></div>
+              <div><dt>Published</dt><dd data-f="date">Oct 00</dd></div>
+            </dl>
+            <div class="dl-actions">
+              <a class="dl-btn" id="dl-iphone" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-iPhone.ipa" aria-label="Download Lineup for iPhone">
+                <span class="ico" aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/></svg><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+                <span class="lbl">Download IPA</span>
+                <span class="bar" aria-hidden="true"></span>
+              </a>
+              <button type="button" class="ghost" data-copy="dl-iphone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
             </div>
-            <div class="t-hang is-loading" data-app="tv">
-              <div class="ticket-shell">
-                <a class="ticket" id="dl-tv" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-AppleTV.ipa" aria-label="Download Lineup for Apple TV">
-                  <span class="t-main">
-                    <span class="t-foil-strip" aria-hidden="true"></span>
-                    <span class="t-sheen" aria-hidden="true"></span>
-                    <span class="t-top"><b><span class="brand">Lineup · </span>Admit one</b><span data-f="serial">Nº ———</span></span>
-                    <span class="t-device">Apple TV</span>
-                    <span class="t-fields">
-                      <span class="f"><span class="k">Version</span><span class="v" data-f="version">0.0.0</span></span>
-                      <span class="f"><span class="k">Build</span><span class="v" data-f="build">000</span></span>
-                      <span class="f"><span class="k">Size</span><span class="v" data-f="size">00 MB</span></span>
-                      <span class="f"><span class="k">Date</span><span class="v" data-f="date">Oct 00</span></span>
-                    </span>
-                    <span class="t-code"><svg class="barcode" aria-hidden="true"></svg><span class="t-hash"><span>SHA-256</span><span data-f="hash">checking</span></span></span>
-                  </span>
-                  <span class="t-stub">
-                    <span class="t-say"><span class="idle">Tear to download</span><span class="busy">Downloading</span></span>
-                    <span class="t-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg></span>
-                  </span>
-                </a>
-              </div>
-            </div>
+            <div class="dl-hash"><span class="cap">SHA-256</span><button type="button" class="hash" data-f="hash" title="Copy the full SHA-256">checking</button></div>
           </div>
-        </div>
+        </article>
 
-        <div class="box-info">
-          <h3>Installing a build</h3>
-          <ol class="how-to">
-            <li><span><b>Pick your device</b> on the machine. The iPhone build goes on iPhone, the Apple TV build on Apple TV.</span></li>
-            <li><span><b>Tear off the ticket.</b> The IPA downloads.</span></li>
-            <li><span><b>Open it in your sideloading app,</b> the one you already use. It signs the app for your device.</span></li>
-          </ol>
-          <p class="fine">These are unsigned IPAs. They come from Lineup's <code>main</code> branch once its checks pass, and each official build replaces the last. The SHA-256 on a ticket is the file's own.</p>
-          <div class="box-actions">
-            <button type="button" class="btn" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
-            <a class="btn" id="raw-iphone" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-iPhone.ipa">iPhone .ipa</a>
-            <a class="btn" id="raw-tv" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-AppleTV.ipa">Apple TV .ipa</a>
+        <article class="dl-card is-loading" data-app="tv">
+          <div class="dl-art" aria-hidden="true">
+            <svg viewBox="0 0 320 300">
+              <defs>
+                <linearGradient id="edge-t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity=".22"/></linearGradient>
+                <linearGradient id="screen-t" x1="0" y1="0" x2=".7" y2="1"><stop offset="0" stop-color="#1c1c1b"/><stop offset="1" stop-color="#090909"/></linearGradient>
+                <radialGradient id="glow-t" cx=".5" cy=".45" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+              </defs>
+              <rect class="fade" x="16" y="26" width="288" height="160" rx="6" fill="url(#screen-t)"/>
+              <rect class="fade glow" x="16" y="26" width="288" height="160" rx="6" fill="url(#glow-t)"/>
+              <rect class="draw" pathLength="1" x="10" y="20" width="300" height="172" rx="10" stroke="url(#edge-t)" stroke-width="1.3"/>
+              <path class="draw late" pathLength="1" d="M128 192l-6 14h76l-6-14" stroke="#fff" stroke-opacity=".3" stroke-width="1.2"/>
+              <rect class="draw late" pathLength="1" x="112" y="232" width="96" height="28" rx="9" stroke="#fff" stroke-opacity=".55" stroke-width="1.2"/>
+              <path class="draw late" pathLength="1" d="M120 260.5h80" stroke="#fff" stroke-opacity=".18" stroke-width="1"/>
+              <rect class="draw late" pathLength="1" x="252" y="214" width="26" height="80" rx="13" stroke="#fff" stroke-opacity=".55" stroke-width="1.2"/>
+              <circle class="draw late" pathLength="1" cx="265" cy="232" r="8.5" stroke="#fff" stroke-opacity=".35" stroke-width="1"/>
+              <circle class="fade" cx="265" cy="252" r="2.4" fill="#fff" fill-opacity=".3"/>
+              <circle class="fade" cx="265" cy="264" r="2.4" fill="#fff" fill-opacity=".3"/>
+              <g class="mark-in">
+                <rect x="138" y="84" width="44" height="44" rx="11" fill="#ecebe6"/>
+                <g fill="#0a0a0a"><circle cx="151.75" cy="95" r="2.75"/><circle cx="151.75" cy="101.9" r="2.75"/><circle cx="151.75" cy="108.8" r="2.75"/><circle cx="151.75" cy="115.6" r="2.75"/><circle cx="158.6" cy="115.6" r="2.75"/><circle cx="165.5" cy="115.6" r="2.75"/></g>
+              </g>
+            </svg>
           </div>
-        </div>
+          <div class="dl-body">
+            <div class="dl-title"><h3>Apple TV</h3><span class="cap" data-f="label">Latest build</span></div>
+            <dl class="dl-facts">
+              <div><dt>Version</dt><dd data-f="version">0.0.0</dd></div>
+              <div><dt>Build</dt><dd data-f="build">000</dd></div>
+              <div><dt>Size</dt><dd data-f="size">00 MB</dd></div>
+              <div><dt>Published</dt><dd data-f="date">Oct 00</dd></div>
+            </dl>
+            <div class="dl-actions">
+              <a class="dl-btn" id="dl-tv" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-AppleTV.ipa" aria-label="Download Lineup for Apple TV">
+                <span class="ico" aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/></svg><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+                <span class="lbl">Download IPA</span>
+                <span class="bar" aria-hidden="true"></span>
+              </a>
+              <button type="button" class="ghost" data-copy="dl-tv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
+            </div>
+            <div class="dl-hash"><span class="cap">SHA-256</span><button type="button" class="hash" data-f="hash" title="Copy the full SHA-256">checking</button></div>
+          </div>
+        </article>
       </div>
+      <ol class="install">
+        <li><span class="n">01</span><span><b>Download the IPA</b>for the device you're installing on.</span></li>
+        <li><span class="n">02</span><span><b>Open it in your sideloading app</b>the one you already use. It signs the app for your device.</span></li>
+        <li><span class="n">03</span><span><b>Come back for the next one</b>Each official build replaces the last, so this page always has the newest.</span></li>
+      </ol>
+      <p class="fine">Unsigned IPAs from Lineup's <code>main</code> branch, published once its checks pass. The SHA-256 is the file's own.</p>
     </section>
   </div>
 
@@ -1336,8 +1246,8 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
       </section>
 
       <div class="empty" id="empty" hidden>
-        <p>Nothing on the card.</p>
-        <button type="button" class="btn" id="clear">Show everything</button>
+        <p>No features match these filters.</p>
+        <button type="button" class="ghost" id="clear">Show everything</button>
       </div>
     </div>
   </div>
@@ -1359,12 +1269,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const motion = matchMedia("(prefers-reduced-motion: no-preference)");
-
-  // ---------- the clock in the top bar ----------
-  const clock = $("#clock");
-  const tick = () => { clock.textContent = new Date().toISOString().slice(11, 19) + " UTC"; };
-  tick();
-  setInterval(tick, 1000);
+  const fine = matchMedia("(hover: hover) and (pointer: fine)");
 
   // ---------- filters ----------
   const state = { plat: "all", rel: null };
@@ -1472,7 +1377,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
   $("#clear").addEventListener("click", () => change(() => { state.plat = "all"; state.rel = null; }));
   document.addEventListener("keydown", e => {
     if (e.metaKey || e.ctrlKey || e.altKey || e.isComposing) return;
-    if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable], .m-keys")) return;
+    if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
     const plat = { "1": "all", "2": "iphone", "3": "tv" }[e.key];
     if (plat) { setPlat(plat); return; }
     if (e.key === "Escape" && (state.rel || state.plat !== "all")) change(() => { if (state.rel) state.rel = null; else state.plat = "all"; });
@@ -1491,354 +1396,231 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 
   // ---------- the numbers ----------
   const latest = relButtons[0];
-  const nums = {
-    iphone: count("iphone", null),
-    tv: count("tv", null),
-    rel: latest ? latest.dataset.release : "",
-    fresh: latest ? count("all", latest.dataset.release) : 0
-  };
   const tally = (el, to) => {
     if (!el) return;
     if (!motion.matches) { el.textContent = to; return; }
     const start = performance.now();
     const step = now => {
-      const p = Math.min(1, (now - start) / 1100);
-      el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+      const p = Math.min(1, (now - start) / 1200);
+      el.textContent = Math.round(to * (1 - Math.pow(1 - p, 4)));
       if (p < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
   };
-  tally($("#sp-iphone"), nums.iphone);
-  tally($("#sp-tv"), nums.tv);
-  tally($("#sp-new"), nums.fresh);
-  $("#sp-rel").textContent = "new in #" + nums.rel;
+  tally($("#sp-iphone"), count("iphone", null));
+  tally($("#sp-tv"), count("tv", null));
+  if (latest) {
+    tally($("#sp-new"), count("all", latest.dataset.release));
+    $("#sp-rel").textContent = "new in #" + latest.dataset.release;
+  }
   // The footer's date is the one written by hand; the hero reads it.
   const updated = $("#updated").textContent.replace(/^\s*Updated\s*/, "").trim();
   const [upDay, upYear] = updated.split(", ");
   if (upDay) { $("#sp-day").textContent = upDay; $("#sp-year").textContent = upYear || ""; }
-  if (latest) {
-    const when = ((latest.querySelector(".when") || {}).textContent || "").split(" · ")[0];
-    $("#tb-rel").textContent = "Release " + nums.rel + (when ? " · " + when : "");
-  }
 
-  // ---------- the board ----------
-  // Each message is drawn small with the real font, then read back as dots,
-  // so the board can say anything the page knows.
-  (function board() {
-    const canvas = $("#board");
+  // ---------- the field ----------
+  // A grid of dots behind the headline. Two soft lights drift across it and
+  // a third follows the pointer, nudging the dots aside.
+  (function field() {
+    const canvas = $("#field");
     if (!canvas || !canvas.getContext) return;
     const ctx = canvas.getContext("2d");
-    const ROWS = 17, K = 4;
-    const lines = ["LINEUP", "RELEASE " + nums.rel, nums.fresh + " NEW", "IPHONE " + nums.iphone, "APPLE TV " + nums.tv, "THANKS FOR TESTING"];
-    let cols = 0, pitch = 0, dpr = 1, ox = 0, lit = null, dim = null, base = null;
-    let messages = [], shown = new Uint8Array(0), noise = new Float32Array(0);
+    const GAP = 24, LEVELS = 20;
+    let w = 0, h = 0, dpr = 1, n = 0, home = null, at = null, level = null;
+    let frame = 0, running = false, visible = true;
+    const start = performance.now();
+    const pointer = { x: 0, y: 0, tx: 0, ty: 0, power: 0, target: 0 };
 
-    function sprite(size, on) {
-      const c = document.createElement("canvas");
-      const s = Math.ceil(size * 2);
-      c.width = c.height = s;
-      const g = c.getContext("2d");
-      const mid = s / 2;
-      if (on) {
-        const glow = g.createRadialGradient(mid, mid, 0, mid, mid, size * .95);
-        glow.addColorStop(0, "rgba(255,246,226,.42)");
-        glow.addColorStop(1, "rgba(255,246,226,0)");
-        g.fillStyle = glow;
-        g.fillRect(0, 0, s, s);
-      }
-      g.fillStyle = on ? "#f8f4ea" : "#191918";
-      g.beginPath();
-      g.arc(mid, mid, size * .36, 0, Math.PI * 2);
-      g.fill();
-      return c;
-    }
-    function rasterize(text) {
-      const src = document.createElement("canvas");
-      const g = src.getContext("2d", { willReadFrequently: true });
-      const font = "800 " + Math.round(ROWS * K * .98) + "px Archivo, Geist, sans-serif";
-      const setFont = () => { g.font = font; if ("fontStretch" in g) g.fontStretch = "condensed"; };
-      setFont();
-      const m = g.measureText(text);
-      const w = Math.ceil((m.width + K * 2) / K);
-      src.width = w * K;
-      src.height = ROWS * K;
-      setFont();
-      g.fillStyle = "#fff";
-      const asc = m.actualBoundingBoxAscent || ROWS * K * .7;
-      const desc = m.actualBoundingBoxDescent || 0;
-      g.fillText(text, K, (ROWS * K + asc - desc) / 2);
-      const data = g.getImageData(0, 0, w * K, ROWS * K).data;
-      const bits = new Uint8Array(w * ROWS);
-      for (let y = 0; y < ROWS; y++) for (let x = 0; x < w; x++) {
-        let sum = 0;
-        for (let j = 0; j < K; j++) for (let i = 0; i < K; i++) sum += data[(((y * K + j) * w * K) + x * K + i) * 4 + 3];
-        bits[y * w + x] = sum / (K * K) > 120 ? 1 : 0;
-      }
-      // A round letter's overshoot can leave a lone dot above or below it.
-      const lone = (x, y) => {
-        for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) {
-          if ((i || j) && x + i >= 0 && x + i < w && y + j >= 0 && y + j < ROWS && bits[(y + j) * w + x + i]) return false;
-        }
-        return true;
-      };
-      for (let y = 0; y < ROWS; y++) for (let x = 0; x < w; x++) if (bits[y * w + x] && lone(x, y)) bits[y * w + x] = 0;
-      return { bits, w };
-    }
-    function at(x, y) {
-      const s = lit.width;
-      return [(ox + (x + .5) * pitch) * dpr - s / 2, ((y + 1) * pitch) * dpr - s / 2];
-    }
     function layout() {
-      const width = canvas.clientWidth;
-      if (!width) return false;
-      pitch = width < 520 ? 5.4 : width < 900 ? 6.6 : 7.6;
-      cols = Math.floor(width / pitch);
-      ox = (width - cols * pitch) / 2;
-      const height = Math.round(ROWS * pitch + pitch);
-      canvas.style.height = height + "px";
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      if (!w || !h) return false;
       dpr = Math.min(2, window.devicePixelRatio || 1);
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
-      lit = sprite(pitch * dpr, true);
-      dim = sprite(pitch * dpr, false);
-      base = document.createElement("canvas");
-      base.width = canvas.width;
-      base.height = canvas.height;
-      const b = base.getContext("2d");
-      for (let y = 0; y < ROWS; y++) for (let x = 0; x < cols; x++) b.drawImage(dim, ...at(x, y));
-      shown = new Uint8Array(cols * ROWS);
-      noise = Float32Array.from({ length: cols * ROWS }, () => Math.random());
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      const cols = Math.floor(w / GAP) + 2, rows = Math.floor(h / GAP) + 2;
+      const ox = (w - (cols - 1) * GAP) / 2, oy = (h - (rows - 1) * GAP) / 2;
+      n = cols * rows;
+      home = new Float32Array(n * 2);
+      at = new Float32Array(n * 2);
+      level = new Uint8Array(n);
+      for (let y = 0, i = 0; y < rows; y++) for (let x = 0; x < cols; x++, i++) { home[i * 2] = ox + x * GAP; home[i * 2 + 1] = oy + y * GAP; }
       return true;
     }
-    function draw(grid) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(base, 0, 0);
-      for (let y = 0; y < ROWS; y++) for (let x = 0; x < cols; x++) if (grid[y * cols + x]) ctx.drawImage(lit, ...at(x, y));
-    }
-    function place(msg, left) {
-      const grid = new Uint8Array(cols * ROWS);
-      for (let y = 0; y < ROWS; y++) for (let x = 0; x < msg.w; x++) {
-        const gx = left + x;
-        if (gx >= 0 && gx < cols && msg.bits[y * msg.w + x]) grid[y * cols + gx] = 1;
+    function render(now) {
+      const t = (now - start) / 1000;
+      const size = Math.max(w, h);
+      const lights = [
+        [w * (.5 + .34 * Math.sin(t * .11)), h * (.42 + .26 * Math.sin(t * .15 + 1.3)), size * .34, .34],
+        [w * (.5 + .4 * Math.cos(t * .08 + 2)), h * (.55 + .3 * Math.cos(t * .12)), size * .26, .22]
+      ];
+      pointer.x += (pointer.tx - pointer.x) * .1;
+      pointer.y += (pointer.ty - pointer.y) * .1;
+      pointer.power += (pointer.target - pointer.power) * .06;
+      if (pointer.power > .01) lights.push([pointer.x, pointer.y, 200, .7 * pointer.power]);
+      for (let i = 0; i < n; i++) {
+        let x = home[i * 2], y = home[i * 2 + 1], glow = 0;
+        for (const [lx, ly, r, a] of lights) {
+          const dx = x - lx, dy = y - ly, d2 = dx * dx + dy * dy, rr = r * r;
+          if (d2 < rr) { const f = 1 - d2 / rr; glow += a * f * f; }
+        }
+        if (pointer.power > .01) {
+          const dx = x - pointer.x, dy = y - pointer.y, d2 = dx * dx + dy * dy;
+          if (d2 < 22500 && d2 > 1) { const d = Math.sqrt(d2), push = (1 - d / 150) * 9 * pointer.power; x += dx / d * push; y += dy / d * push; }
+        }
+        at[i * 2] = x; at[i * 2 + 1] = y;
+        level[i] = Math.min(LEVELS - 1, Math.floor(Math.min(1, .085 + glow) * LEVELS));
       }
-      return grid;
-    }
-    const mix = (from, to, p) => to.map((v, i) => (noise[i] < p ? v : from[i]));
-
-    let index = 0, started = 0, timer = 0, frame = 0, running = false;
-    function play(now) {
-      frame = 0;
-      const msg = messages[index];
-      const t = now - started;
-      if (msg.w <= cols) {
-        const target = place(msg, Math.floor((cols - msg.w) / 2));
-        if (t < 700) { draw(mix(shown, target, t / 700)); frame = requestAnimationFrame(play); return; }
-        draw(target);
-        shown = target;
-        timer = setTimeout(next, 2600);
-      } else {
-        // Too long to stand still: it runs across like a ribbon board.
-        const speed = cols / 3.2;
-        const left = Math.round(cols - (t / 1000) * speed);
-        const grid = place(msg, left);
-        draw(t < 300 ? mix(shown, grid, t / 300) : grid);
-        if (left < -msg.w) { shown = grid; next(); return; }
-        frame = requestAnimationFrame(play);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      for (let l = 1; l < LEVELS; l++) {
+        const a = (l + .5) / LEVELS, s = 1 + a * 1.1;
+        ctx.fillStyle = "rgba(236,235,230," + a.toFixed(3) + ")";
+        ctx.beginPath();
+        for (let i = 0; i < n; i++) if (level[i] === l) ctx.rect(at[i * 2] - s / 2, at[i * 2 + 1] - s / 2, s, s);
+        ctx.fill();
       }
     }
-    function next() {
-      index = (index + 1) % messages.length;
-      started = performance.now();
-      frame = requestAnimationFrame(play);
-    }
-    function stop() { running = false; cancelAnimationFrame(frame); clearTimeout(timer); }
-    function start() {
-      if (running || !messages.length || !layout()) return;
+    function loop(now) { render(now); frame = requestAnimationFrame(loop); }
+    function play() {
+      if (running || !visible || document.hidden || !layout()) return;
+      if (!motion.matches) { render(start); return; }
       running = true;
-      if (!motion.matches) {
-        const msg = messages.find(m => m.w <= cols) || messages[0];
-        draw(place(msg, Math.max(0, Math.floor((cols - msg.w) / 2))));
-        return;
-      }
-      started = performance.now();
-      frame = requestAnimationFrame(play);
+      frame = requestAnimationFrame(loop);
     }
-    const fontReady = document.fonts ? document.fonts.load("800 64px Archivo").catch(() => null) : Promise.resolve();
-    fontReady.then(() => {
-      messages = lines.map(rasterize);
-      let visible = true;
-      if ("IntersectionObserver" in window) {
-        new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible && !document.hidden ? start() : stop(); }).observe(canvas);
-      } else start();
-      document.addEventListener("visibilitychange", () => { document.hidden ? stop() : visible && start(); });
-      let width = canvas.clientWidth;
-      if ("ResizeObserver" in window) new ResizeObserver(() => {
-        if (canvas.clientWidth === width) return;
-        width = canvas.clientWidth;
-        if (running) { stop(); start(); }
-      }).observe(canvas);
+    function pause() { running = false; cancelAnimationFrame(frame); }
+    const hero = $(".hero");
+    hero.addEventListener("pointermove", e => {
+      if (!fine.matches) return;
+      const r = canvas.getBoundingClientRect();
+      pointer.tx = e.clientX - r.left; pointer.ty = e.clientY - r.top;
+      if (pointer.target === 0) { pointer.x = pointer.tx; pointer.y = pointer.ty; }
+      pointer.target = 1;
     });
+    hero.addEventListener("pointerleave", () => { pointer.target = 0; });
+    if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? play() : pause(); }).observe(canvas);
+    document.addEventListener("visibilitychange", () => { document.hidden ? pause() : play(); });
+    let width = 0;
+    if ("ResizeObserver" in window) new ResizeObserver(() => {
+      if (canvas.clientWidth === width) return;
+      width = canvas.clientWidth;
+      pause(); play();
+    }).observe(canvas);
+    play();
   })();
 
-  // ---------- box office ----------
-  // Each official build is a release on this site's repo. An app's ticket is
-  // the newest release holding its IPA; until the list answers, the tickets
+  // ---------- downloads ----------
+  // Each official build is a release on this site's repo. An app's card is
+  // the newest release holding its IPA; until the list answers, the buttons
   // point at the latest release.
-  const machine = $(".machine");
-  const screen = $("#m-msg");
-  const keys = $$(".m-key");
-  const hangs = $$(".t-hang");
-  const builds = {};
-  let chosen = null, timer = 0;
-  const names = { iphone: "iPhone", tv: "Apple TV" };
-  const say = (text, cursor) => {
-    screen.textContent = text;
-    if (cursor) { const c = document.createElement("span"); c.className = "blink"; c.textContent = "_"; screen.append(c); }
-  };
-  const ready = app => builds[app] === false ? "NONE YET" : "TEAR TO DOWNLOAD";
-
-  function choose(app) {
-    if (chosen === app) return;
-    chosen = app;
-    machine.dataset.app = app;
-    keys.forEach(k => { k.setAttribute("aria-checked", String(k.dataset.app === app)); k.tabIndex = k.dataset.app === app ? 0 : -1; });
-    clearTimeout(timer);
-    const next = hangs.find(h => h.dataset.app === app);
-    const out = hangs.find(h => h !== next && h.classList.contains("is-out"));
-    const print = () => {
-      hangs.forEach(h => { if (h !== next) h.classList.remove("is-out"); });
-      next.classList.remove("is-out");
-      void next.offsetWidth;
-      next.classList.add("is-out");
-      if (!motion.matches) { say(ready(app)); return; }
-      say("PRINTING " + names[app].toUpperCase(), true);
-      timer = setTimeout(() => say(ready(app)), 1350);
-    };
-    if (out && motion.matches) {
-      out.classList.remove("is-out");
-      say("RETURNING", true);
-      timer = setTimeout(print, 400);
-    } else print();
-  }
-  keys.forEach(k => k.addEventListener("click", () => choose(k.dataset.app)));
-  keys.forEach(k => k.addEventListener("keydown", e => {
-    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) return;
-    e.preventDefault();
-    const other = keys.find(o => o !== k);
-    other.focus();
-    choose(other.dataset.app);
-  }));
-  // The machine prints when it comes into view, for the app being read about.
-  const firstApp = state.plat === "tv" ? "tv" : "iphone";
-  if ("IntersectionObserver" in window) {
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); if (!chosen) choose(firstApp); } }, { threshold: .4 });
-    io.observe(machine);
-  } else choose(firstApp);
-
-  const day = iso => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-  // Bars drawn from the file's own hash, so every build's ticket differs.
-  function barcode(svg, seed) {
-    const hex = (seed || "").toLowerCase().replace(/[^0-9a-f]/g, "") || "1f0e7a9c4b3d2e18";
-    let x = 0;
-    const bars = [];
-    const put = (w, ink) => { if (ink) bars.push('<rect x="' + x + '" width="' + w + '" height="40"/>'); x += w; };
-    put(1, 1); put(1, 0); put(1, 1); put(2, 0);
-    for (const ch of hex) { const v = parseInt(ch, 16); put(1 + (v & 3), 1); put(1 + ((v >> 2) % 3), 0); }
-    put(1, 1); put(1, 0); put(1, 1);
-    svg.setAttribute("viewBox", "0 0 " + x + " 40");
-    svg.setAttribute("preserveAspectRatio", "none");
-    svg.innerHTML = bars.join("");
-  }
-  hangs.forEach(h => barcode($(".barcode", h), ""));
-  const settle = (hang, values) => {
-    hang.classList.remove("is-loading");
-    Object.entries(values).forEach(([k, v]) => { const el = $('[data-f="' + k + '"]', hang); if (el) el.textContent = v; });
-  };
+  const cards = $$(".dl-card");
   const assets = { iphone: "Lineup-iPhone.ipa", tv: "Lineup-AppleTV.ipa" };
+  const names = { iphone: "iPhone", tv: "Apple TV" };
+  const day = iso => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const fill = (card, values) => {
+    card.classList.remove("is-loading");
+    Object.entries(values).forEach(([k, v]) => { const el = $('[data-f="' + k + '"]', card); if (el) el.textContent = v; });
+  };
   fetch("https://api.github.com/repos/nulldev85/nulldev85.github.io/releases?per_page=30",
         { headers: { Accept: "application/vnd.github+json" } })
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(releases => Object.entries(assets).forEach(([app, asset]) => {
-      const hang = hangs.find(h => h.dataset.app === app);
-      const ticket = $(".ticket", hang);
-      const key = $('[data-key="' + app + '"]');
-      let hit = null;
-      for (const release of releases) {
-        if (release.draft) continue;
-        const file = (release.assets || []).find(a => a.name === asset && a.state === "uploaded");
-        if (file) { hit = { release, file }; break; }
-      }
-      if (!hit) {
-        builds[app] = false;
-        hang.classList.add("is-soon");
-        ticket.removeAttribute("href");
-        ticket.setAttribute("aria-disabled", "true");
-        $(".t-say .idle", hang).textContent = "None yet";
-        settle(hang, { version: "—", build: "—", size: "—", date: "—", hash: "no build yet", serial: "Nº —" });
-        key.textContent = "none yet";
-        if (chosen === app) say(ready(app));
-        return;
-      }
-      const { release, file } = hit;
-      builds[app] = file.browser_download_url;
-      ticket.href = file.browser_download_url;
-      $("#raw-" + app).href = file.browser_download_url;
-      const label = (file.label || "").replace(/^(iPhone|Apple TV)\s*/, "");
-      const parts = label.match(/^(\S+)\s*\((\d+)\)$/);
-      const digest = (file.digest || "").replace(/^sha256:/, "");
-      const commit = (release.tag_name || "").replace(/^build-/, "");
-      const size = Math.round(file.size / 1e6) + " MB";
-      settle(hang, {
-        version: parts ? parts[1] : (label || "—"),
-        build: parts ? parts[2] : "—",
-        size,
-        date: day(file.updated_at),
-        hash: digest ? digest.slice(0, 10) + "…" + digest.slice(-6) : "—",
-        serial: "Nº " + (commit || "latest")
+    .then(releases => {
+      let newest = null;
+      cards.forEach(card => {
+        const app = card.dataset.app;
+        const button = $(".dl-btn", card);
+        let hit = null;
+        for (const release of releases) {
+          if (release.draft) continue;
+          const file = (release.assets || []).find(a => a.name === assets[app] && a.state === "uploaded");
+          if (file) { hit = { release, file }; break; }
+        }
+        if (!hit) {
+          card.classList.add("is-soon");
+          button.removeAttribute("href");
+          button.setAttribute("aria-disabled", "true");
+          $(".lbl", button).textContent = "Not yet";
+          fill(card, { version: "—", build: "—", size: "—", date: "—", hash: "no build yet", label: "Arrives with the next build" });
+          return;
+        }
+        const { release, file } = hit;
+        button.href = file.browser_download_url;
+        const label = (file.label || "").replace(/^(iPhone|Apple TV)\s*/, "");
+        const parts = label.match(/^(\S+)\s*\((\d+)\)$/);
+        const digest = (file.digest || "").replace(/^sha256:/, "");
+        const commit = (release.tag_name || "").replace(/^build-/, "");
+        const size = Math.round(file.size / 1e6) + " MB";
+        fill(card, {
+          version: parts ? parts[1] : (label || "—"),
+          build: parts ? parts[2] : "—",
+          size,
+          date: day(file.updated_at),
+          hash: digest ? digest.slice(0, 16) + "…" + digest.slice(-8) : "—",
+          label: commit ? "Commit " + commit : "Latest build"
+        });
+        const hash = $(".hash", card);
+        hash.dataset.full = digest;
+        if (!digest) hash.disabled = true;
+        button.setAttribute("aria-label", "Download Lineup for " + names[app] + (label ? ", version " + label : "") + ", " + size);
+        if (!newest || release.published_at > newest.release.published_at) newest = { release, commit };
       });
-      barcode($(".barcode", hang), digest || commit);
-      key.textContent = label || "latest";
-      const sz = document.createElement("span");
-      sz.className = "sz";
-      sz.textContent = " · " + size;
-      key.append(sz);
-      ticket.setAttribute("aria-label", "Download Lineup for " + names[app] + (label ? ", version " + label : "") + ", " + size);
-    }))
-    .catch(() => hangs.forEach(h => {
-      settle(h, { version: "Latest", build: "—", size: "—", date: "—", hash: "offline", serial: "Nº latest" });
-      $('[data-key="' + h.dataset.app + '"]').textContent = "latest build";
-    }));
+      if (newest && newest.commit) $("#tb-build").textContent = "Build " + newest.commit + " · " + day(newest.release.published_at);
+    })
+    .catch(() => cards.forEach(card => fill(card, { version: "Latest", build: "—", size: "—", date: "—", hash: "unavailable", label: "Latest build" })));
 
-  // Tilt and sheen follow the pointer; a tap tears the stub.
-  const fine = matchMedia("(hover: hover) and (pointer: fine)");
-  $$(".ticket").forEach(ticket => {
-    const main = $(".t-main", ticket);
-    ticket.addEventListener("pointermove", e => {
-      if (!fine.matches || !motion.matches) return;
-      const r = ticket.getBoundingClientRect();
-      const m = main.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-      ticket.style.setProperty("--rx", ((0.5 - y) * 6).toFixed(2) + "deg");
-      ticket.style.setProperty("--ry", ((x - 0.5) * 8).toFixed(2) + "deg");
-      main.style.setProperty("--mx", ((e.clientX - m.left) / m.width * 100).toFixed(1) + "%");
-      main.style.setProperty("--my", ((e.clientY - m.top) / m.height * 100).toFixed(1) + "%");
+  // Cards draw themselves when they come into view.
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(items => items.forEach(it => {
+      if (it.isIntersecting) { it.target.classList.add("is-in"); io.unobserve(it.target); }
+    }), { threshold: .25 });
+    cards.forEach(c => io.observe(c));
+  } else cards.forEach(c => c.classList.add("is-in"));
+
+  cards.forEach(card => {
+    // Light on the border and a slight lean of the drawing, toward the pointer.
+    card.addEventListener("pointermove", e => {
+      if (!fine.matches) return;
+      const r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+      card.style.setProperty("--my", (e.clientY - r.top) + "px");
+      if (motion.matches) {
+        card.style.setProperty("--px", ((e.clientX - r.left) / r.width - .5).toFixed(3));
+        card.style.setProperty("--py", ((e.clientY - r.top) / r.height - .5).toFixed(3));
+      }
     });
-    ticket.addEventListener("pointerleave", () => { ticket.style.removeProperty("--rx"); ticket.style.removeProperty("--ry"); });
-    ticket.addEventListener("click", e => {
-      if (ticket.getAttribute("aria-disabled") === "true") { e.preventDefault(); return; }
-      ticket.classList.add("is-torn");
-      say("ENJOY THE GAME");
-      clearTimeout(ticket.settle);
-      ticket.settle = setTimeout(() => { ticket.classList.remove("is-torn"); if (chosen) say(ready(chosen)); }, 1800);
+    card.addEventListener("pointerleave", () => { card.style.removeProperty("--px"); card.style.removeProperty("--py"); });
+
+    const button = $(".dl-btn", card);
+    const lbl = $(".lbl", button);
+    button.addEventListener("click", e => {
+      if (button.getAttribute("aria-disabled") === "true") { e.preventDefault(); return; }
+      clearTimeout(button.reset);
+      button.classList.remove("is-done");
+      button.classList.add("is-busy");
+      lbl.textContent = "Starting…";
+      button.reset = setTimeout(() => {
+        button.classList.replace("is-busy", "is-done");
+        lbl.textContent = "Download started";
+        button.reset = setTimeout(() => { button.classList.remove("is-done"); lbl.textContent = "Download IPA"; }, 2600);
+      }, 1300);
     });
   });
-  const copy = $("#copy");
-  copy.addEventListener("click", async () => {
-    const link = $("#dl-" + (chosen || "iphone")).href;
-    try { await navigator.clipboard.writeText(link); copy.dataset.state = "done"; } catch (e) { return; }
-    clearTimeout(copy.reset);
-    copy.reset = setTimeout(() => { delete copy.dataset.state; }, 1800);
-  });
+
+  const flash = el => {
+    el.dataset.state = "done";
+    clearTimeout(el.reset);
+    el.reset = setTimeout(() => { delete el.dataset.state; }, 1800);
+  };
+  $$("[data-copy]").forEach(b => b.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(document.getElementById(b.dataset.copy).href); flash(b); } catch (e) {}
+  }));
+  $$(".hash").forEach(b => b.addEventListener("click", async () => {
+    if (!b.dataset.full) return;
+    const shown = b.textContent;
+    try { await navigator.clipboard.writeText(b.dataset.full); } catch (e) { return; }
+    b.textContent = "Copied";
+    flash(b);
+    setTimeout(() => { b.textContent = shown; }, 1400);
+  }));
 })();
 </script>
 
