@@ -428,9 +428,9 @@ footer .gutter {
       <a href="#hood">Under the hood</a>
     </nav>
     <div class="filters" role="group" aria-label="Show features for">
-      <button type="button" id="f-all" data-plat="all" aria-pressed="true">All <span class="n">24</span></button>
+      <button type="button" id="f-all" data-plat="all" aria-pressed="true">All <span class="n">25</span></button>
       <button type="button" id="f-iphone" data-plat="iphone" aria-pressed="false">iPhone <span class="n">23</span></button>
-      <button type="button" id="f-tv" data-plat="tv" aria-pressed="false">Apple TV <span class="n">7</span></button>
+      <button type="button" id="f-tv" data-plat="tv" aria-pressed="false">Apple TV <span class="n">22</span></button>
     </div>
   </div>
 </header>
@@ -479,6 +479,7 @@ footer .gutter {
     </div>
     <div class="panel-rule"></div>
     <div class="ledger-list">
+      <button type="button" class="rel" data-release="93" aria-pressed="false"><span class="pr">#93</span><span class="when">Oct 19 · 11:49 PM PT</span><span class="what">Apple TV gets the iPhone's features; Auto Sync reads small scoreboards and late plays</span><span class="n">15 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
       <button type="button" class="rel" data-release="91" aria-pressed="false"><span class="pr">#91</span><span class="when">Oct 19 · 1:40 PM PT</span><span class="what">Auto Sync, team pages, more ratings, per-show tracks, performance sweep</span><span class="n">7 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
       <button type="button" class="rel" data-release="89" aria-pressed="false"><span class="pr">#89</span><span class="when">Oct 19 · 1:56 AM PT</span><span class="what">Live stats for soccer, tennis, UFC and racing; AetherEngine 7.40.1; engine logos</span><span class="n">3 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
       <button type="button" class="rel" data-release="87" aria-pressed="false"><span class="pr">#87</span><span class="when">Oct 18 · 8:51 PM PT</span><span class="what">Skip Intro on Apple TV, live stats and Multiview on iPhone</span><span class="n">4 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
@@ -491,51 +492,55 @@ footer .gutter {
     <div class="panel-head"><span class="tile green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14"/><circle cx="12" cy="12" r="2.6"/></svg></span><h2 id="sports-h">Sports</h2><span class="acc" data-count></span></div>
     <div class="panel-rule"></div>
 
-    <article class="entry" id="auto-sync" data-platform="iphone" data-release="91">
+    <article class="entry" id="auto-sync" data-platform="iphone tv" data-release="91 93" data-release-iphone="91 93" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#91 · Oct 19</div>
-        <div class="shas"><span>8c42937</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91, #93 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>8c42937</span><span>6767e77</span><span>4b3d7c5</span><span>b66c0e8</span></div>
       </div>
       <div class="copy">
         <h3>Auto Sync</h3>
-        <p class="lede">Live stats line up with your stream by reading the scoreboard on your screen. No taps.</p>
+        <p class="lede">Live stats line up with your stream by reading the scoreboard on your screen. Nothing to press.</p>
         <ol class="steps">
           <li><span><b>It takes a frame.</b> About once a second, the app grabs the frame on screen from whichever player engine is running.</span></li>
-          <li><span><b>It reads the scoreboard.</b> Apple's text recognition reads the broadcast's clock and score on the iPhone itself. Nothing is uploaded.</span></li>
+          <li><span><b>It finds the scoreboard.</b> A corner scoreboard can be a few percent of the picture, too small to read in one look at the whole frame. Until it finds a clock, the app reads the top and bottom thirds in turn, zoomed in, and the whole frame every third time. Once found, it reads only a band across the clock's line. Baseball finds its scoreboard by the line naming a team.</span></li>
+          <li><span><b>It reads the scoreboard.</b> Apple's text recognition reads the broadcast's clock and score on the device itself. Nothing is uploaded.</span></li>
           <li><span><b>It compares with ESPN.</b> ESPN records the real time of every play, with the game clock and score at that moment. When your screen first shows 4:52 and ESPN logged a play at 4:52 thirty seconds ago, your stream is 30 seconds behind.</span></li>
+          <li><span><b>It waits for late plays.</b> ESPN posts some plays minutes after they happen. In one NHL game a hit reached the feed 208 seconds late, so a stream only a little behind showed it first. Every clock and score the app sees is kept for ten minutes and checked again as plays arrive, so it still locks.</span></li>
           <li><span><b>It follows each sport's clock.</b> Football and basketball count down, as ESPN does. Hockey broadcasts count down while ESPN counts up within the period, so the app converts. Soccer's clock never stops, so every reading gives an answer, which is why soccer locks fastest. Baseball has no clock, so it waits for the score to change.</span></li>
           <li><span><b>It throws out bad readings.</b> A misread digit or a clock frozen at 45:00 in stoppage time can mislead. The app waits until several estimates agree within 2.5 seconds, then adds a little on the late side so stats never run ahead of the picture.</span></li>
-          <li><span><b>It keeps watching.</b> Once locked it checks every 4 seconds in case the stream reconnects. It rests when the phone runs hot or the app is in the background, and it can be switched off in the sync sheet.</span></li>
+          <li><span><b>It keeps watching.</b> Once locked it checks every 4 seconds in case the stream reconnects. It rests when the device runs hot or the app is in the background, and it can be switched off where you sync by hand.</span></li>
+          <li><span><b>It says what it sees.</b> The sync line says how far it has got: no picture from the player, looking for the scoreboard, or the clock it reads and how many plays agree.</span></li>
         </ol>
-        <p class="stack"><span>Vision text recognition</span><span>AVPlayerItemVideoOutput</span><span>Aether displayed frame</span><span>libvlc snapshot</span><span>ESPN play wallclock</span></p>
+        <p class="stack"><span>Vision text recognition</span><span>region of interest</span><span>AVPlayerItemVideoOutput</span><span>Aether displayed frame</span><span>libvlc snapshot</span><span>ESPN play wallclock</span></p>
       </div>
     </article>
 
-    <article class="entry" id="live-stats" data-platform="iphone" data-release="87">
+    <article class="entry" id="live-stats" data-platform="iphone tv" data-release="87 93" data-release-iphone="87" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#87 · Oct 18</div>
-        <div class="shas"><span>ffd595d</span><span>ef88db0</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#87 iPhone · #93 Apple TV</span><span data-when="iphone">#87 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>ffd595d</span><span>ef88db0</span><span>b66c0e8</span></div>
       </div>
       <div class="copy">
         <h3>Live stats while you watch</h3>
-        <p class="lede">A Stats button on the player opens the game's score, win probability, play-by-play, box score and leaders. Upright they sit under the picture. Turned sideways, beside it.</p>
+        <p class="lede">A Stats button on the player opens the game's score, win probability, play-by-play, box score and leaders.<span data-only="iphone"> On iPhone they sit under the picture upright, and beside it turned sideways.</span><span data-only="tv"> On Apple TV they sit beside the picture, which narrows to make room.</span></p>
         <dl class="how">
           <div><dt>Source</dt><dd>ESPN's game feed, every 10 seconds. NFL, college football, NBA, NHL and MLB.</dd></div>
           <div><dt>No spoilers</dt><dd>ESPN stamps each play with the moment it happened. A play shows only once that moment plus your stream's delay has passed. The box score waits for the latest play that came with it, and the game's score on the Sports tab is held the same way.</dd></div>
           <div><dt>Pausing</dt><dd>Holds everything back by as long as you paused.</dd></div>
-          <div><dt>Sync by hand</dt><dd>The sync sheet shows the latest play and asks if it's on your screen: <b class="ui">It Just Happened</b>, <b class="ui">Not Yet</b> or <b class="ui">Already Saw It</b>. Until a sync, everything is held a minute.</dd></div>
+          <div><dt>Sync by hand</dt><dd>The sync steps show the latest play and ask if it's on your screen: <b class="ui">It Just Happened</b>, <b class="ui">Not Yet</b> or <b class="ui">Already Saw It</b>. Until a sync, everything is held a minute.</dd></div>
+          <div data-only="tv"><dt>On Apple TV</dt><dd>Stats is a button in the full-screen controls. Every row takes focus, so the lists scroll. Select on a play syncs to it, and the sync chip opens the sync steps inside the panel. Back leaves the steps, then closes the panel. It stays open from one game to the next.</dd></div>
         </dl>
-        <p class="stack"><span>ESPN summary feed</span><span>play time + stream delay</span><span>delay kept per channel</span></p>
+        <p class="stack"><span>ESPN summary feed</span><span>play time + stream delay</span><span>delay kept per channel</span><span data-only="tv">1280 × 720 picture, 640 pt panel</span></p>
       </div>
     </article>
 
-    <article class="entry" id="more-sports" data-platform="iphone" data-release="89">
+    <article class="entry" id="more-sports" data-platform="iphone tv" data-release="89 93" data-release-iphone="89" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#89 · Oct 19</div>
-        <div class="shas"><span>83bc555</span><span>6fade34</span><span>a2ec372</span><span>2518198</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#89 iPhone · #93 Apple TV</span><span data-when="iphone">#89 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>83bc555</span><span>6fade34</span><span>a2ec372</span><span>2518198</span><span>b66c0e8</span></div>
       </div>
       <div class="copy">
         <h3>Soccer, tennis, UFC and racing stats</h3>
@@ -569,15 +574,15 @@ footer .gutter {
       </div>
     </article>
 
-    <article class="entry" id="team-pages" data-platform="iphone" data-release="91">
+    <article class="entry" id="team-pages" data-platform="iphone tv" data-release="91 93" data-release-iphone="91" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#91 · Oct 19</div>
-        <div class="shas"><span>b58cad2</span><span>2fad50a</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>b58cad2</span><span>2fad50a</span><span>3bbf753</span><span>d553ae7</span></div>
       </div>
       <div class="copy">
         <h3>Team pages</h3>
-        <p class="lede">Schedule, standings, roster, injuries and news for any team. Touch and hold a game and pick a team, or tap the arrow beside a team in <b class="ui">Settings › My Teams</b>. Follow the team from its header.</p>
+        <p class="lede">Schedule, standings, roster, injuries and news for any team.<span data-only="iphone"> On iPhone, touch and hold a game and pick a team, or tap the arrow beside a team in <b class="ui">Settings › My Teams</b>.</span><span data-only="tv"> On Apple TV, hold Select on a game and pick a team.</span> Follow the team from its header.</p>
         <dl class="how">
           <div><dt>Source</dt><dd>ESPN, loaded one tab at a time and kept for five minutes.</dd></div>
           <div><dt>Standings</dt><dd>The team's own conference, division or league table, sorted the way the league ranks it.</dd></div>
@@ -588,15 +593,15 @@ footer .gutter {
       </div>
     </article>
 
-    <article class="entry" id="game-replays" data-platform="iphone" data-release="84">
+    <article class="entry" id="game-replays" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#84 · Oct 18</div>
-        <div class="shas"><span>465195d</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>465195d</span><span>3bbf753</span></div>
       </div>
       <div class="copy">
         <h3>Game Replays in My Teams</h3>
-        <p class="lede">Recordings of your followed NFL teams' games, in a Game Replays section under My Teams.</p>
+        <p class="lede">Recordings of your followed NFL teams' games, in a Game Replays section under My Teams on the Sports tab.</p>
         <dl class="how">
           <div><dt>Source</dt><dd>Your provider's own catch-up archive.</dd></div>
           <div><dt>Matching</dt><dd>Only channels that keep recordings are checked. A recording counts only if it has ended, is still inside the provider's keep window and names a matchup with one of your teams. RedZone, highlights and news are left out.</dd></div>
@@ -606,19 +611,37 @@ footer .gutter {
       </div>
     </article>
 
-    <article class="entry" id="catch-up" data-platform="iphone" data-release="84">
+    <article class="entry" id="catch-up" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#84 · Oct 18</div>
-        <div class="shas"><span>0b0accb</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>0b0accb</span><span>3bbf753</span></div>
       </div>
       <div class="copy">
         <h3>Catch Up from a live game</h3>
-        <p class="lede">Touch and hold any live game and pick <b class="ui">Catch Up</b> to open that channel's recordings. You can start the current game over while it's still on.</p>
+        <p class="lede">Hold any live game<span data-only="iphone"> (touch and hold on iPhone)</span><span data-only="tv"> (hold Select on Apple TV)</span> and pick <b class="ui">Catch Up</b> to open that channel's recordings. You can start the current game over while it's still on.</p>
         <dl class="how">
           <div><dt>Works for</dt><dd>Any sport whose matched channel keeps recordings, including a backup channel when the main one doesn't.</dd></div>
+          <div data-only="tv"><dt>Recordings only</dt><dd>On Apple TV, a recording that can't be found says so. It never falls back to the live channel.</dd></div>
         </dl>
         <p class="stack"><span>matched event channels</span><span>TV Guide catch-up list</span></p>
+      </div>
+    </article>
+
+    <article class="entry" id="game-channels" data-platform="tv" data-release="93">
+      <div class="meta">
+        <div class="plats"><span class="chip">Apple TV</span></div>
+        <div class="rels">#93 · Oct 19</div>
+        <div class="shas"><span>3bbf753</span><span>d553ae7</span></div>
+      </div>
+      <div class="copy">
+        <h3>Channels for a live game</h3>
+        <p class="lede">Hold Select on a live game and pick <b class="ui">Channels</b> to see every channel carrying it, as on iPhone.</p>
+        <dl class="how">
+          <div><dt>Checked</dt><dd>Every channel listed is one Lineup checked against the guide for this game. The one playing is marked.</dd></div>
+          <div><dt>Searching</dt><dd><b class="ui">Choose Another Channel</b> in the same menu still searches your provider yourself.</dd></div>
+        </dl>
+        <p class="stack"><span>matched event channels</span><span>guide-checked</span></p>
       </div>
     </article>
 
@@ -664,20 +687,21 @@ footer .gutter {
     <div class="panel-head"><span class="tile indigo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#fff"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></span><h2 id="library-h">Library</h2><span class="acc" data-count></span></div>
     <div class="panel-rule"></div>
 
-    <article class="entry" id="collections" data-platform="iphone" data-release="84">
+    <article class="entry" id="collections" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#84 · Oct 18</div>
-        <div class="shas"><span>5a803b2</span><span>46d4f04</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>5a803b2</span><span>46d4f04</span><span>6ea8eb6</span><span>948a031</span></div>
       </div>
       <div class="copy">
         <h3>Collections</h3>
-        <p class="lede">Your own collections of movies and shows, on a Collections shelf.</p>
+        <p class="lede">Your own collections of movies and shows.<span data-only="iphone"> On iPhone they're on a Collections shelf.</span><span data-only="tv"> On Apple TV they're under <b class="ui">Collections</b> in the Library menu.</span></p>
         <dl class="how">
-          <div><dt>Making them</dt><dd>Create, rename and delete. Add a title by touching and holding its poster, or with the collection button on its page. Each card previews up to three posters.</dd></div>
+          <div data-only="iphone"><dt>Making them</dt><dd>Create, rename and delete. Add a title by touching and holding its poster, or with the collection button on its page. Each card previews up to three posters.</dd></div>
+          <div data-only="tv"><dt>Making them</dt><dd>Hold Select on a movie or show and pick <b class="ui">Collections</b>. Select adds it to or takes it out of each one, and a new one is named with the TV's keyboard. Hold Select on a collection to rename or delete it.</dd></div>
           <div><dt>Server ones</dt><dd>Your media servers' own collections are listed too, to browse. They aren't changed.</dd></div>
-          <div><dt>Storage</dt><dd>On the phone. Each title is saved with its server, so the same title on two servers stays separate.</dd></div>
-          <div><dt>Order</dt><dd>Move Collections like any other shelf in <b class="ui">Edit Shelves</b>.</dd></div>
+          <div><dt>Storage</dt><dd>On the device. Each title is saved with its server, so the same title on two servers stays separate.</dd></div>
+          <div data-only="iphone"><dt>Order</dt><dd>Move Collections like any other shelf in <b class="ui">Edit Shelves</b>.</dd></div>
         </dl>
         <p class="stack"><span>on-device store</span><span>server + item ID keys</span></p>
       </div>
@@ -701,11 +725,11 @@ footer .gutter {
       </div>
     </article>
 
-    <article class="entry" id="ratings" data-platform="iphone" data-release="91">
+    <article class="entry" id="ratings" data-platform="iphone tv" data-release="91 93" data-release-iphone="91" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#91 · Oct 19</div>
-        <div class="shas"><span>55760f6</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>55760f6</span><span>6ea8eb6</span></div>
       </div>
       <div class="copy">
         <h3>Metacritic and Letterboxd</h3>
@@ -713,35 +737,36 @@ footer .gutter {
         <dl class="how">
           <div><dt>Source</dt><dd>MDBList.</dd></div>
           <div><dt>Look</dt><dd>The Metascore sits in Metacritic's own green, yellow or red box.</dd></div>
-          <div><dt>Small screens</dt><dd>Five chips tighten up before they wrap to a second line.</dd></div>
+          <div data-only="iphone"><dt>Small screens</dt><dd>Five chips tighten up before they wrap to a second line.</dd></div>
         </dl>
         <p class="stack"><span>MDBList</span><span>Metascore out of 100</span><span>Letterboxd out of 5</span></p>
       </div>
     </article>
 
-    <article class="entry" id="betterposters" data-platform="iphone" data-release="84">
+    <article class="entry" id="betterposters" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#84 · Oct 18</div>
-        <div class="shas"><span>5a803b2</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>5a803b2</span><span>6ea8eb6</span></div>
       </div>
       <div class="copy">
         <h3>BetterPosters</h3>
         <p class="lede">An opt-in switch in <b class="ui">Settings › Metadata</b> that swaps movie and show posters for BetterPosters versions, with ratings printed on them.</p>
         <dl class="how">
           <div><dt>Matching</dt><dd>By IMDb ID. Titles without one keep their art.</dd></div>
-          <div><dt>Style</dt><dd><b class="ui">Poster Style</b> opens BetterPosters' own designer.</dd></div>
+          <div data-only="iphone"><dt>Style</dt><dd><b class="ui">Poster Style</b> opens BetterPosters' own designer.</dd></div>
+          <div data-only="tv"><dt>Style</dt><dd>On Apple TV, BetterPosters' default style, on movie and show cards. The switch is under <b class="ui">Artwork</b>.</dd></div>
           <div><dt>Loading</dt><dd>Your normal poster stays up until the new one loads, and stays if it fails.</dd></div>
         </dl>
         <p class="stack"><span>btttr.cc</span><span>IMDb ID</span></p>
       </div>
     </article>
 
-    <article class="entry" id="title-logos" data-platform="iphone" data-release="84">
+    <article class="entry" id="title-logos" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#84 · Oct 18</div>
-        <div class="shas"><span>b8e66dc</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>b8e66dc</span><span>6ea8eb6</span></div>
       </div>
       <div class="copy">
         <h3>Title logos</h3>
@@ -749,6 +774,7 @@ footer .gutter {
         <dl class="how">
           <div><dt>Source</dt><dd>Fanart.tv. English first, then logos with no language, HD first, then the most liked.</dd></div>
           <div><dt>Loading</dt><dd>The text holds the logo's space until it arrives, so nothing shifts.</dd></div>
+          <div data-only="tv"><dt>Server first</dt><dd>On Apple TV your server's own logo comes first. Fanart.tv fills in where it has none.</dd></div>
           <div><dt>Setting</dt><dd><b class="ui">Settings › Metadata › Title Logos</b>.</dd></div>
         </dl>
         <p class="stack"><span>Fanart.tv API</span><span>TMDB, IMDb and TVDB IDs</span></p>
@@ -781,30 +807,32 @@ footer .gutter {
       </div>
     </article>
 
-    <article class="entry" id="subtitles-online" data-platform="iphone" data-release="84">
+    <article class="entry" id="subtitles-online" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#84 · Oct 18</div>
-        <div class="shas"><span>709a2f0</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>709a2f0</span><span>b0bbcb7</span></div>
       </div>
       <div class="copy">
         <h3>Find Subtitles Online</h3>
         <p class="lede"><b class="ui">Subtitles › Find Subtitles Online</b> searches OpenSubtitles. No account needed.</p>
         <dl class="how">
           <div><dt>Matching</dt><dd>The title's IMDb ID, or for an episode the show's ID plus season and episode.</dd></div>
-          <div><dt>Searching</dt><dd>Pick a language, then narrow the releases with the filter box. Filtering runs on the phone without searching again.</dd></div>
+          <div data-only="iphone"><dt>Searching</dt><dd>Pick a language, then narrow the releases with the filter box. Filtering runs on the phone without searching again.</dd></div>
+          <div data-only="tv"><dt>Searching</dt><dd>Pick a language, then the release that matches your video.</dd></div>
           <div><dt>Adding it</dt><dd>The file is checked, then added to the playing video without a restart.</dd></div>
-          <div><dt>Limits</dt><dd>AetherEngine and VLC only, and not in Picture in Picture.</dd></div>
+          <div data-only="iphone"><dt>Limits</dt><dd>AetherEngine and VLC only, and not in Picture in Picture.</dd></div>
+          <div data-only="tv"><dt>Engines</dt><dd>Both of Apple TV's engines. If the stream reconnects, the subtitle is added again.</dd></div>
         </dl>
         <p class="stack"><span>OpenSubtitles API</span><span>SubRip sidecar</span></p>
       </div>
     </article>
 
-    <article class="entry" id="subtitle-settings" data-platform="iphone" data-release="84">
+    <article class="entry" id="subtitle-settings" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#84 · Oct 18</div>
-        <div class="shas"><span>a6c8069</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>a6c8069</span><span>b0bbcb7</span></div>
       </div>
       <div class="copy">
         <h3>Subtitle Settings</h3>
@@ -819,15 +847,15 @@ footer .gutter {
       </div>
     </article>
 
-    <article class="entry" id="seek-previews" data-platform="iphone" data-release="84">
+    <article class="entry" id="seek-previews" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#84 · Oct 18</div>
-        <div class="shas"><span>a6c8069</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#84 iPhone · #93 Apple TV</span><span data-when="iphone">#84 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>a6c8069</span><span>b0bbcb7</span></div>
       </div>
       <div class="copy">
         <h3>Seek previews</h3>
-        <p class="lede">Dragging the seek bar shows a thumbnail of that moment.</p>
+        <p class="lede">Moving along the seek bar shows a thumbnail of that moment.</p>
         <dl class="how">
           <div><dt>Source</dt><dd>Jellyfin's Trickplay sheets: grids of thumbnails your server already made.</dd></div>
           <div><dt>How</dt><dd>The app downloads a sheet, cuts out the frame it needs and keeps it. Seeking never waits on a thumbnail.</dd></div>
@@ -837,19 +865,20 @@ footer .gutter {
       </div>
     </article>
 
-    <article class="entry" id="audio-memory" data-platform="iphone" data-release="91">
+    <article class="entry" id="audio-memory" data-platform="iphone tv" data-release="91 93" data-release-iphone="91" data-release-tv="93">
       <div class="meta">
-        <div class="plats"><span class="chip">iPhone</span></div>
-        <div class="rels">#91 · Oct 19</div>
-        <div class="shas"><span>d090b3a</span></div>
+        <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+        <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
+        <div class="shas"><span>d090b3a</span><span>b0bbcb7</span></div>
       </div>
       <div class="copy">
         <h3>Audio menu and per-show memory</h3>
-        <p class="lede">An Audio menu for a title's sound tracks (languages, commentary) on all three player engines, and a memory for each show.</p>
+        <p class="lede">Each show remembers the sound and subtitles you pick.<span data-only="iphone"> On iPhone there's also a new Audio menu for a title's sound tracks (languages, commentary) on all three player engines.</span></p>
         <dl class="how">
           <div><dt>What it keeps</dt><dd>The audio and subtitles you pick, including subtitles off, are saved for that show.</dd></div>
           <div><dt>Next episode</dt><dd>The app finds the same track by name, then by language code, then by the language written in the track's name, like "Track 2 – [Spanish]".</dd></div>
           <div><dt>Smooth start</dt><dd>Where it can, the player opens already on that language, so you don't hear it switch.</dd></div>
+          <div data-only="tv"><dt>On Apple TV</dt><dd>The Subtitles menu says when your choice is kept for the show.</dd></div>
         </dl>
         <p class="stack"><span>name → language code → language in title</span><span>up to 200 shows</span></p>
       </div>
@@ -955,7 +984,7 @@ footer .gutter {
 <footer>
   <div class="gutter">
     <span>Lineup for iPhone and Apple TV · tester notes</span>
-    <span>Updated Oct 19, 2026</span>
+    <span>Updated Oct 20, 2026</span>
   </div>
 </footer>
 
