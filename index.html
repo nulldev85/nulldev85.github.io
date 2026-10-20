@@ -5,78 +5,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lineup · Tester notes</title>
 <meta name="description" content="What's new in Lineup for iPhone and Apple TV: every feature, how it works, and the newest official build of each app.">
-<meta name="color-scheme" content="dark light">
-<meta name="theme-color" content="#0b0b0c" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#f2f0e9" media="(prefers-color-scheme: light)">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0a0a">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nulldev85.github.io/">
 <meta property="og:title" content="Lineup · Tester notes">
 <meta property="og:description" content="Every feature, how it works, and the newest build of Lineup for iPhone and Apple TV.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23d6f64f'/%3E%3Cg fill='%23121212'%3E%3Ccircle cx='10' cy='8' r='2'/%3E%3Ccircle cx='10' cy='13' r='2'/%3E%3Ccircle cx='10' cy='18' r='2'/%3E%3Ccircle cx='10' cy='23' r='2'/%3E%3Ccircle cx='15' cy='23' r='2'/%3E%3Ccircle cx='20' cy='23' r='2'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ecebe6'/%3E%3Cg fill='%230a0a0a'%3E%3Ccircle cx='10' cy='8' r='2'/%3E%3Ccircle cx='10' cy='13' r='2'/%3E%3Ccircle cx='10' cy='18' r='2'/%3E%3Ccircle cx='10' cy='23' r='2'/%3E%3Ccircle cx='15' cy='23' r='2'/%3E%3Ccircle cx='20' cy='23' r='2'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@500..900&family=Geist+Mono:wght@400..600&family=Geist:wght@300..800&family=Instrument+Serif:ital@0;1&display=swap">
-<script>
-  // The chosen theme is set before the first paint, so a light-mode reader
-  // never sees a dark flash.
-  try { const t = localStorage.getItem("lineup-notes-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
-</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Doto:wght@500..900&family=Geist+Mono:wght@400..600&family=Geist:wght@300..800&display=swap">
+<script>document.documentElement.classList.add("js");</script>
 <style>
 /* ------------------------------------------------------------------
-   Lineup tester notes.
-   Two type voices: Geist for reading, Instrument Serif italic for the
-   big words, Geist Mono for anything a machine wrote (SHAs, versions,
-   dates). iPhone is lime and Apple TV is lavender, everywhere: chips,
-   the filter, the scoreboard, the tickets.
+   Lineup tester notes, as a stadium after dark.
+   Archivo at full width for the loud words, Geist for reading,
+   Geist Mono for anything a machine wrote, Doto for lit dots.
+   One ink, warm white, on near-black. The only colour is the
+   on-air light.
    ------------------------------------------------------------------ */
-@property --angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-
 :root {
-  color-scheme: light dark;
-  --bg: light-dark(#f2f0e9, #0b0b0c);
-  --surface: light-dark(#fbfaf6, #141416);
-  --surface-2: light-dark(#e8e5dc, #1c1c1f);
-  --ink: light-dark(#141413, #f0efe9);
-  --ink-2: light-dark(#3a3935, #c8c6bf);
-  --muted: light-dark(#6a6861, #8f8d86);
-  --faint: light-dark(#98958c, #5f5e5a);
-  --line: light-dark(rgb(20 20 19 / .09), rgb(255 255 255 / .075));
-  --line-2: light-dark(rgb(20 20 19 / .16), rgb(255 255 255 / .13));
-  --glass: light-dark(rgb(242 240 233 / .78), rgb(11 11 12 / .72));
-  --shadow: light-dark(rgb(40 36 20 / .16), rgb(0 0 0 / .5));
+  color-scheme: dark;
+  --bg: #0a0a0a;
+  --panel: #111110;
+  --panel-2: #161615;
+  --raise: #1d1d1c;
+  --line: rgb(255 255 255 / .065);
+  --line-2: rgb(255 255 255 / .11);
+  --line-3: rgb(255 255 255 / .2);
+  --ink: #ecebe6;
+  --ink-2: #b9b7b0;
+  --muted: #84827c;
+  --faint: #54534f;
+  --led: #f6f2e7;
+  --onair: #e2493b;
 
-  --lime: #d6f64f;
-  --lav: #c9bbff;
-  --lime-ink: light-dark(#4b6c00, #d6f64f);
-  --lime-dot: light-dark(#97c20a, #d6f64f);
-  --lav-dot: light-dark(#8f78f2, #c9bbff);
-  --lav-ink: light-dark(#5a43c8, #c9bbff);
-  --paper-ink: #121212;
-
+  --wide: "Archivo", "Geist", ui-sans-serif, system-ui, sans-serif;
   --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --serif: "Instrument Serif", ui-serif, Georgia, serif;
   --dots: "Doto", var(--mono);
 
   --max: 1160px;
   --gutter: clamp(16px, 4vw, 40px);
-  --bar-h: 62px;
+  --bar-h: 60px;
   --ease: cubic-bezier(.2, .8, .2, 1);
-}
-:root[data-theme="light"] { color-scheme: light; }
-:root[data-theme="dark"] { color-scheme: dark; }
-@supports not (color: light-dark(#000, #fff)) {
-  :root {
-    --bg: #0b0b0c; --surface: #141416; --surface-2: #1c1c1f; --ink: #f0efe9; --ink-2: #c8c6bf;
-    --muted: #8f8d86; --faint: #5f5e5a; --line: rgb(255 255 255 / .075); --line-2: rgb(255 255 255 / .13);
-    --glass: rgb(11 11 12 / .72); --shadow: rgb(0 0 0 / .5); --lime-ink: #d6f64f; --lav-ink: #c9bbff; --lime-dot: #d6f64f; --lav-dot: #c9bbff;
-  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { -webkit-text-size-adjust: 100%; }
-#releases, #changes { scroll-margin-top: calc(var(--bar-h) + 8px); }
+html { -webkit-text-size-adjust: 100%; background: var(--bg); }
 body {
   margin: 0;
   min-height: 100dvh;
@@ -84,240 +61,265 @@ body {
   font: 400 16px/1.6 var(--sans);
   color: var(--ink);
   background:
-    radial-gradient(1100px 620px at 92% -8%, color-mix(in oklab, var(--lav) 13%, transparent), transparent 62%),
-    radial-gradient(900px 520px at -12% 4%, color-mix(in oklab, var(--lime) 9%, transparent), transparent 60%),
+    radial-gradient(1200px 700px at 50% -260px, rgb(255 250 235 / .06), transparent 70%),
     var(--bg);
   background-repeat: no-repeat;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-/* A little paper grain over everything. */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 90;
   pointer-events: none;
-  opacity: .05;
+  opacity: .06;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-::selection { background: var(--lime); color: var(--paper-ink); }
+/* The layout grid's own edges, drawn faintly down the page. */
+.rails { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.rails::before {
+  content: "";
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  width: min(100%, var(--max));
+  translate: -50% 0;
+  border-inline: 1px solid rgb(255 255 255 / .035);
+}
+@media (max-width: 760px) { .rails { display: none; } }
+::selection { background: var(--ink); color: var(--bg); }
 a { color: inherit; }
-:focus-visible { outline: 2px solid var(--lime-ink); outline-offset: 3px; }
+:focus-visible { outline: 1.5px solid var(--ink); outline-offset: 3px; }
 button { font: inherit; color: inherit; }
 kbd {
-  font: 500 11px/1 var(--mono);
+  font: 500 10.5px/1 var(--mono);
   padding: 3px 6px;
-  border-radius: 6px;
+  border-radius: 4px;
   border: 1px solid var(--line-2);
   border-bottom-width: 2px;
   color: var(--ink-2);
-  background: var(--surface);
 }
-.wrap { width: min(100%, var(--max)); margin-inline: auto; padding-inline: var(--gutter); }
+code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; background: var(--raise); color: var(--ink); }
+.wrap { position: relative; z-index: 1; width: min(100%, var(--max)); margin-inline: auto; padding-inline: var(--gutter); }
+.cap { font: 500 10.5px/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
 
-/* ---------------- nav ---------------- */
-.site-nav .wrap { display: flex; align-items: center; gap: 14px; height: 72px; }
-.logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
-.logo-mark { width: 30px; height: 30px; flex: none; }
-.logo-mark rect { fill: var(--lime); }
-.logo-mark circle { fill: var(--paper-ink); }
-.logo-word { font: 700 20px/1 var(--sans); letter-spacing: -.045em; }
-.logo-tag {
-  font: 500 10.5px/1 var(--mono);
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding: 5px 8px;
-  border: 1px solid var(--line-2);
-  border-radius: 999px;
-}
-.nav-links { margin-left: auto; display: flex; gap: 2px; }
-.nav-links a {
-  padding: 8px 13px;
-  border-radius: 999px;
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 14.5px;
-  font-weight: 500;
-  transition: color .2s, background-color .2s;
-}
-.nav-links a:hover { color: var(--ink); background: var(--surface); }
-.theme-btn {
-  width: 38px; height: 38px;
-  display: grid; place-items: center;
-  border-radius: 50%;
-  border: 1px solid var(--line-2);
-  background: transparent;
-  cursor: pointer;
-  transition: background-color .2s, transform .3s var(--ease);
-}
-.theme-btn:hover { background: var(--surface); }
-.theme-btn:active { transform: rotate(-25deg) scale(.94); }
-.theme-btn svg { width: 17px; height: 17px; display: none; }
-.theme-btn[data-mode="auto"] .i-auto, .theme-btn[data-mode="dark"] .i-dark, .theme-btn[data-mode="light"] .i-light { display: block; }
-@media (max-width: 680px) {
-  .nav-links { display: none; }
-  .theme-btn { margin-left: auto; }
-}
+/* ---------------- top bar ---------------- */
+.topbar { position: relative; z-index: 1; border-bottom: 1px solid var(--line); }
+.topbar .wrap { display: flex; align-items: center; gap: 22px; height: 56px; }
+.mark { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.mark svg { width: 26px; height: 26px; }
+.mark b { font: 800 15px/1 var(--wide); font-stretch: 125%; letter-spacing: .02em; text-transform: uppercase; }
+.onair { display: inline-flex; align-items: center; gap: 8px; }
+.onair i { width: 6px; height: 6px; border-radius: 50%; background: var(--onair); box-shadow: 0 0 10px var(--onair); animation: onair 2.4s ease-in-out infinite; }
+@keyframes onair { 50% { opacity: .35; } }
+.tb-rel { margin-left: auto; }
+.tb-clock { min-width: 11ch; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+@media (max-width: 620px) { .tb-rel { display: none; } .tb-clock { margin-left: auto; } }
 
 /* ---------------- hero ---------------- */
-.hero { display: grid; gap: 44px; padding-top: clamp(32px, 7vw, 92px); }
-@media (min-width: 940px) { .hero { grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); align-items: end; } }
-.eyebrow {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
-  margin: 0;
-  font: 500 11.5px/1.4 var(--mono);
-  letter-spacing: .14em;
+.hero { padding-top: clamp(40px, 8vw, 96px); }
+.hero-h {
+  margin: 18px 0 0;
+  font: 800 clamp(38px, 8.6vw, 118px)/.86 var(--wide);
+  font-stretch: 125%;
+  letter-spacing: -.015em;
   text-transform: uppercase;
-  color: var(--muted);
 }
-.eyebrow .sep { color: var(--faint); }
-.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); flex: none; animation: pulse 2.4s ease-out infinite; }
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--lime) 70%, transparent); }
-  70%, 100% { box-shadow: 0 0 0 9px transparent; }
-}
-h1 {
-  margin: 20px 0 0;
-  font: 700 clamp(54px, 9vw, 112px)/.9 var(--sans);
-  letter-spacing: -.058em;
-}
-h1 .s {
-  display: block;
-  margin-top: .04em;
-  font: italic 400 1.1em/.92 var(--serif);
-  letter-spacing: -.025em;
-  color: var(--lime-ink);
-}
-.intro { margin: 26px 0 0; max-width: 34ch; font-size: clamp(17px, 1.55vw, 20px); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
-.btn {
-  display: inline-flex; align-items: center; gap: 9px;
-  height: 48px; padding: 0 20px;
-  border-radius: 999px;
-  font: 600 15px/1 var(--sans);
-  letter-spacing: -.01em;
-  text-decoration: none;
-  transition: transform .25s var(--ease), background-color .2s, border-color .2s;
-}
-.btn:hover { transform: translateY(-2px); }
-.btn:active { transform: translateY(0) scale(.98); }
-.btn svg { width: 16px; height: 16px; }
-.btn-solid { background: var(--ink); color: var(--bg); }
-.btn-line { border: 1px solid var(--line-2); }
-.btn-line:hover { border-color: var(--ink); }
-
-/* The scoreboard: real counts from this page, in LED dots. */
-.board {
-  margin: 0;
-  position: relative;
-  padding: 18px 18px 16px;
-  border-radius: 22px;
-  color: #ecebe4;
+.hero-h span { display: block; }
+.hero-h .l2 {
+  color: transparent;
   background:
-    radial-gradient(rgb(255 255 255 / .06) 1px, transparent 1.4px) 0 0 / 6px 6px,
-    linear-gradient(180deg, #121314, #08090a);
-  border: 1px solid rgb(255 255 255 / .08);
-  box-shadow: 0 30px 60px -20px var(--shadow), inset 0 1px 0 rgb(255 255 255 / .06), inset 0 -10px 30px rgb(0 0 0 / .5);
+    linear-gradient(100deg, transparent 40%, rgb(255 255 255 / .9) 50%, transparent 60%) 120% 0 / 260% 100% no-repeat,
+    linear-gradient(180deg, #3b3b39, #222221);
+  -webkit-background-clip: text;
+          background-clip: text;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-h .l2 { animation: sweep 2.6s .5s var(--ease) both; }
+}
+@keyframes sweep { from { background-position: 120% 0, 0 0; } to { background-position: -40% 0, 0 0; } }
+
+/* The board: real numbers from this page, as stadium dots. */
+.board {
+  position: relative;
+  margin: clamp(32px, 5vw, 56px) 0 0;
+  padding: 12px 12px 0;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #1b1b1a, #0e0e0d);
+  border: 1px solid var(--line-2);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .06), 0 50px 90px -40px #000;
 }
 .board::before, .board::after {
   content: "";
   position: absolute;
-  top: 10px;
-  width: 6px; height: 6px;
+  top: 4px;
+  width: 4px; height: 4px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #5c5d5f, #1b1c1d);
+  background: radial-gradient(circle at 35% 35%, #5a5a58, #191918);
 }
-.board::before { left: 10px; }
-.board::after { right: 10px; }
-.board-top {
-  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-  padding: 0 10px 12px;
-  font: 500 10.5px/1 var(--mono);
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: #8b8a84;
+.board::before { left: 4px; }
+.board::after { right: 4px; }
+.board canvas {
+  display: block;
+  width: 100%;
+  height: 120px;
+  border-radius: 7px;
+  background: #050505;
+  box-shadow: inset 0 0 0 1px #000, inset 0 10px 24px rgb(0 0 0 / .9);
 }
-.board-top span:last-child { text-align: right; }
-.board-live { display: inline-flex; align-items: center; gap: 7px; color: #ff6a55; }
-.board-live i { width: 6px; height: 6px; border-radius: 50%; background: #ff4d3d; box-shadow: 0 0 10px #ff4d3d; animation: blink 1.6s steps(2) infinite; }
-@keyframes blink { 50% { opacity: .25; } }
-.board-main {
-  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px;
-  padding: 16px 10px 14px;
-  border-radius: 14px;
-  background: rgb(0 0 0 / .35);
-  border: 1px solid rgb(255 255 255 / .05);
-}
-.team { display: grid; justify-items: center; gap: 6px; }
-.team-name { font: 600 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: #a9a8a1; }
-.digits {
-  font: 800 clamp(64px, 15vw, 96px)/.9 var(--dots);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: .02em;
-}
-.team-iphone .digits { color: var(--lime); text-shadow: 0 0 18px color-mix(in oklab, var(--lime) 55%, transparent); }
-.team-tv .digits { color: var(--lav); text-shadow: 0 0 18px color-mix(in oklab, var(--lav) 55%, transparent); }
-.board-mid { display: grid; justify-items: center; gap: 4px; padding-inline: 4px; }
-.board-mid .k { font: 500 9.5px/1 var(--mono); letter-spacing: .2em; color: #77766f; }
-.board-mid .digits { font-size: clamp(30px, 6vw, 40px); color: #f4f3ec; text-shadow: 0 0 12px rgb(255 255 255 / .35); }
-.board-mid .new { font: 600 10px/1 var(--mono); letter-spacing: .12em; color: var(--lime); text-transform: uppercase; margin-top: 2px; }
-.board figcaption {
-  display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-  padding: 12px 10px 0;
-  font: 500 10.5px/1.4 var(--mono);
-  letter-spacing: .06em;
-  color: #74736d;
-}
+.board figcaption { display: flex; justify-content: space-between; gap: 12px; padding: 10px 4px 11px; white-space: nowrap; }
+@media (max-width: 520px) { .board figcaption span + span, .hero .cap .more { display: none; } }
 
-/* ---------------- download ---------------- */
-.block { margin-top: clamp(72px, 11vw, 128px); }
-.block-head { display: grid; gap: 12px; max-width: 660px; margin-bottom: 30px; }
-.kicker { margin: 0; font: 500 11.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 10px; }
-.kicker::before { content: ""; width: 22px; height: 1px; background: var(--line-2); }
-.block-head h2 { margin: 0; font: 700 clamp(38px, 5.4vw, 60px)/1 var(--sans); letter-spacing: -.05em; text-wrap: balance; }
-.block-head h2 em { font: italic 400 1.12em/1 var(--serif); letter-spacing: -.015em; }
-.block-head p { margin: 0; font-size: 17px; color: var(--ink-2); text-wrap: pretty; }
-.block-head code { font: 500 .88em var(--mono); padding: 2px 6px; border-radius: 6px; background: var(--surface-2); }
+.hero-foot { display: grid; gap: 32px; margin-top: 36px; }
+@media (min-width: 900px) { .hero-foot { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 64px; align-items: start; } }
+.intro { margin: 0; max-width: 40ch; font-size: clamp(17px, 1.5vw, 19px); line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
+.intro-links { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 22px; }
+.intro-links a { font: 500 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; color: var(--ink); padding: 6px 0; border-bottom: 1px solid var(--line-3); transition: border-color .2s; }
+.intro-links a:hover { border-color: var(--ink); }
+.specs { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line-2); }
+@media (min-width: 560px) { .specs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.specs > div { padding: 14px 0 0; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.specs > div + div { padding-left: 16px; border-left: 1px solid var(--line); }
+@media (max-width: 559.98px) { .specs > div:nth-child(3) { padding-left: 0; border-left: 0; } .specs > div:nth-child(n+3) { margin-top: 18px; } }
+.specs dt { font: 500 10px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.specs dd { margin: 0; font-size: 13px; color: var(--muted); }
+.specs dd b { display: block; font: 800 34px/1 var(--wide); font-stretch: 112%; color: var(--ink); font-variant-numeric: tabular-nums; margin-bottom: 4px; white-space: nowrap; }
 
-.passes { display: grid; gap: 26px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); }
-.pass { container-type: inline-size; display: grid; gap: 12px; min-width: 0; }
-.pass[data-app="iphone"] { --paper: var(--lime); }
-.pass[data-app="tv"] { --paper: var(--lav); }
-.pass.is-soon { --paper: #cfcdc5; }
+/* ---------------- section heads ---------------- */
+.sec-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px 16px;
+  padding: 64px 0 20px;
+  border-bottom: 1px solid var(--line-2);
+}
+.sec-no { font: 500 11px/1 var(--mono); color: var(--faint); letter-spacing: .1em; }
+.sec-head h2 { margin: 0; font: 800 clamp(26px, 4.4vw, 50px)/1 var(--wide); font-stretch: 125%; letter-spacing: -.01em; text-transform: uppercase; }
+.sec-count { font: 500 11px/1 var(--mono); letter-spacing: .08em; color: var(--muted); white-space: nowrap; }
+.sec-sub { grid-column: 2 / -1; margin: 6px 0 0; max-width: 60ch; font-size: 15px; color: var(--muted); text-wrap: pretty; }
 
-.ticket-shell { filter: drop-shadow(0 22px 26px var(--shadow)) drop-shadow(0 2px 3px rgb(0 0 0 / .18)); }
+/* ---------------- box office ---------------- */
+.box { margin-top: clamp(48px, 8vw, 96px); }
+.box-body { display: grid; gap: 48px; padding-top: 40px; }
+@media (min-width: 940px) { .box-body { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 72px; align-items: start; } }
+
+.machine { position: relative; width: 100%; max-width: 560px; }
+.m-face {
+  position: relative;
+  z-index: 2;
+  padding: 18px 18px 0;
+  border-radius: 22px 22px 12px 12px;
+  background: linear-gradient(180deg, #1e1e1d 0%, #151514 58%, #101010 100%);
+  border: 1px solid var(--line-2);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), inset 0 -1px 0 rgb(0 0 0 / .7), 0 60px 90px -50px #000;
+}
+.m-face::before, .m-face::after {
+  content: "";
+  position: absolute; top: 7px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #5d5d5b, #1a1a19);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .05);
+}
+.m-face::before { left: 7px; }
+.m-face::after { right: 7px; }
+.m-top { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; padding-top: 4px; }
+.m-brand { display: grid; gap: 5px; }
+.m-brand b { font: 800 16px/1 var(--wide); font-stretch: 125%; letter-spacing: .02em; text-transform: uppercase; }
+.m-brand span { font: 500 9px/1.3 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.m-screen {
+  height: 48px;
+  display: flex; align-items: center;
+  padding: 0 14px;
+  border-radius: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  background: radial-gradient(rgb(255 255 255 / .045) .8px, transparent 1.1px) 0 0 / 4px 4px, #060606;
+  box-shadow: inset 0 0 0 1px #000, inset 0 8px 16px rgb(0 0 0 / .9), 0 1px 0 rgb(255 255 255 / .05);
+  font: 700 clamp(15px, 4.4vw, 19px)/1 var(--dots);
+  letter-spacing: .04em;
+  color: var(--led);
+  text-shadow: 0 0 8px rgb(255 244 222 / .55);
+}
+.m-screen .blink { animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.m-keys { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+.m-key {
+  position: relative;
+  display: grid; gap: 6px;
+  padding: 13px 14px 12px;
+  text-align: left;
+  border-radius: 10px;
+  border: 1px solid rgb(255 255 255 / .08);
+  background: linear-gradient(180deg, #232322, #191918);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), 0 3px 0 #070707, 0 5px 12px rgb(0 0 0 / .55);
+  cursor: pointer;
+  transition: translate .12s, box-shadow .12s;
+}
+.m-key:hover { background: linear-gradient(180deg, #272726, #1b1b1a); }
+.m-key[aria-checked="true"], .m-key:active { translate: 0 2px; box-shadow: inset 0 1px 0 rgb(255 255 255 / .05), 0 1px 0 #070707, 0 2px 5px rgb(0 0 0 / .5); }
+.m-key .led { position: absolute; top: 13px; right: 13px; width: 6px; height: 6px; border-radius: 50%; background: #2b2b2a; box-shadow: inset 0 1px 1px rgb(0 0 0 / .7); transition: background-color .2s, box-shadow .2s; }
+.m-key[aria-checked="true"] .led { background: var(--led); box-shadow: 0 0 9px rgb(255 244 222 / .85), 0 0 2px #fff; }
+.k-name { font: 800 14px/1 var(--wide); font-stretch: 118%; letter-spacing: .02em; text-transform: uppercase; }
+.k-ver { font: 500 11px/1.2 var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 460px) { .k-ver .sz { display: none; } }
+.m-grille { height: 22px; margin-top: 16px; background: radial-gradient(circle, #050505 1.3px, transparent 1.7px) 0 0 / 7px 7px; opacity: .95; }
+.m-slot {
+  height: 16px;
+  margin: 12px 4px 0;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #000, #0b0b0b);
+  box-shadow: inset 0 4px 6px #000, 0 -1px 0 rgb(255 255 255 / .05);
+}
+/* The ticket comes out of the slot: everything above the slot is clipped. */
+.m-feed { position: relative; z-index: 1; margin-inline: 22px; clip-path: inset(0 -80px -120px -80px); }
+.js .m-feed { display: grid; }
+.js .t-hang { grid-area: 1 / 1; translate: 0 -104%; visibility: hidden; transition: translate .36s cubic-bezier(.55, 0, .8, .2), visibility 0s .36s; }
+.js .t-hang.is-out { translate: 0 0; visibility: visible; transition: none; animation: print 1.3s steps(13, end); }
+.t-hang + .t-hang { margin-top: 18px; }
+.js .t-hang + .t-hang { margin-top: 0; }
+@keyframes print { from { translate: 0 -104%; } }
+.js .t-hang.is-out .ticket { animation: swing 1.5s 1.3s cubic-bezier(.3, 1.4, .45, 1) both; }
+@keyframes swing { 0% { rotate: 0deg; } 22% { rotate: 1.8deg; } 52% { rotate: -1deg; } 78% { rotate: .4deg; } 100% { rotate: 0deg; } }
+
+.ticket-shell { container: ticket / inline-size; filter: drop-shadow(0 26px 22px rgb(0 0 0 / .65)) drop-shadow(0 2px 2px rgb(0 0 0 / .5)); }
 .ticket {
-  --stub: 92px;
-  --notch: 11px;
+  --stub: 86px;
+  --notch: 10px;
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--stub);
-  min-height: 244px;
-  color: var(--paper-ink);
+  min-height: 232px;
+  color: #dcdad3;
   text-decoration: none;
-  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
+  border-radius: 0 0 16px 16px;
+  transform-origin: 50% 0;
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   transition: transform .6s var(--ease);
   -webkit-tap-highlight-color: transparent;
 }
-.ticket:hover { --lift: -4px; transition-duration: .18s; }
-.ticket:active { --lift: 0px; }
-.ticket { border-radius: 20px; }
-.ticket:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
-.t-main, .t-stub { position: relative; background: var(--paper); }
-/* Two pieces of one ticket, each with half of the punched notch. */
+.ticket:hover { transition-duration: .16s; }
+.ticket:focus-visible { outline: 1.5px solid var(--ink); outline-offset: 5px; }
+.t-main, .t-stub {
+  position: relative;
+  background:
+    linear-gradient(168deg, rgb(255 255 255 / .05), transparent 40%),
+    linear-gradient(180deg, #1c1c1b, #121211);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .075);
+}
+.t-main::after, .t-stub::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='.5'/%3E%3C/svg%3E");
+}
 .t-main {
   display: grid;
   grid-template-rows: auto 1fr auto auto;
   gap: 14px;
-  padding: 18px 20px 16px 22px;
-  border-radius: 20px 0 0 20px;
+  padding: 20px 18px 15px 20px;
+  border-radius: 0 0 0 16px;
   overflow: hidden;
-  -webkit-mask: radial-gradient(circle at 100% 0, #0000 var(--notch), #000 calc(var(--notch) + .5px)) top / 100% 51% no-repeat,
-                radial-gradient(circle at 100% 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px)) bottom / 100% 51% no-repeat;
-          mask: radial-gradient(circle at 100% 0, #0000 var(--notch), #000 calc(var(--notch) + .5px)) top / 100% 51% no-repeat,
-                radial-gradient(circle at 100% 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px)) bottom / 100% 51% no-repeat;
+  -webkit-mask: radial-gradient(circle at 100% 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px));
+          mask: radial-gradient(circle at 100% 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px));
 }
 .t-stub {
   display: grid;
@@ -325,136 +327,110 @@ h1 .s {
   justify-items: center;
   align-items: center;
   gap: 14px;
-  padding: 20px 0 18px;
-  border-radius: 0 20px 20px 0;
-  border-left: 2px dashed rgb(0 0 0 / .26);
-  -webkit-mask: radial-gradient(circle at 0 0, #0000 var(--notch), #000 calc(var(--notch) + .5px)) top / 100% 51% no-repeat,
-                radial-gradient(circle at 0 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px)) bottom / 100% 51% no-repeat;
-          mask: radial-gradient(circle at 0 0, #0000 var(--notch), #000 calc(var(--notch) + .5px)) top / 100% 51% no-repeat,
-                radial-gradient(circle at 0 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px)) bottom / 100% 51% no-repeat;
-  transform-origin: 0 100%;
+  padding: 18px 0 16px;
+  border-radius: 0 0 16px 0;
+  border-left: 1.5px dashed rgb(255 255 255 / .14);
+  -webkit-mask: radial-gradient(circle at 0 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px));
+          mask: radial-gradient(circle at 0 100%, #0000 var(--notch), #000 calc(var(--notch) + .5px));
+  transform-origin: 0 0;
   transition: transform .7s cubic-bezier(.3, 1.5, .4, 1);
 }
-.t-top { display: flex; justify-content: space-between; gap: 10px; font: 500 10px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; }
-.t-top b { font-weight: 700; letter-spacing: .2em; }
-.t-top span { opacity: .6; }
-.t-device { align-self: center; font: italic 400 clamp(46px, 13cqi, 64px)/.9 var(--serif); letter-spacing: -.02em; position: relative; z-index: 1; }
-.t-glyph { position: absolute; right: 16px; top: 40px; width: 58px; height: 74px; opacity: .1; }
-@container (min-width: 440px) { .t-glyph { width: 76px; height: 96px; } }
-.t-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
-@container (min-width: 440px) { .t-fields { grid-template-columns: repeat(4, auto); justify-content: space-between; } }
-.f { display: grid; gap: 4px; min-width: 0; }
-.f .k { font: 500 9px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; opacity: .55; }
-.f .v { font: 600 15px/1.1 var(--mono); letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pass.is-loading .f .v { color: transparent; border-radius: 4px; background: linear-gradient(90deg, rgb(0 0 0 / .08), rgb(0 0 0 / .16), rgb(0 0 0 / .08)) 0 0 / 200% 100%; animation: shimmer 1.2s linear infinite; }
-@keyframes shimmer { to { background-position: -200% 0; } }
-.t-code { display: grid; gap: 6px; }
-.barcode { display: block; width: 100%; height: 34px; fill: var(--paper-ink); }
-.t-hash { display: flex; justify-content: space-between; gap: 10px; font: 500 9.5px/1 var(--mono); letter-spacing: .06em; opacity: .62; }
-.t-hash span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* A strip of foil, like the hologram on a real ticket. */
-.t-holo {
-  position: absolute; left: 0; right: 0; top: 0; height: 5px;
-  background: linear-gradient(90deg, #ff9ad6, #93d5ff, #a8ffb3, #ffe489, #ff9ad6, #93d5ff) 0 0 / 200% 100%;
-  opacity: .9;
-  animation: holo 6s linear infinite;
+/* A strip of dull foil along the printed edge. */
+.t-foil-strip {
+  position: absolute; left: 0; right: 0; top: 0; height: 3px;
+  background: linear-gradient(90deg, #4a4a49, #d9d9d6, #76808a, #ececea, #8a7f78, #c4c4c0, #4a4a49) 0 0 / 220% 100%;
+  opacity: .75;
+  animation: foil 7s linear infinite;
 }
-@keyframes holo { to { background-position: -200% 0; } }
-.t-foil {
+@keyframes foil { to { background-position: -220% 0; } }
+.t-sheen {
   position: absolute; inset: 0; z-index: 2;
   pointer-events: none;
   opacity: 0;
-  mix-blend-mode: soft-light;
-  background:
-    radial-gradient(circle at var(--mx, 30%) var(--my, 20%), rgb(255 255 255 / .9), transparent 42%),
-    conic-gradient(from var(--angle) at var(--mx, 30%) var(--my, 20%), #ff7ccf, #7cc8ff, #8dffa0, #ffd86b, #ff7ccf);
+  mix-blend-mode: screen;
+  background: radial-gradient(circle at var(--mx, 30%) var(--my, 20%), rgb(255 255 255 / .16), transparent 45%);
   transition: opacity .4s;
 }
-.ticket:hover .t-foil, .ticket:focus-visible .t-foil { opacity: 1; animation: spin 5s linear infinite; }
-@keyframes spin { to { --angle: 360deg; } }
-.t-arrow {
+.ticket:hover .t-sheen, .ticket:focus-visible .t-sheen { opacity: 1; }
+.t-top { display: flex; justify-content: space-between; gap: 10px; font: 500 9px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: #8b8983; white-space: nowrap; }
+@container ticket (max-width: 400px) { .t-top .brand { display: none; } .t-top { letter-spacing: .14em; } }
+.t-top b { font-weight: 600; color: #cfcdc6; }
+.t-device {
   align-self: center;
-  width: 48px; height: 48px;
-  display: grid; place-items: center;
-  border-radius: 50%;
-  background: var(--paper-ink);
-  color: var(--paper);
-  transition: transform .35s var(--ease);
-}
-.t-arrow svg { width: 20px; height: 20px; }
-.ticket:hover .t-arrow { transform: translateY(3px); }
-.t-say {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font: 600 10.5px/1 var(--mono);
-  letter-spacing: .18em;
+  font: 800 clamp(28px, 8.6cqi, 42px)/.95 var(--wide);
+  font-stretch: 125%;
+  letter-spacing: -.01em;
   text-transform: uppercase;
-  white-space: nowrap;
+  background: linear-gradient(180deg, #f4f2ec 10%, #8f8d87 95%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 rgb(0 0 0 / .8));
 }
+.t-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+@container ticket (min-width: 440px) { .t-fields { grid-template-columns: repeat(4, auto); justify-content: space-between; } }
+.f { display: grid; gap: 5px; min-width: 0; }
+.f .k { font: 500 8.5px/1 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: #75736d; }
+.f .v { font: 600 14.5px/1.1 var(--mono); letter-spacing: -.02em; color: #e7e5df; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.is-loading .f .v { color: transparent; border-radius: 3px; background: linear-gradient(90deg, #222, #2e2e2d, #222) 0 0 / 200% 100%; animation: shimmer 1.2s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.t-code { display: grid; gap: 6px; }
+.barcode { display: block; width: 100%; height: 30px; fill: #cfcdc6; opacity: .82; }
+.t-hash { display: flex; justify-content: space-between; gap: 10px; font: 500 9px/1 var(--mono); letter-spacing: .08em; color: #75736d; }
+.t-hash span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-say { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font: 600 9.5px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: #a6a49e; }
 .t-say .busy, .is-torn .t-say .idle { display: none; }
 .is-torn .t-say .busy { display: inline; }
-/* Tapping tears the stub off a little, then it settles back. */
-.ticket.is-torn .t-stub { transform: translate(8px, 4px) rotate(7deg); }
-.pass.is-soon .ticket { cursor: default; }
-.pass.is-soon .t-arrow { background: rgb(0 0 0 / .35); }
-.pass-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-inline: 4px; }
-.pass-meta { font: 500 12px/1.4 var(--mono); color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.copy-link {
-  flex: none;
-  display: inline-flex; align-items: center; gap: 7px;
-  height: 32px; padding: 0 12px;
-  border-radius: 999px;
+.t-arrow {
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #0a0a0a;
+  box-shadow: 0 0 0 4px rgb(255 255 255 / .04), 0 6px 14px rgb(0 0 0 / .6);
+  transition: translate .35s var(--ease);
+}
+.t-arrow svg { width: 18px; height: 18px; }
+.ticket:hover .t-arrow { translate: 0 3px; }
+.ticket.is-torn .t-stub { transform: translate(7px, 6px) rotate(8deg); }
+.is-soon .ticket { cursor: default; }
+.is-soon .t-arrow { background: #2a2a29; color: #6a6964; }
+
+.box-info { display: grid; gap: 26px; align-content: start; }
+.box-info h3 { margin: 0; font: 800 15px/1.2 var(--wide); font-stretch: 118%; text-transform: uppercase; letter-spacing: .02em; }
+.how-to { list-style: none; counter-reset: h; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--line-2); }
+.how-to li { counter-increment: h; display: grid; grid-template-columns: 44px minmax(0, 1fr); padding: 14px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); font-size: 15.5px; }
+.how-to li::before { content: counter(h, decimal-leading-zero); font: 500 11px/2.2 var(--mono); color: var(--faint); }
+.how-to b { color: var(--ink); font-weight: 600; }
+.fine { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--muted); max-width: 54ch; }
+.box-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 38px; padding: 0 14px;
+  border-radius: 6px;
   border: 1px solid var(--line-2);
   background: transparent;
-  font: 500 12.5px/1 var(--sans);
+  font: 500 11.5px/1 var(--mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
   color: var(--ink-2);
   cursor: pointer;
-  transition: border-color .2s, color .2s;
+  transition: border-color .2s, color .2s, background-color .2s;
 }
-.copy-link:hover { border-color: var(--ink); color: var(--ink); }
-.copy-link svg { width: 14px; height: 14px; }
-.copy-link .done, .copy-link[data-state="done"] .idle { display: none; }
-.copy-link[data-state="done"] .done { display: inline; }
-.copy-link[data-state="done"] { color: var(--lime-ink); border-color: var(--lime-ink); }
-.install-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 26px; font-size: 14px; color: var(--muted); }
-.link-btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 0;
-  border: 0;
-  background: none;
-  font: 600 14px/1.4 var(--sans);
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: var(--line-2);
-  text-underline-offset: 4px;
-  cursor: pointer;
-}
-.link-btn:hover { text-decoration-color: var(--ink); }
-.pop {
-  width: min(460px, calc(100vw - 32px));
-  margin: auto;
-  padding: 26px 26px 22px;
-  border: 1px solid var(--line-2);
-  border-radius: 24px;
-  background: var(--surface);
-  color: var(--ink);
-  box-shadow: 0 40px 100px -20px rgb(0 0 0 / .55);
-}
-.pop::backdrop { background: rgb(0 0 0 / .45); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-.pop h3 { margin: 0 0 14px; font: italic 400 34px/1 var(--serif); letter-spacing: -.01em; }
-.pop ol { margin: 0; padding: 0; list-style: none; counter-reset: p; display: grid; gap: 12px; }
-.pop li { counter-increment: p; display: grid; grid-template-columns: 30px 1fr; color: var(--ink-2); }
-.pop li::before { content: counter(p, decimal-leading-zero); font: 500 12px/1.9 var(--mono); color: var(--lime-ink); }
-.pop .fine { margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13.5px; color: var(--muted); }
-.pop-close { margin-top: 18px; height: 40px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--ink); color: var(--bg); font: 600 14px/1 var(--sans); cursor: pointer; }
+.btn:hover { border-color: var(--line-3); color: var(--ink); background: var(--panel); }
+.btn svg { width: 14px; height: 14px; }
+.btn .done, .btn[data-state="done"] .idle { display: none; }
+.btn[data-state="done"] .done { display: inline; }
+.btn[data-state="done"] { color: var(--ink); border-color: var(--ink); }
 
-/* ---------------- toolbar ---------------- */
+/* ---------------- filter bar ---------------- */
 .toolbar {
   position: sticky; top: 0; z-index: 30;
-  margin-top: clamp(80px, 11vw, 132px);
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(20px) saturate(1.5);
-          backdrop-filter: blur(20px) saturate(1.5);
+  margin-top: clamp(72px, 10vw, 120px);
+  background: rgb(10 10 10 / .78);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+          backdrop-filter: blur(18px) saturate(1.3);
   border-block: 1px solid var(--line);
   view-transition-name: toolbar;
 }
@@ -462,64 +438,58 @@ h1 .s {
 .seg {
   position: relative;
   display: inline-grid; grid-auto-flow: column;
-  padding: 4px;
-  border-radius: 999px;
-  background: var(--surface);
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--panel);
   border: 1px solid var(--line-2);
   isolation: isolate;
 }
 .seg-thumb {
   position: absolute; z-index: -1;
-  top: 4px; bottom: 4px; left: 0;
+  top: 3px; bottom: 3px; left: 0;
   width: var(--w, 0px);
   transform: translateX(var(--x, 0px));
-  border-radius: 999px;
+  border-radius: 5px;
   background: var(--ink);
-  transition: transform .45s cubic-bezier(.3, 1.3, .5, 1), width .45s cubic-bezier(.3, 1.3, .5, 1), background-color .3s;
+  box-shadow: 0 1px 0 rgb(255 255 255 / .5) inset, 0 2px 8px rgb(0 0 0 / .4);
+  transition: transform .45s cubic-bezier(.3, 1.25, .5, 1), width .45s cubic-bezier(.3, 1.25, .5, 1);
 }
-.seg[data-plat="iphone"] .seg-thumb { background: var(--lime); }
-.seg[data-plat="tv"] .seg-thumb { background: var(--lav); }
 .seg button {
   display: inline-flex; align-items: baseline; gap: 7px;
-  padding: 10px 14px;
-  border: 0; border-radius: 999px;
+  padding: 9px 13px;
+  border: 0; border-radius: 5px;
   background: transparent;
-  font: 600 14px/1 var(--sans);
-  letter-spacing: -.01em;
+  font: 600 13.5px/1 var(--sans);
   color: var(--muted);
   cursor: pointer;
   transition: color .3s;
 }
 .seg button:hover { color: var(--ink); }
-.seg button .n { font: 500 11px/1 var(--mono); opacity: .7; }
-.seg button[aria-pressed="true"] { color: var(--bg); }
-.seg[data-plat="iphone"] button[aria-pressed="true"], .seg[data-plat="tv"] button[aria-pressed="true"] { color: var(--paper-ink); }
+.seg button .n { font: 500 10.5px/1 var(--mono); opacity: .75; }
+.seg button[aria-pressed="true"] { color: #0a0a0a; }
 .seg:not([data-plat]) button[aria-pressed="true"] { background: var(--ink); }
 .rel-chip {
   display: inline-flex; align-items: center; gap: 8px;
-  height: 36px; padding: 0 8px 0 12px;
-  border-radius: 999px;
-  border: 1px solid var(--lime-ink);
-  background: color-mix(in oklab, var(--lime) 14%, transparent);
-  color: var(--ink);
-  font: 500 12.5px/1 var(--mono);
+  height: 34px; padding: 0 6px 0 11px;
+  border-radius: 6px;
+  border: 1px solid var(--line-3);
+  background: var(--panel);
+  font: 500 12px/1 var(--mono);
   cursor: pointer;
 }
-.rel-chip i { font-style: normal; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 12px; }
 .rel-chip .w { color: var(--muted); }
-.kbd-hint { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--muted); }
+.rel-chip i { font-style: normal; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 4px; background: var(--raise); color: var(--ink-2); font-size: 11px; }
+.kbd-hint { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); }
 .kbd-hint span { margin-left: 4px; }
 @media (max-width: 860px), (hover: none) { .kbd-hint { display: none; } }
-@media (max-width: 400px) {
-  .seg button { padding-inline: 11px; gap: 5px; }
-  .rel-chip .w { display: none; }
-}
+@media (max-width: 400px) { .seg button { padding-inline: 10px; gap: 5px; } .rel-chip .w { display: none; } }
 
-/* ---------------- notes: releases + features ---------------- */
+/* ---------------- releases + features ---------------- */
 .notes { display: grid; grid-template-columns: minmax(0, 1fr); }
 .side, .feed { min-width: 0; }
+#releases, #changes { scroll-margin-top: calc(var(--bar-h) + 8px); }
 @media (min-width: 1040px) {
-  .notes { grid-template-columns: 286px minmax(0, 1fr); gap: 64px; }
+  .notes { grid-template-columns: 280px minmax(0, 1fr); gap: 64px; }
   .side {
     position: sticky; top: calc(var(--bar-h) + 8px);
     align-self: start;
@@ -529,8 +499,8 @@ h1 .s {
     scrollbar-width: thin;
   }
 }
-.side-h { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 14px; font: italic 400 30px/1 var(--serif); }
-.side-h span { font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); font-style: normal; }
+.side-h { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 16px; font: 800 15px/1 var(--wide); font-stretch: 125%; text-transform: uppercase; letter-spacing: .02em; }
+.side-h span { font: 500 10px/1 var(--mono); letter-spacing: .14em; color: var(--faint); }
 .ledger-list { position: relative; display: grid; gap: 2px; }
 .ledger-list::before { content: ""; position: absolute; left: 14px; top: 20px; bottom: 20px; width: 1px; background: var(--line-2); }
 .rel {
@@ -541,7 +511,7 @@ h1 .s {
   column-gap: 12px; row-gap: 4px;
   width: 100%;
   padding: 12px 12px 12px 10px;
-  border: 0; border-radius: 14px;
+  border: 0; border-radius: 8px;
   background: transparent;
   text-align: left;
   cursor: pointer;
@@ -551,7 +521,7 @@ h1 .s {
   content: "";
   grid-area: dot;
   width: 9px; height: 9px;
-  margin: 5px 0 0 0;
+  margin-top: 5px;
   border-radius: 50%;
   background: var(--bg);
   border: 1.5px solid var(--faint);
@@ -559,27 +529,27 @@ h1 .s {
   transition: background-color .25s, border-color .25s, box-shadow .25s;
 }
 .rel .pr { grid-area: pr; font: 600 13px/1.5 var(--mono); }
-.rel .when { grid-area: when; justify-self: end; font: 400 11px/1.75 var(--mono); color: var(--faint); white-space: nowrap; }
+.rel .when { grid-area: when; justify-self: end; font: 400 10.5px/1.8 var(--mono); color: var(--faint); white-space: nowrap; }
 .rel .what { grid-area: what; font-size: 14.5px; line-height: 1.42; color: var(--ink-2); text-wrap: pretty; }
-.rel .n { grid-area: n; font: 500 11px/1.4 var(--mono); color: var(--muted); }
+.rel .n { grid-area: n; font: 500 10.5px/1.4 var(--mono); color: var(--muted); }
 .rel .chev { display: none; }
-.rel:hover { background: var(--surface); }
-.rel[aria-pressed="true"] { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-2); }
-.rel[aria-pressed="true"]::before { background: var(--lime); border-color: var(--lime); box-shadow: 0 0 0 4px color-mix(in oklab, var(--lime) 22%, transparent); }
-.rel:first-child .pr::after { content: "latest"; margin-left: 8px; padding: 2px 6px; border-radius: 999px; font: 600 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; vertical-align: 2px; color: var(--paper-ink); background: var(--lime); }
+.rel:hover { background: var(--panel); }
+.rel[aria-pressed="true"] { background: var(--panel); box-shadow: inset 0 0 0 1px var(--line-2); }
+.rel[aria-pressed="true"]::before { background: var(--led); border-color: var(--led); box-shadow: 0 0 10px rgb(255 244 222 / .6); }
+.rel:first-child .pr::after { content: "latest"; margin-left: 8px; padding: 3px 6px; border-radius: 3px; font: 600 8.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; vertical-align: 2px; color: #0a0a0a; background: var(--ink); }
 .toc { display: grid; gap: 2px; margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--line); }
 .toc a {
   display: grid; grid-template-columns: 30px 1fr auto; align-items: baseline;
   padding: 8px 12px;
-  border-radius: 12px;
+  border-radius: 6px;
   color: var(--muted);
   text-decoration: none;
-  font-size: 14.5px; font-weight: 500;
+  font-size: 14px; font-weight: 500;
   transition: color .2s, background-color .2s;
 }
-.toc a span, .toc a i { font: 500 11px/1 var(--mono); font-style: normal; color: var(--faint); }
+.toc a span, .toc a i { font: 500 10.5px/1 var(--mono); font-style: normal; color: var(--faint); }
 .toc a:hover { color: var(--ink); }
-.toc a.is-current { color: var(--ink); background: var(--surface); }
+.toc a.is-current { color: var(--ink); background: var(--panel); }
 @media (max-width: 1039.98px) {
   .side { padding-top: 40px; }
   .ledger-list {
@@ -596,26 +566,13 @@ h1 .s {
   }
   .ledger-list::-webkit-scrollbar { display: none; }
   .ledger-list::before { display: none; }
-  .rel { grid-template-columns: auto 1fr; grid-template-areas: "pr when" "what what" "n n"; padding: 14px 16px; scroll-snap-align: start; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+  .rel { grid-template-columns: auto 1fr; grid-template-areas: "pr when" "what what" "n n"; padding: 14px 16px; scroll-snap-align: start; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
   .rel::before { display: none; }
-  .rel[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px var(--lime-ink); }
+  .rel[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px var(--ink); }
   .toc { display: none; }
 }
 
-/* sections */
 .section { scroll-margin-top: calc(var(--bar-h) + 8px); }
-.sec-head {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: baseline;
-  gap: 8px 16px;
-  padding: 64px 0 20px;
-  border-bottom: 1px solid var(--line-2);
-}
-.sec-no { font: 500 12px/1 var(--mono); color: var(--faint); }
-.sec-head h2 { margin: 0; font: italic 400 clamp(44px, 6.4vw, 72px)/.95 var(--serif); letter-spacing: -.02em; }
-.sec-count { font: 500 11.5px/1 var(--mono); color: var(--muted); white-space: nowrap; }
-.sec-sub { grid-column: 2 / -1; margin: 0; font-size: 15px; color: var(--muted); text-wrap: pretty; }
 
 /* entries: the markup each merge round copies */
 .entries { container-type: inline-size; }
@@ -627,75 +584,80 @@ h1 .s {
   border-bottom: 1px solid var(--line);
   scroll-margin-top: calc(var(--bar-h) + 16px);
 }
-.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-width: 0; }
 .plats { display: flex; gap: 6px; }
 .chip {
   display: inline-flex; align-items: center; gap: 7px;
-  height: 24px; padding: 0 10px 0 8px;
-  border-radius: 999px;
-  background: var(--surface-2);
-  font: 600 10.5px/1 var(--mono);
-  letter-spacing: .07em;
+  height: 24px; padding: 0 9px 0 8px;
+  border-radius: 5px;
+  border: 1px solid var(--line-2);
+  font: 600 10px/1 var(--mono);
+  letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--ink-2);
 }
-.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--lime-dot); box-shadow: 0 0 0 2px color-mix(in oklab, var(--lime-dot) 25%, transparent); }
-.entry[data-platform="tv"] .chip::before, .entry[data-platform="iphone tv"] .chip:nth-child(2)::before { background: var(--lav-dot); box-shadow: 0 0 0 2px color-mix(in oklab, var(--lav-dot) 25%, transparent); }
+.chip::before {
+  content: "";
+  width: 9px; height: 12px;
+  background: currentColor;
+  -webkit-mask: var(--glyph) center / contain no-repeat;
+          mask: var(--glyph) center / contain no-repeat;
+  --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 12'%3E%3Crect x='.75' y='.75' width='7.5' height='10.5' rx='1.8' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+.entry[data-platform="tv"] .chip::before, .entry[data-platform="iphone tv"] .chip:nth-child(2)::before {
+  width: 13px; height: 11px;
+  --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 11'%3E%3Crect x='.75' y='.75' width='11.5' height='7' rx='1.2' fill='none' stroke='black' stroke-width='1.5'/%3E%3Cpath d='M4 10.25h5' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E");
+}
 .rels { font: 500 12px/1.5 var(--mono); color: var(--ink-2); }
-.shas { display: flex; flex-wrap: wrap; gap: 2px 8px; font: 400 11px/1.6 var(--mono); color: var(--faint); }
+.shas { display: flex; flex-wrap: wrap; gap: 2px 8px; font: 400 10.5px/1.6 var(--mono); color: var(--faint); }
 .shas span::before { content: "@"; opacity: .6; }
 @container (min-width: 660px) {
-  .entry { grid-template-columns: 184px minmax(0, 1fr); gap: 30px; }
+  .entry { grid-template-columns: 180px minmax(0, 1fr); gap: 32px; }
   .meta { position: sticky; top: calc(var(--bar-h) + 28px); align-self: start; flex-direction: column; align-items: flex-start; gap: 12px; }
   .plats { flex-direction: column; align-items: flex-start; }
 }
 .entry .copy { min-width: 0; }
-.entry h3 { margin: 0 0 10px; font: 600 clamp(23px, 2.5vw, 29px)/1.15 var(--sans); letter-spacing: -.03em; text-wrap: balance; }
+.entry h3 { margin: 0 0 10px; font: 600 clamp(22px, 2.4vw, 28px)/1.15 var(--sans); letter-spacing: -.028em; text-wrap: balance; }
 .lede { margin: 0; max-width: 62ch; font-size: 17.5px; line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
 .ui {
   font-weight: 600;
   color: var(--ink);
-  padding: 1px 7px;
-  border-radius: 7px;
-  background: var(--surface-2);
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--raise);
   box-shadow: inset 0 -1px 0 var(--line-2);
   white-space: nowrap;
 }
 .how { margin: 22px 0 0; display: grid; border-top: 1px solid var(--line); max-width: 70ch; }
 .how > div { display: grid; grid-template-columns: 1fr; gap: 3px; padding: 13px 0; border-bottom: 1px solid var(--line); }
-.how dt { font: 500 10.5px/1.9 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.how dt { font: 500 10px/1.9 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .how dd { margin: 0; font-size: 15.5px; line-height: 1.6; color: var(--ink-2); text-wrap: pretty; }
 @container (min-width: 520px) { .how > div { grid-template-columns: 128px minmax(0, 1fr); gap: 18px; } }
 .steps { list-style: none; counter-reset: s; margin: 22px 0 0; padding: 0; display: grid; gap: 14px; max-width: 70ch; }
-.steps li { counter-increment: s; display: grid; grid-template-columns: 32px minmax(0, 1fr); font-size: 15.5px; line-height: 1.6; color: var(--ink-2); }
-.steps li::before { content: counter(s, decimal-leading-zero); font: 500 12px/2.1 var(--mono); color: var(--lime-ink); }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); font-size: 15.5px; line-height: 1.6; color: var(--ink-2); }
+.steps li::before { content: counter(s, decimal-leading-zero); font: 500 11px/2.2 var(--mono); color: var(--faint); }
 .steps b { color: var(--ink); font-weight: 600; }
 .stack { display: flex; flex-wrap: wrap; gap: 6px; margin: 22px 0 0; }
-.stack span {
-  font: 500 11.5px/1 var(--mono);
-  padding: 7px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--line-2);
-  color: var(--muted);
-}
-.empty { display: grid; justify-items: start; gap: 14px; padding: 64px 0; }
-.empty p { margin: 0; font: italic 400 34px/1.1 var(--serif); color: var(--muted); }
-.empty button { height: 42px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line-2); background: transparent; font-weight: 600; cursor: pointer; }
+.stack span { font: 500 11px/1 var(--mono); padding: 7px 9px; border-radius: 4px; border: 1px solid var(--line-2); color: var(--muted); }
+.empty { display: grid; justify-items: start; gap: 16px; padding: 64px 0; }
+.empty p { margin: 0; font: 800 26px/1.1 var(--wide); font-stretch: 125%; text-transform: uppercase; color: var(--faint); }
 
 /* ---------------- footer ---------------- */
-.site-foot { margin-top: 110px; border-top: 1px solid var(--line); overflow: hidden; }
+.site-foot { position: relative; z-index: 1; margin-top: 110px; border-top: 1px solid var(--line); overflow: hidden; }
 .foot-big {
-  margin: 28px 0 -0.12em;
-  font: 800 clamp(92px, 25vw, 330px)/.82 var(--sans);
-  letter-spacing: -.075em;
+  margin: 28px 0 -0.14em;
+  font: 900 clamp(76px, 20.5vw, 268px)/.82 var(--wide);
+  font-stretch: 125%;
+  letter-spacing: -.03em;
+  text-transform: uppercase;
   white-space: nowrap;
-  background: linear-gradient(180deg, var(--line-2), transparent 92%);
+  background: linear-gradient(180deg, #262625, transparent 88%);
   -webkit-background-clip: text;
           background-clip: text;
   color: transparent;
   user-select: none;
 }
-.foot-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 22px; padding: 22px 0 calc(34px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); font: 500 11.5px/1.5 var(--mono); color: var(--muted); }
+.foot-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 22px; padding: 20px 0 calc(32px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); }
 .foot-row a { text-decoration: none; }
 .foot-row a:hover { color: var(--ink); }
 
@@ -708,142 +670,139 @@ h1 .s {
 @keyframes rise { from { opacity: 0; transform: translateY(26px); } }
 @media (prefers-reduced-motion: no-preference) {
   .hero > * { animation: arrive .9s var(--ease) both; }
-  .hero > :nth-child(2) { animation-delay: .12s; }
+  .hero > :nth-child(2) { animation-delay: .08s; }
+  .hero > :nth-child(3) { animation-delay: .18s; }
+  .hero > :nth-child(4) { animation-delay: .28s; }
 }
-@keyframes arrive { from { opacity: 0; transform: translateY(18px); } }
+@keyframes arrive { from { opacity: 0; transform: translateY(16px); } }
 ::view-transition-group(*) { animation-duration: .38s; animation-timing-function: var(--ease); }
 ::view-transition-group(toolbar) { animation: none; }
 ::view-transition-old(toolbar) { display: none; }
 ::view-transition-new(toolbar) { animation: none; }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
 }
 </style>
 </head>
 <body>
+<div class="rails" aria-hidden="true"></div>
 
-<header class="site-nav" id="top">
+<header class="topbar" id="top">
   <div class="wrap">
-    <a class="logo" href="#top" aria-label="Lineup tester notes">
-      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9"/><circle cx="10" cy="8" r="2"/><circle cx="10" cy="13" r="2"/><circle cx="10" cy="18" r="2"/><circle cx="10" cy="23" r="2"/><circle cx="15" cy="23" r="2"/><circle cx="20" cy="23" r="2"/></svg>
-      <span class="logo-word">lineup</span>
-      <span class="logo-tag">Tester notes</span>
+    <a class="mark" href="#top" aria-label="Lineup tester notes">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#ecebe6"/><g fill="#0a0a0a"><circle cx="10" cy="8" r="2"/><circle cx="10" cy="13" r="2"/><circle cx="10" cy="18" r="2"/><circle cx="10" cy="23" r="2"/><circle cx="15" cy="23" r="2"/><circle cx="20" cy="23" r="2"/></g></svg>
+      <b>Lineup</b>
     </a>
-    <nav class="nav-links" aria-label="Page">
-      <a href="#download">Download</a>
-      <a href="#releases">Releases</a>
-      <a href="#changes">Features</a>
-    </nav>
-    <button type="button" class="theme-btn" id="theme" data-mode="auto" aria-label="Theme: auto. Change theme">
-      <svg class="i-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg>
-      <svg class="i-dark" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
-      <svg class="i-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>
-    </button>
+    <span class="cap onair"><i aria-hidden="true"></i>Tester notes</span>
+    <span class="cap tb-rel" id="tb-rel">Release 93</span>
+    <span class="cap tb-clock" id="clock" aria-hidden="true">00:00:00 UTC</span>
   </div>
 </header>
 
 <main>
   <div class="wrap">
     <section class="hero">
-      <div>
-        <p class="eyebrow"><span class="pulse" aria-hidden="true"></span><span>Tester notes</span><span class="sep">/</span><span id="eyebrow-rel">Release #93</span></p>
-        <h1>What's new <span class="s">in Lineup</span></h1>
-        <p class="intro">A focused sports player for iPhone and Apple TV. Your channels, your games, your library. Here's what landed in each release, how it works, and the newest build of each app.</p>
-        <div class="hero-actions">
-          <a class="btn btn-solid" href="#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg>Get the builds</a>
-          <a class="btn btn-line" href="#changes">Read the notes</a>
-        </div>
-      </div>
-      <figure class="board" aria-label="Features on this page for each app">
-        <div class="board-top"><span>Home</span><span class="board-live"><i></i>Testing</span><span>Away</span></div>
-        <div class="board-main">
-          <div class="team team-iphone"><span class="team-name">iPhone</span><span class="digits" id="sb-iphone">23</span></div>
-          <div class="board-mid"><span class="k">REL</span><span class="digits" id="sb-rel">93</span><span class="new"><span id="sb-new">15</span> new</span></div>
-          <div class="team team-tv"><span class="team-name">Apple TV</span><span class="digits" id="sb-tv">22</span></div>
-        </div>
-        <figcaption><span>Features per app, counted from this page</span><span id="sb-date"></span></figcaption>
+      <p class="cap">For iPhone and Apple TV<span class="more"> · what changed, how it works, where to get it</span></p>
+      <h1 class="hero-h"><span class="l1">What's new</span><span class="l2">in Lineup</span></h1>
+      <figure class="board">
+        <canvas id="board" aria-hidden="true"></canvas>
+        <figcaption class="cap"><span>Fig. 01 · The board</span><span>Counted from this page</span></figcaption>
       </figure>
+      <div class="hero-foot">
+        <div>
+          <p class="intro">Lineup is a focused sports player for iPhone and Apple TV: your channels, your games, your library. This page is where testers find out what changed in each release, how it works, and where to get the newest build.</p>
+          <div class="intro-links"><a href="#download">Box office ↓</a><a href="#changes">Read the notes ↓</a></div>
+        </div>
+        <dl class="specs">
+          <div><dt>iPhone</dt><dd><b id="sp-iphone">23</b>features</dd></div>
+          <div><dt>Apple TV</dt><dd><b id="sp-tv">22</b>features</dd></div>
+          <div><dt>Latest</dt><dd><b id="sp-new">15</b><span id="sp-rel">new in #93</span></dd></div>
+          <div><dt>Updated</dt><dd><b id="sp-day">Oct 20</b><span id="sp-year">2026</span></dd></div>
+        </dl>
+      </div>
     </section>
 
-    <!-- ================= DOWNLOAD ================= -->
-    <section class="block" id="download" aria-labelledby="download-h">
-      <div class="block-head">
-        <p class="kicker">Download</p>
-        <h2 id="download-h">Grab a <em>ticket.</em></h2>
-        <p>The newest official build of each app, straight from <code>main</code> once its checks pass. Tap a ticket to download the IPA.</p>
-      </div>
-      <div class="passes">
-        <article class="pass is-loading" data-app="iphone">
-          <div class="ticket-shell">
-            <a class="ticket" id="dl-iphone" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-iPhone.ipa" aria-label="Download Lineup for iPhone">
-              <span class="t-main">
-                <span class="t-holo" aria-hidden="true"></span>
-                <span class="t-foil" aria-hidden="true"></span>
-                <span class="t-top"><b>Lineup</b><span>Admit one · sideload</span></span>
-                <span class="t-device">iPhone</span>
-                <svg class="t-glyph" viewBox="0 0 76 96" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><rect x="16" y="4" width="44" height="88" rx="10"/><path d="M32 12h12"/></svg>
-                <span class="t-fields">
-                  <span class="f"><span class="k">Version</span><span class="v" data-f="version">0.0.0</span></span>
-                  <span class="f"><span class="k">Build</span><span class="v" data-f="build">000</span></span>
-                  <span class="f"><span class="k">Size</span><span class="v" data-f="size">00 MB</span></span>
-                  <span class="f"><span class="k">Date</span><span class="v" data-f="date">Oct 00</span></span>
-                </span>
-                <span class="t-code"><svg class="barcode" aria-hidden="true"></svg><span class="t-hash"><span>SHA-256</span><span data-f="hash">checking</span></span></span>
-              </span>
-              <span class="t-stub">
-                <span class="t-say"><span class="idle">Download .ipa</span><span class="busy">Downloading</span></span>
-                <span class="t-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg></span>
-              </span>
-            </a>
+    <!-- ================= BOX OFFICE ================= -->
+    <section class="box" id="download" aria-labelledby="download-h">
+      <header class="sec-head"><span class="sec-no">00</span><h2 id="download-h">Box office</h2><span class="sec-count">Official builds</span><p class="sec-sub">The newest official build of each app, printed fresh from <code>main</code> once its checks pass. Pick a device, then tear off the ticket.</p></header>
+      <div class="box-body">
+        <div class="machine" data-app="">
+          <div class="m-face">
+            <div class="m-top">
+              <div class="m-brand"><b>Lineup</b><span>Box office<br>Builds</span></div>
+              <div class="m-screen" role="status" aria-live="polite" id="m-msg">READY<span class="blink">_</span></div>
+            </div>
+            <div class="m-keys" role="radiogroup" aria-label="Device">
+              <button type="button" class="m-key" role="radio" aria-checked="false" data-app="iphone"><i class="led" aria-hidden="true"></i><span class="k-name">iPhone</span><span class="k-ver" data-key="iphone">checking</span></button>
+              <button type="button" class="m-key" role="radio" aria-checked="false" data-app="tv"><i class="led" aria-hidden="true"></i><span class="k-name">Apple TV</span><span class="k-ver" data-key="tv">checking</span></button>
+            </div>
+            <div class="m-grille" aria-hidden="true"></div>
+            <div class="m-slot" aria-hidden="true"></div>
           </div>
-          <div class="pass-foot">
-            <span class="pass-meta" id="dl-iphone-meta">Latest official build</span>
-            <button type="button" class="copy-link" data-copy="dl-iphone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
+          <div class="m-feed">
+            <div class="t-hang is-loading" data-app="iphone">
+              <div class="ticket-shell">
+                <a class="ticket" id="dl-iphone" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-iPhone.ipa" aria-label="Download Lineup for iPhone">
+                  <span class="t-main">
+                    <span class="t-foil-strip" aria-hidden="true"></span>
+                    <span class="t-sheen" aria-hidden="true"></span>
+                    <span class="t-top"><b><span class="brand">Lineup · </span>Admit one</b><span data-f="serial">Nº ———</span></span>
+                    <span class="t-device">iPhone</span>
+                    <span class="t-fields">
+                      <span class="f"><span class="k">Version</span><span class="v" data-f="version">0.0.0</span></span>
+                      <span class="f"><span class="k">Build</span><span class="v" data-f="build">000</span></span>
+                      <span class="f"><span class="k">Size</span><span class="v" data-f="size">00 MB</span></span>
+                      <span class="f"><span class="k">Date</span><span class="v" data-f="date">Oct 00</span></span>
+                    </span>
+                    <span class="t-code"><svg class="barcode" aria-hidden="true"></svg><span class="t-hash"><span>SHA-256</span><span data-f="hash">checking</span></span></span>
+                  </span>
+                  <span class="t-stub">
+                    <span class="t-say"><span class="idle">Tear to download</span><span class="busy">Downloading</span></span>
+                    <span class="t-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg></span>
+                  </span>
+                </a>
+              </div>
+            </div>
+            <div class="t-hang is-loading" data-app="tv">
+              <div class="ticket-shell">
+                <a class="ticket" id="dl-tv" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-AppleTV.ipa" aria-label="Download Lineup for Apple TV">
+                  <span class="t-main">
+                    <span class="t-foil-strip" aria-hidden="true"></span>
+                    <span class="t-sheen" aria-hidden="true"></span>
+                    <span class="t-top"><b><span class="brand">Lineup · </span>Admit one</b><span data-f="serial">Nº ———</span></span>
+                    <span class="t-device">Apple TV</span>
+                    <span class="t-fields">
+                      <span class="f"><span class="k">Version</span><span class="v" data-f="version">0.0.0</span></span>
+                      <span class="f"><span class="k">Build</span><span class="v" data-f="build">000</span></span>
+                      <span class="f"><span class="k">Size</span><span class="v" data-f="size">00 MB</span></span>
+                      <span class="f"><span class="k">Date</span><span class="v" data-f="date">Oct 00</span></span>
+                    </span>
+                    <span class="t-code"><svg class="barcode" aria-hidden="true"></svg><span class="t-hash"><span>SHA-256</span><span data-f="hash">checking</span></span></span>
+                  </span>
+                  <span class="t-stub">
+                    <span class="t-say"><span class="idle">Tear to download</span><span class="busy">Downloading</span></span>
+                    <span class="t-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg></span>
+                  </span>
+                </a>
+              </div>
+            </div>
           </div>
-        </article>
+        </div>
 
-        <article class="pass is-loading" data-app="tv">
-          <div class="ticket-shell">
-            <a class="ticket" id="dl-tv" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-AppleTV.ipa" aria-label="Download Lineup for Apple TV">
-              <span class="t-main">
-                <span class="t-holo" aria-hidden="true"></span>
-                <span class="t-foil" aria-hidden="true"></span>
-                <span class="t-top"><b>Lineup</b><span>Admit one · sideload</span></span>
-                <span class="t-device">Apple TV</span>
-                <svg class="t-glyph" viewBox="0 0 76 96" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><rect x="4" y="18" width="68" height="44" rx="6"/><path d="M26 78h24M38 62v16"/></svg>
-                <span class="t-fields">
-                  <span class="f"><span class="k">Version</span><span class="v" data-f="version">0.0.0</span></span>
-                  <span class="f"><span class="k">Build</span><span class="v" data-f="build">000</span></span>
-                  <span class="f"><span class="k">Size</span><span class="v" data-f="size">00 MB</span></span>
-                  <span class="f"><span class="k">Date</span><span class="v" data-f="date">Oct 00</span></span>
-                </span>
-                <span class="t-code"><svg class="barcode" aria-hidden="true"></svg><span class="t-hash"><span>SHA-256</span><span data-f="hash">checking</span></span></span>
-              </span>
-              <span class="t-stub">
-                <span class="t-say"><span class="idle">Download .ipa</span><span class="busy">Downloading</span></span>
-                <span class="t-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg></span>
-              </span>
-            </a>
+        <div class="box-info">
+          <h3>Installing a build</h3>
+          <ol class="how-to">
+            <li><span><b>Pick your device</b> on the machine. The iPhone build goes on iPhone, the Apple TV build on Apple TV.</span></li>
+            <li><span><b>Tear off the ticket.</b> The IPA downloads.</span></li>
+            <li><span><b>Open it in your sideloading app,</b> the one you already use. It signs the app for your device.</span></li>
+          </ol>
+          <p class="fine">These are unsigned IPAs. They come from Lineup's <code>main</code> branch once its checks pass, and each official build replaces the last. The SHA-256 on a ticket is the file's own.</p>
+          <div class="box-actions">
+            <button type="button" class="btn" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
+            <a class="btn" id="raw-iphone" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-iPhone.ipa">iPhone .ipa</a>
+            <a class="btn" id="raw-tv" href="https://github.com/nulldev85/nulldev85.github.io/releases/latest/download/Lineup-AppleTV.ipa">Apple TV .ipa</a>
           </div>
-          <div class="pass-foot">
-            <span class="pass-meta" id="dl-tv-meta">Latest official build</span>
-            <button type="button" class="copy-link" data-copy="dl-tv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
-          </div>
-        </article>
-      </div>
-      <div class="install-row">
-        <button type="button" class="link-btn" popovertarget="install">How do I install these?</button>
-        <span>Unsigned IPAs. Every official build replaces these on its own.</span>
-      </div>
-      <div class="pop" id="install" popover>
-        <h3>Installing a build</h3>
-        <ol>
-          <li><span>Download the IPA for your device. The iPhone build goes on iPhone, the Apple TV build on Apple TV.</span></li>
-          <li><span>Open it in the sideloading app you already use. It signs the app for your device.</span></li>
-          <li><span>Come back for the next one. Each official build replaces the one here, so the tickets always hold the newest.</span></li>
-        </ol>
-        <p class="fine">Builds come from Lineup's <code>main</code> branch once its checks pass and are published to this site's GitHub releases. The SHA-256 on each ticket is the file's own.</p>
-        <button type="button" class="pop-close" popovertarget="install" popovertargetaction="hide">Got it</button>
+        </div>
       </div>
     </section>
   </div>
@@ -1377,8 +1336,8 @@ h1 .s {
       </section>
 
       <div class="empty" id="empty" hidden>
-        <p>Nothing matches these filters.</p>
-        <button type="button" id="clear">Show everything</button>
+        <p>Nothing on the card.</p>
+        <button type="button" class="btn" id="clear">Show everything</button>
       </div>
     </div>
   </div>
@@ -1386,9 +1345,9 @@ h1 .s {
 
 <footer class="site-foot">
   <div class="wrap">
-    <div class="foot-big" aria-hidden="true">lineup</div>
-    <div class="foot-row">
-      <span>Lineup for iPhone and Apple TV · tester notes</span>
+    <div class="foot-big" aria-hidden="true">Lineup</div>
+    <div class="foot-row cap">
+      <span>Lineup for iPhone and Apple TV · thanks for testing</span>
       <span id="updated">Updated Oct 20, 2026</span>
       <a href="#top">Back to top ↑</a>
     </div>
@@ -1400,26 +1359,12 @@ h1 .s {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const motion = matchMedia("(prefers-reduced-motion: no-preference)");
-  const store = {
-    set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
-  };
 
-  // ---------- theme: auto, dark, light ----------
-  const root = document.documentElement;
-  const themeButton = $("#theme");
-  const showTheme = mode => {
-    if (mode === "auto") delete root.dataset.theme; else root.dataset.theme = mode;
-    themeButton.dataset.mode = mode;
-    themeButton.setAttribute("aria-label", "Theme: " + mode + ". Change theme");
-    themeButton.title = mode === "auto" ? "Theme follows your device" : "Theme: " + mode;
-  };
-  showTheme(root.dataset.theme || "auto");
-  themeButton.addEventListener("click", () => {
-    const order = ["auto", "dark", "light"];
-    const next = order[(order.indexOf(themeButton.dataset.mode) + 1) % order.length];
-    showTheme(next);
-    store.set("lineup-notes-theme", next === "auto" ? null : next);
-  });
+  // ---------- the clock in the top bar ----------
+  const clock = $("#clock");
+  const tick = () => { clock.textContent = new Date().toISOString().slice(11, 19) + " UTC"; };
+  tick();
+  setInterval(tick, 1000);
 
   // ---------- filters ----------
   const state = { plat: "all", rel: null };
@@ -1525,10 +1470,9 @@ h1 .s {
   )));
   relChip.addEventListener("click", () => change(() => { state.rel = null; }));
   $("#clear").addEventListener("click", () => change(() => { state.plat = "all"; state.rel = null; }));
-  const popoverOpen = () => { try { return !!document.querySelector(":popover-open"); } catch (e) { return false; } };
   document.addEventListener("keydown", e => {
-    if (e.metaKey || e.ctrlKey || e.altKey || e.isComposing || popoverOpen()) return;
-    if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
+    if (e.metaKey || e.ctrlKey || e.altKey || e.isComposing) return;
+    if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable], .m-keys")) return;
     const plat = { "1": "all", "2": "iphone", "3": "tv" }[e.key];
     if (plat) { setPlat(plat); return; }
     if (e.key === "Escape" && (state.rel || state.plat !== "all")) change(() => { if (state.rel) state.rel = null; else state.plat = "all"; });
@@ -1545,37 +1489,252 @@ h1 .s {
     sections.forEach(s => io.observe(s));
   }
 
-  // ---------- scoreboard ----------
+  // ---------- the numbers ----------
+  const latest = relButtons[0];
+  const nums = {
+    iphone: count("iphone", null),
+    tv: count("tv", null),
+    rel: latest ? latest.dataset.release : "",
+    fresh: latest ? count("all", latest.dataset.release) : 0
+  };
   const tally = (el, to) => {
     if (!el) return;
-    const pad = n => String(n).padStart(2, "0");
-    if (!motion.matches) { el.textContent = pad(to); return; }
+    if (!motion.matches) { el.textContent = to; return; }
     const start = performance.now();
-    const tick = now => {
+    const step = now => {
       const p = Math.min(1, (now - start) / 1100);
-      el.textContent = pad(Math.round(to * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) requestAnimationFrame(tick);
+      el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
     };
-    requestAnimationFrame(tick);
+    requestAnimationFrame(step);
   };
-  tally($("#sb-iphone"), count("iphone", null));
-  tally($("#sb-tv"), count("tv", null));
-  const latest = relButtons[0];
+  tally($("#sp-iphone"), nums.iphone);
+  tally($("#sp-tv"), nums.tv);
+  tally($("#sp-new"), nums.fresh);
+  $("#sp-rel").textContent = "new in #" + nums.rel;
+  // The footer's date is the one written by hand; the hero reads it.
+  const updated = $("#updated").textContent.replace(/^\s*Updated\s*/, "").trim();
+  const [upDay, upYear] = updated.split(", ");
+  if (upDay) { $("#sp-day").textContent = upDay; $("#sp-year").textContent = upYear || ""; }
   if (latest) {
-    $("#sb-new").textContent = count("all", latest.dataset.release);
-    const when = (latest.querySelector(".when") || {}).textContent || "";
-    $("#eyebrow-rel").textContent = "Release #" + latest.dataset.release + (when ? " · " + when.split(" · ")[0] : "");
+    const when = ((latest.querySelector(".when") || {}).textContent || "").split(" · ")[0];
+    $("#tb-rel").textContent = "Release " + nums.rel + (when ? " · " + when : "");
   }
-  $("#sb-date").textContent = $("#updated").textContent.trim();
 
-  // ---------- downloads ----------
+  // ---------- the board ----------
+  // Each message is drawn small with the real font, then read back as dots,
+  // so the board can say anything the page knows.
+  (function board() {
+    const canvas = $("#board");
+    if (!canvas || !canvas.getContext) return;
+    const ctx = canvas.getContext("2d");
+    const ROWS = 17, K = 4;
+    const lines = ["LINEUP", "RELEASE " + nums.rel, nums.fresh + " NEW", "IPHONE " + nums.iphone, "APPLE TV " + nums.tv, "THANKS FOR TESTING"];
+    let cols = 0, pitch = 0, dpr = 1, ox = 0, lit = null, dim = null, base = null;
+    let messages = [], shown = new Uint8Array(0), noise = new Float32Array(0);
+
+    function sprite(size, on) {
+      const c = document.createElement("canvas");
+      const s = Math.ceil(size * 2);
+      c.width = c.height = s;
+      const g = c.getContext("2d");
+      const mid = s / 2;
+      if (on) {
+        const glow = g.createRadialGradient(mid, mid, 0, mid, mid, size * .95);
+        glow.addColorStop(0, "rgba(255,246,226,.42)");
+        glow.addColorStop(1, "rgba(255,246,226,0)");
+        g.fillStyle = glow;
+        g.fillRect(0, 0, s, s);
+      }
+      g.fillStyle = on ? "#f8f4ea" : "#191918";
+      g.beginPath();
+      g.arc(mid, mid, size * .36, 0, Math.PI * 2);
+      g.fill();
+      return c;
+    }
+    function rasterize(text) {
+      const src = document.createElement("canvas");
+      const g = src.getContext("2d", { willReadFrequently: true });
+      const font = "800 " + Math.round(ROWS * K * .98) + "px Archivo, Geist, sans-serif";
+      const setFont = () => { g.font = font; if ("fontStretch" in g) g.fontStretch = "condensed"; };
+      setFont();
+      const m = g.measureText(text);
+      const w = Math.ceil((m.width + K * 2) / K);
+      src.width = w * K;
+      src.height = ROWS * K;
+      setFont();
+      g.fillStyle = "#fff";
+      const asc = m.actualBoundingBoxAscent || ROWS * K * .7;
+      const desc = m.actualBoundingBoxDescent || 0;
+      g.fillText(text, K, (ROWS * K + asc - desc) / 2);
+      const data = g.getImageData(0, 0, w * K, ROWS * K).data;
+      const bits = new Uint8Array(w * ROWS);
+      for (let y = 0; y < ROWS; y++) for (let x = 0; x < w; x++) {
+        let sum = 0;
+        for (let j = 0; j < K; j++) for (let i = 0; i < K; i++) sum += data[(((y * K + j) * w * K) + x * K + i) * 4 + 3];
+        bits[y * w + x] = sum / (K * K) > 120 ? 1 : 0;
+      }
+      // A round letter's overshoot can leave a lone dot above or below it.
+      const lone = (x, y) => {
+        for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) {
+          if ((i || j) && x + i >= 0 && x + i < w && y + j >= 0 && y + j < ROWS && bits[(y + j) * w + x + i]) return false;
+        }
+        return true;
+      };
+      for (let y = 0; y < ROWS; y++) for (let x = 0; x < w; x++) if (bits[y * w + x] && lone(x, y)) bits[y * w + x] = 0;
+      return { bits, w };
+    }
+    function at(x, y) {
+      const s = lit.width;
+      return [(ox + (x + .5) * pitch) * dpr - s / 2, ((y + 1) * pitch) * dpr - s / 2];
+    }
+    function layout() {
+      const width = canvas.clientWidth;
+      if (!width) return false;
+      pitch = width < 520 ? 5.4 : width < 900 ? 6.6 : 7.6;
+      cols = Math.floor(width / pitch);
+      ox = (width - cols * pitch) / 2;
+      const height = Math.round(ROWS * pitch + pitch);
+      canvas.style.height = height + "px";
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      lit = sprite(pitch * dpr, true);
+      dim = sprite(pitch * dpr, false);
+      base = document.createElement("canvas");
+      base.width = canvas.width;
+      base.height = canvas.height;
+      const b = base.getContext("2d");
+      for (let y = 0; y < ROWS; y++) for (let x = 0; x < cols; x++) b.drawImage(dim, ...at(x, y));
+      shown = new Uint8Array(cols * ROWS);
+      noise = Float32Array.from({ length: cols * ROWS }, () => Math.random());
+      return true;
+    }
+    function draw(grid) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(base, 0, 0);
+      for (let y = 0; y < ROWS; y++) for (let x = 0; x < cols; x++) if (grid[y * cols + x]) ctx.drawImage(lit, ...at(x, y));
+    }
+    function place(msg, left) {
+      const grid = new Uint8Array(cols * ROWS);
+      for (let y = 0; y < ROWS; y++) for (let x = 0; x < msg.w; x++) {
+        const gx = left + x;
+        if (gx >= 0 && gx < cols && msg.bits[y * msg.w + x]) grid[y * cols + gx] = 1;
+      }
+      return grid;
+    }
+    const mix = (from, to, p) => to.map((v, i) => (noise[i] < p ? v : from[i]));
+
+    let index = 0, started = 0, timer = 0, frame = 0, running = false;
+    function play(now) {
+      frame = 0;
+      const msg = messages[index];
+      const t = now - started;
+      if (msg.w <= cols) {
+        const target = place(msg, Math.floor((cols - msg.w) / 2));
+        if (t < 700) { draw(mix(shown, target, t / 700)); frame = requestAnimationFrame(play); return; }
+        draw(target);
+        shown = target;
+        timer = setTimeout(next, 2600);
+      } else {
+        // Too long to stand still: it runs across like a ribbon board.
+        const speed = cols / 3.2;
+        const left = Math.round(cols - (t / 1000) * speed);
+        const grid = place(msg, left);
+        draw(t < 300 ? mix(shown, grid, t / 300) : grid);
+        if (left < -msg.w) { shown = grid; next(); return; }
+        frame = requestAnimationFrame(play);
+      }
+    }
+    function next() {
+      index = (index + 1) % messages.length;
+      started = performance.now();
+      frame = requestAnimationFrame(play);
+    }
+    function stop() { running = false; cancelAnimationFrame(frame); clearTimeout(timer); }
+    function start() {
+      if (running || !messages.length || !layout()) return;
+      running = true;
+      if (!motion.matches) {
+        const msg = messages.find(m => m.w <= cols) || messages[0];
+        draw(place(msg, Math.max(0, Math.floor((cols - msg.w) / 2))));
+        return;
+      }
+      started = performance.now();
+      frame = requestAnimationFrame(play);
+    }
+    const fontReady = document.fonts ? document.fonts.load("800 64px Archivo").catch(() => null) : Promise.resolve();
+    fontReady.then(() => {
+      messages = lines.map(rasterize);
+      let visible = true;
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible && !document.hidden ? start() : stop(); }).observe(canvas);
+      } else start();
+      document.addEventListener("visibilitychange", () => { document.hidden ? stop() : visible && start(); });
+      let width = canvas.clientWidth;
+      if ("ResizeObserver" in window) new ResizeObserver(() => {
+        if (canvas.clientWidth === width) return;
+        width = canvas.clientWidth;
+        if (running) { stop(); start(); }
+      }).observe(canvas);
+    });
+  })();
+
+  // ---------- box office ----------
   // Each official build is a release on this site's repo. An app's ticket is
   // the newest release holding its IPA; until the list answers, the tickets
   // point at the latest release.
-  const downloads = [
-    { key: "iphone", asset: "Lineup-iPhone.ipa", device: "iPhone" },
-    { key: "tv", asset: "Lineup-AppleTV.ipa", device: "Apple TV" }
-  ];
+  const machine = $(".machine");
+  const screen = $("#m-msg");
+  const keys = $$(".m-key");
+  const hangs = $$(".t-hang");
+  const builds = {};
+  let chosen = null, timer = 0;
+  const names = { iphone: "iPhone", tv: "Apple TV" };
+  const say = (text, cursor) => {
+    screen.textContent = text;
+    if (cursor) { const c = document.createElement("span"); c.className = "blink"; c.textContent = "_"; screen.append(c); }
+  };
+  const ready = app => builds[app] === false ? "NONE YET" : "TEAR TO DOWNLOAD";
+
+  function choose(app) {
+    if (chosen === app) return;
+    chosen = app;
+    machine.dataset.app = app;
+    keys.forEach(k => { k.setAttribute("aria-checked", String(k.dataset.app === app)); k.tabIndex = k.dataset.app === app ? 0 : -1; });
+    clearTimeout(timer);
+    const next = hangs.find(h => h.dataset.app === app);
+    const out = hangs.find(h => h !== next && h.classList.contains("is-out"));
+    const print = () => {
+      hangs.forEach(h => { if (h !== next) h.classList.remove("is-out"); });
+      next.classList.remove("is-out");
+      void next.offsetWidth;
+      next.classList.add("is-out");
+      if (!motion.matches) { say(ready(app)); return; }
+      say("PRINTING " + names[app].toUpperCase(), true);
+      timer = setTimeout(() => say(ready(app)), 1350);
+    };
+    if (out && motion.matches) {
+      out.classList.remove("is-out");
+      say("RETURNING", true);
+      timer = setTimeout(print, 400);
+    } else print();
+  }
+  keys.forEach(k => k.addEventListener("click", () => choose(k.dataset.app)));
+  keys.forEach(k => k.addEventListener("keydown", e => {
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) return;
+    e.preventDefault();
+    const other = keys.find(o => o !== k);
+    other.focus();
+    choose(other.dataset.app);
+  }));
+  // The machine prints when it comes into view, for the app being read about.
+  const firstApp = state.plat === "tv" ? "tv" : "iphone";
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); if (!chosen) choose(firstApp); } }, { threshold: .4 });
+    io.observe(machine);
+  } else choose(firstApp);
+
   const day = iso => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
   // Bars drawn from the file's own hash, so every build's ticket differs.
   function barcode(svg, seed) {
@@ -1590,18 +1749,19 @@ h1 .s {
     svg.setAttribute("preserveAspectRatio", "none");
     svg.innerHTML = bars.join("");
   }
-  const passes = downloads.map(d => ({ ...d, pass: $('.pass[data-app="' + d.key + '"]') }));
-  passes.forEach(({ pass }) => barcode($(".barcode", pass), ""));
-  const settle = (pass, values) => {
-    pass.classList.remove("is-loading");
-    Object.entries(values).forEach(([k, v]) => { const el = $('[data-f="' + k + '"]', pass); if (el) el.textContent = v; });
+  hangs.forEach(h => barcode($(".barcode", h), ""));
+  const settle = (hang, values) => {
+    hang.classList.remove("is-loading");
+    Object.entries(values).forEach(([k, v]) => { const el = $('[data-f="' + k + '"]', hang); if (el) el.textContent = v; });
   };
+  const assets = { iphone: "Lineup-iPhone.ipa", tv: "Lineup-AppleTV.ipa" };
   fetch("https://api.github.com/repos/nulldev85/nulldev85.github.io/releases?per_page=30",
         { headers: { Accept: "application/vnd.github+json" } })
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(releases => passes.forEach(({ key, asset, device, pass }) => {
-      const ticket = $(".ticket", pass);
-      const meta = $("#dl-" + key + "-meta");
+    .then(releases => Object.entries(assets).forEach(([app, asset]) => {
+      const hang = hangs.find(h => h.dataset.app === app);
+      const ticket = $(".ticket", hang);
+      const key = $('[data-key="' + app + '"]');
       let hit = null;
       for (const release of releases) {
         if (release.draft) continue;
@@ -1609,35 +1769,47 @@ h1 .s {
         if (file) { hit = { release, file }; break; }
       }
       if (!hit) {
-        pass.classList.add("is-soon");
+        builds[app] = false;
+        hang.classList.add("is-soon");
         ticket.removeAttribute("href");
         ticket.setAttribute("aria-disabled", "true");
-        $(".t-say .idle", pass).textContent = "Soon";
-        settle(pass, { version: "Soon", build: "—", size: "—", date: "—", hash: "no build yet" });
-        meta.textContent = "Arrives with the next official build";
+        $(".t-say .idle", hang).textContent = "None yet";
+        settle(hang, { version: "—", build: "—", size: "—", date: "—", hash: "no build yet", serial: "Nº —" });
+        key.textContent = "none yet";
+        if (chosen === app) say(ready(app));
         return;
       }
       const { release, file } = hit;
+      builds[app] = file.browser_download_url;
       ticket.href = file.browser_download_url;
+      $("#raw-" + app).href = file.browser_download_url;
       const label = (file.label || "").replace(/^(iPhone|Apple TV)\s*/, "");
       const parts = label.match(/^(\S+)\s*\((\d+)\)$/);
       const digest = (file.digest || "").replace(/^sha256:/, "");
       const commit = (release.tag_name || "").replace(/^build-/, "");
       const size = Math.round(file.size / 1e6) + " MB";
-      settle(pass, {
+      settle(hang, {
         version: parts ? parts[1] : (label || "—"),
         build: parts ? parts[2] : "—",
         size,
         date: day(file.updated_at),
-        hash: digest ? digest.slice(0, 10) + "…" + digest.slice(-6) : "—"
+        hash: digest ? digest.slice(0, 10) + "…" + digest.slice(-6) : "—",
+        serial: "Nº " + (commit || "latest")
       });
-      barcode($(".barcode", pass), digest || commit);
-      ticket.setAttribute("aria-label", "Download Lineup for " + device + (label ? ", version " + label : "") + ", " + size);
-      meta.textContent = (commit ? "From commit " + commit : "Latest official build") + " · " + day(release.published_at || file.updated_at);
+      barcode($(".barcode", hang), digest || commit);
+      key.textContent = label || "latest";
+      const sz = document.createElement("span");
+      sz.className = "sz";
+      sz.textContent = " · " + size;
+      key.append(sz);
+      ticket.setAttribute("aria-label", "Download Lineup for " + names[app] + (label ? ", version " + label : "") + ", " + size);
     }))
-    .catch(() => passes.forEach(({ pass }) => settle(pass, { version: "Latest", build: "—", size: "—", date: "—", hash: "offline" })));
+    .catch(() => hangs.forEach(h => {
+      settle(h, { version: "Latest", build: "—", size: "—", date: "—", hash: "offline", serial: "Nº latest" });
+      $('[data-key="' + h.dataset.app + '"]').textContent = "latest build";
+    }));
 
-  // Tilt and foil follow the pointer; a tap tears the stub.
+  // Tilt and sheen follow the pointer; a tap tears the stub.
   const fine = matchMedia("(hover: hover) and (pointer: fine)");
   $$(".ticket").forEach(ticket => {
     const main = $(".t-main", ticket);
@@ -1646,8 +1818,8 @@ h1 .s {
       const r = ticket.getBoundingClientRect();
       const m = main.getBoundingClientRect();
       const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-      ticket.style.setProperty("--rx", ((0.5 - y) * 7).toFixed(2) + "deg");
-      ticket.style.setProperty("--ry", ((x - 0.5) * 9).toFixed(2) + "deg");
+      ticket.style.setProperty("--rx", ((0.5 - y) * 6).toFixed(2) + "deg");
+      ticket.style.setProperty("--ry", ((x - 0.5) * 8).toFixed(2) + "deg");
       main.style.setProperty("--mx", ((e.clientX - m.left) / m.width * 100).toFixed(1) + "%");
       main.style.setProperty("--my", ((e.clientY - m.top) / m.height * 100).toFixed(1) + "%");
     });
@@ -1655,16 +1827,18 @@ h1 .s {
     ticket.addEventListener("click", e => {
       if (ticket.getAttribute("aria-disabled") === "true") { e.preventDefault(); return; }
       ticket.classList.add("is-torn");
+      say("ENJOY THE GAME");
       clearTimeout(ticket.settle);
-      ticket.settle = setTimeout(() => ticket.classList.remove("is-torn"), 1700);
+      ticket.settle = setTimeout(() => { ticket.classList.remove("is-torn"); if (chosen) say(ready(chosen)); }, 1800);
     });
   });
-  $$(".copy-link").forEach(button => button.addEventListener("click", async () => {
-    const link = document.getElementById(button.dataset.copy).href;
-    try { await navigator.clipboard.writeText(link); button.dataset.state = "done"; } catch (e) { return; }
-    clearTimeout(button.reset);
-    button.reset = setTimeout(() => { delete button.dataset.state; }, 1800);
-  }));
+  const copy = $("#copy");
+  copy.addEventListener("click", async () => {
+    const link = $("#dl-" + (chosen || "iphone")).href;
+    try { await navigator.clipboard.writeText(link); copy.dataset.state = "done"; } catch (e) { return; }
+    clearTimeout(copy.reset);
+    copy.reset = setTimeout(() => { delete copy.dataset.state; }, 1800);
+  });
 })();
 </script>
 
