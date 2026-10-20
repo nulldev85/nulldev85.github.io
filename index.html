@@ -739,6 +739,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
       <section class="releases" id="releases" aria-labelledby="releases-h">
         <h2 class="side-h" id="releases-h">Releases <span>Tap to filter</span></h2>
         <div class="ledger-list">
+          <button type="button" class="rel" data-release="95" aria-pressed="false"><span class="pr">#95</span><span class="when">Oct 20 · 2:10 PM PT</span><span class="what">Episodes in the Apple TV player, Settings › Library, an engine per tab, stats never ahead of the picture</span><span class="n">6 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
           <button type="button" class="rel" data-release="93" aria-pressed="false"><span class="pr">#93</span><span class="when">Oct 19 · 11:49 PM PT</span><span class="what">Apple TV gets the iPhone's features; Auto Sync reads small scoreboards and late plays</span><span class="n">15 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
           <button type="button" class="rel" data-release="91" aria-pressed="false"><span class="pr">#91</span><span class="when">Oct 19 · 1:40 PM PT</span><span class="what">Auto Sync, team pages, more ratings, per-show tracks, performance sweep</span><span class="n">7 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
           <button type="button" class="rel" data-release="89" aria-pressed="false"><span class="pr">#89</span><span class="when">Oct 19 · 1:56 AM PT</span><span class="what">Live stats for soccer, tennis, UFC and racing; AetherEngine 7.40.1; engine logos</span><span class="n">3 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
@@ -760,11 +761,11 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
         <header class="sec-head"><span class="sec-no">01</span><h2 id="sports-h">Sports</h2><span class="sec-count" data-count></span><p class="sec-sub">Live games, live stats and the channels that carry them.</p></header>
         <div class="entries">
 
-        <article class="entry" id="auto-sync" data-platform="iphone tv" data-release="91 93" data-release-iphone="91 93" data-release-tv="93">
+        <article class="entry" id="auto-sync" data-platform="iphone tv" data-release="91 93 95" data-release-iphone="91 93 95" data-release-tv="93 95">
           <div class="meta">
             <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-            <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV</span><span data-when="iphone">#91, #93 · Oct 19</span><span data-when="tv">#93 · Oct 19</span></div>
-            <div class="shas"><span>8c42937</span><span>6767e77</span><span>4b3d7c5</span><span>b66c0e8</span></div>
+            <div class="rels"><span data-when="all">#91 iPhone · #93 Apple TV · #95 both</span><span data-when="iphone">#91, #93, #95 · Oct 20</span><span data-when="tv">#93, #95 · Oct 20</span></div>
+            <div class="shas"><span>8c42937</span><span>6767e77</span><span>4b3d7c5</span><span>b66c0e8</span><span>0fce0e6</span></div>
           </div>
           <div class="copy">
             <h3>Auto Sync</h3>
@@ -773,22 +774,23 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
               <li><span><b>It takes a frame.</b> About once a second, the app grabs the frame on screen from whichever player engine is running.</span></li>
               <li><span><b>It finds the scoreboard.</b> A corner scoreboard can be a few percent of the picture, too small to read in one look at the whole frame. Until it finds a clock, the app reads the top and bottom thirds in turn, zoomed in, and the whole frame every third time. Once found, it reads only a band across the clock's line. Baseball finds its scoreboard by the line naming a team.</span></li>
               <li><span><b>It reads the scoreboard.</b> Apple's text recognition reads the broadcast's clock and score on the device itself. Nothing is uploaded.</span></li>
-              <li><span><b>It compares with ESPN.</b> ESPN records the real time of every play, with the game clock and score at that moment. When your screen first shows 4:52 and ESPN logged a play at 4:52 thirty seconds ago, your stream is 30 seconds behind.</span></li>
+              <li><span><b>It compares with ESPN.</b> ESPN records the real time of every play, with the game clock and score at that moment. When your screen shows 4:52 and ESPN logged a play at 4:52 thirty seconds ago, your stream is 30 seconds behind.</span></li>
+              <li><span><b>It watches the clock run.</b> A clock that counts down (football, basketball, hockey) is timed between two readings. If as many seconds went off the clock as passed on the wall, it ran the whole way, so every second in between was on screen at its own moment. A play that falls between two frames still counts. A clock that is simply there, back from an ad break or stopped, says nothing on its own: counted, it put the delay out by the length of the break.</span></li>
               <li><span><b>It waits for late plays.</b> ESPN posts some plays minutes after they happen. In one NHL game a hit reached the feed 208 seconds late, so a stream only a little behind showed it first. Every clock and score the app sees is kept for ten minutes and checked again as plays arrive, so it still locks.</span></li>
               <li><span><b>It follows each sport's clock.</b> Football and basketball count down, as ESPN does. Hockey broadcasts count down while ESPN counts up within the period, so the app converts. Soccer's clock never stops, so every reading gives an answer, which is why soccer locks fastest. Baseball has no clock, so it waits for the score to change.</span></li>
-              <li><span><b>It throws out bad readings.</b> A misread digit or a clock frozen at 45:00 in stoppage time can mislead. The app waits until several estimates agree within 2.5 seconds, then adds a little on the late side so stats never run ahead of the picture.</span></li>
+              <li><span><b>It throws out bad readings.</b> A misread digit or a clock frozen at 45:00 in stoppage time can mislead. So can a free throw: ESPN stamps it with its foul's time, though it goes in half a minute later, so a score from one isn't used. The app waits until several estimates agree within 2.5 seconds, then adds a little on the late side so stats never run ahead of the picture.</span></li>
               <li><span><b>It keeps watching.</b> Once locked it checks every 4 seconds in case the stream reconnects. It rests when the device runs hot or the app is in the background, and it can be switched off where you sync by hand.</span></li>
               <li><span><b>It says what it sees.</b> The sync line says how far it has got: no picture from the player, looking for the scoreboard, or the clock it reads and how many plays agree.</span></li>
             </ol>
-            <p class="stack"><span>Vision text recognition</span><span>region of interest</span><span>AVPlayerItemVideoOutput</span><span>Aether displayed frame</span><span>libvlc snapshot</span><span>ESPN play wallclock</span></p>
+            <p class="stack"><span>Vision text recognition</span><span>region of interest</span><span>AVPlayerItemVideoOutput</span><span>Aether displayed frame</span><span>libvlc snapshot</span><span>ESPN play wallclock</span><span>running-clock timing</span></p>
           </div>
         </article>
 
-        <article class="entry" id="live-stats" data-platform="iphone tv" data-release="87 93" data-release-iphone="87" data-release-tv="93">
+        <article class="entry" id="live-stats" data-platform="iphone tv" data-release="87 93 95" data-release-iphone="87 95" data-release-tv="93 95">
           <div class="meta">
             <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
-            <div class="rels"><span data-when="all">#87 iPhone · #93 Apple TV</span><span data-when="iphone">#87 · Oct 18</span><span data-when="tv">#93 · Oct 19</span></div>
-            <div class="shas"><span>ffd595d</span><span>ef88db0</span><span>b66c0e8</span></div>
+            <div class="rels"><span data-when="all">#87 iPhone · #93 Apple TV · #95 both</span><span data-when="iphone">#87, #95 · Oct 20</span><span data-when="tv">#93, #95 · Oct 20</span></div>
+            <div class="shas"><span>ffd595d</span><span>ef88db0</span><span>b66c0e8</span><span>0fce0e6</span></div>
           </div>
           <div class="copy">
             <h3>Live stats while you watch</h3>
@@ -796,6 +798,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
             <dl class="how">
               <div><dt>Source</dt><dd>ESPN's game feed, every 10 seconds. NFL, college football, NBA, NHL and MLB.</dd></div>
               <div><dt>No spoilers</dt><dd>ESPN stamps each play with the moment it happened. A play shows only once that moment plus your stream's delay has passed. The box score waits for the latest play that came with it, and the game's score on the Sports tab is held the same way.</dd></div>
+              <div><dt>Score and clock</dt><dd>ESPN's own score and clock update within seconds, but its plays come 20 to 60 seconds later. A fetch whose score or clock is already past its latest play waits for the moment it was fetched, not for that play, so the score never runs ahead of the picture. In basketball and football the clock shown is never one the picture hasn't reached yet.</dd></div>
               <div><dt>Pausing</dt><dd>Holds everything back by as long as you paused.</dd></div>
               <div><dt>Sync by hand</dt><dd>The sync steps show the latest play and ask if it's on your screen: <b class="ui">It Just Happened</b>, <b class="ui">Not Yet</b> or <b class="ui">Already Saw It</b>. Until a sync, everything is held a minute.</dd></div>
               <div data-only="tv"><dt>On Apple TV</dt><dd>Stats is a button in the full-screen controls. Every row takes focus, so the lists scroll. Select on a play syncs to it, and the sync chip opens the sync steps inside the panel. Back leaves the steps, then closes the panel. It stays open from one game to the next.</dd></div>
@@ -956,6 +959,42 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
         <header class="sec-head"><span class="sec-no">02</span><h2 id="library-h">Library</h2><span class="sec-count" data-count></span><p class="sec-sub">Your media servers, with better posters and more to go on.</p></header>
         <div class="entries">
 
+        <article class="entry" id="settings-library" data-platform="tv" data-release="95">
+          <div class="meta">
+            <div class="plats"><span class="chip">Apple TV</span></div>
+            <div class="rels">#95 · Oct 20</div>
+            <div class="shas"><span>1fb1948</span></div>
+          </div>
+          <div class="copy">
+            <h3>Settings › Library</h3>
+            <p class="lede">The Library tab's menu is gone. Everything it held is now in its own section of Settings, called Library.</p>
+            <dl class="how">
+              <div><dt>Moved there</dt><dd><b class="ui">Collections</b>, <b class="ui">Add Shelf</b>, <b class="ui">Remove a Shelf</b>, <b class="ui">Edit Shelves</b>, <b class="ui">Refresh Library</b> and <b class="ui">Clear Local Tracking</b>.</dd></div>
+              <div><dt>Also there</dt><dd>Your media servers, the Library hero, MDBList and Metadata.</dd></div>
+              <div><dt>Live TV</dt><dd>Your TV source is in a section of its own, Live TV.</dd></div>
+              <div><dt>Library tab</dt><dd>Only your shelves. Where it used to point to the menu, it now names the Settings row.</dd></div>
+            </dl>
+            <p class="stack"><span>one Settings section per tab</span><span>same panels as before</span></p>
+          </div>
+        </article>
+
+        <article class="entry" id="aiostreams-episodes" data-platform="iphone tv" data-release="95">
+          <div class="meta">
+            <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
+            <div class="rels">#95 · Oct 20</div>
+            <div class="shas"><span>d8c3a4d</span></div>
+          </div>
+          <div class="copy">
+            <h3>AIOStreams episodes</h3>
+            <p class="lede">An AIOStreams server's tab in the stream list no longer says it doesn't have an episode that it does.</p>
+            <dl class="how">
+              <div><dt>Why it said so</dt><dd>When the server's metadata addon can't describe a show, the server still answers for the show, but with a stand-in that lists no episodes. The tab read "doesn't have this title · Has the show".</dd></div>
+              <div><dt>Now</dt><dd>An AIOStreams id names the episode itself, and its streams need nothing else. When the server gives no episode back, the app asks for that episode's streams by its id.</dd></div>
+            </dl>
+            <p class="stack"><span>AIOStreams Jellyfin layer</span><span>packed episode ids</span><span>PlaybackInfo</span></p>
+          </div>
+        </article>
+
         <article class="entry" id="collections" data-platform="iphone tv" data-release="84 93" data-release-iphone="84" data-release-tv="93">
           <div class="meta">
             <div class="plats"><span class="chip">iPhone</span><span class="chip">Apple TV</span></div>
@@ -964,7 +1003,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
           </div>
           <div class="copy">
             <h3>Collections</h3>
-            <p class="lede">Your own collections of movies and shows.<span data-only="iphone"> On iPhone they're on a Collections shelf.</span><span data-only="tv"> On Apple TV they're under <b class="ui">Collections</b> in the Library menu.</span></p>
+            <p class="lede">Your own collections of movies and shows.<span data-only="iphone"> On iPhone they're on a Collections shelf.</span><span data-only="tv"> On Apple TV they're under <b class="ui">Settings › Library › Collections</b>.</span></p>
             <dl class="how">
               <div data-only="iphone"><dt>Making them</dt><dd>Create, rename and delete. Add a title by touching and holding its poster, or with the collection button on its page. Each card previews up to three posters.</dd></div>
               <div data-only="tv"><dt>Making them</dt><dd>Hold Select on a movie or show and pick <b class="ui">Collections</b>. Select adds it to or takes it out of each one, and a new one is named with the TV's keyboard. Hold Select on a collection to rename or delete it.</dd></div>
@@ -1056,6 +1095,44 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
       <section class="section" id="player" aria-labelledby="player-h">
         <header class="sec-head"><span class="sec-no">03</span><h2 id="player-h">Player</h2><span class="sec-count" data-count></span><p class="sec-sub">Subtitles, sound, seeking and the engines underneath.</p></header>
         <div class="entries">
+
+        <article class="entry" id="episodes-row" data-platform="tv" data-release="95">
+          <div class="meta">
+            <div class="plats"><span class="chip">Apple TV</span></div>
+            <div class="rels">#95 · Oct 20</div>
+            <div class="shas"><span>1fb1948</span><span>0242111</span></div>
+          </div>
+          <div class="copy">
+            <h3>Episodes in the player</h3>
+            <p class="lede">An <b class="ui">Episodes</b> button in the player opens the season along the bottom of the screen, as Apple's own player does. Pick one and it plays on its best stream.</p>
+            <dl class="how">
+              <div><dt>Where</dt><dd>In the full-screen controls of a Library episode with others in its season.</dd></div>
+              <div><dt>The row</dt><dd>A grey panel under the title, in place of the seek bar, with the time over it. Each episode sits on its still with its number, length and name. It opens on the next episode.</dd></div>
+              <div><dt>Marks</dt><dd>The episode playing says Now Playing, watched ones have a check, and the one the remote is on gets a white rim.</dd></div>
+              <div><dt>Playing</dt><dd>Select finds the best stream the way Next Episode does and starts it. Back closes the row.</dd></div>
+            </dl>
+            <p class="stack"><span>season from your server</span><span>best stream, as Next Episode</span><span>focus section</span></p>
+          </div>
+        </article>
+
+        <article class="entry" id="tab-engines" data-platform="tv" data-release="95">
+          <div class="meta">
+            <div class="plats"><span class="chip">Apple TV</span></div>
+            <div class="rels">#95 · Oct 20</div>
+            <div class="shas"><span>9d162e6</span></div>
+          </div>
+          <div class="copy">
+            <h3>A playback engine for each tab</h3>
+            <p class="lede"><b class="ui">Settings › Playback</b> has a row for each tab that plays video: Sports, TV Guide, Library and Search. Each can use VLC or AetherEngine.</p>
+            <dl class="how">
+              <div><dt>Why</dt><dd>Some server streams stutter and fall out of sync on AetherEngine but play fine on VLC. Set Library to VLC and keep live TV on AetherEngine.</dd></div>
+              <div><dt>Unset</dt><dd>A tab not given one uses the single engine every tab used before, so nothing changes until you pick.</dd></div>
+              <div><dt>When</dt><dd>The next stream you open in that tab.</dd></div>
+              <div><dt>Carried over</dt><dd>A preview taken to full screen keeps its player. Multiview uses the engine of the tab it was opened from.</dd></div>
+            </dl>
+            <p class="stack"><span>one setting per tab</span><span>falls back to the shared engine</span></p>
+          </div>
+        </article>
 
         <article class="entry" id="skip-intro" data-platform="iphone tv" data-release="84 87" data-release-iphone="84" data-release-tv="87">
           <div class="meta">
