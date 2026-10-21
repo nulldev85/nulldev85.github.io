@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0c0d10">
-  <meta name="description" content="Latest builds and release notes for Lineup, Aether and NullSign by NullDev.">
-  <title>NullDev · Apps</title>
+  <meta name="description" content="Latest builds and release notes for Lineup, Aether and NullSign.">
+  <title>Null’s Apps</title>
   <style>
     :root {
       color-scheme: dark;
@@ -31,16 +31,15 @@
     a { color: inherit; }
     .shell { width: min(1100px, calc(100% - 40px)); margin: 0 auto; }
     .topbar { height: 82px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
-    .brand { display: inline-flex; gap: 11px; align-items: center; font-size: 14px; font-weight: 800; letter-spacing: .11em; text-decoration: none; text-transform: uppercase; }
+    .brand { display: inline-flex; gap: 11px; align-items: center; font-size: 14px; font-weight: 800; letter-spacing: .015em; text-decoration: none; }
     .brand-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; color: white; background: linear-gradient(145deg, #fa3c63, #a9163c); box-shadow: 0 5px 22px #f42e5530; }
     .brand-mark svg { width: 17px; height: 17px; }
     .copy-repo { min-width: 112px; min-height: 42px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid rgba(255,255,255,.15); border-radius: 13px; color: var(--text); background: rgba(255,255,255,.07); font: inherit; font-size: 13px; font-weight: 750; cursor: pointer; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
     .copy-repo:hover, .copy-repo:focus-visible { background: rgba(255,255,255,.13); border-color: rgba(255,255,255,.3); transform: translateY(-1px); outline: none; }
     .copy-repo svg { width: 16px; height: 16px; color: #c8cedb; }
-    .hero { padding: 55px 0 35px; }
-    .eyebrow { margin: 0 0 13px; color: #ff7891; font-size: 11px; font-weight: 800; letter-spacing: .19em; text-transform: uppercase; }
-    h1 { max-width: 680px; margin: 0; font-size: clamp(34px, 6vw, 58px); line-height: 1.03; letter-spacing: -.052em; }
-    .intro { max-width: 580px; margin: 17px 0 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
+    .hero { padding: 34px 0 27px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .intro { max-width: 700px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
     .projects { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(285px, .75fr); gap: 16px; padding-bottom: 28px; }
     .project-card { position: relative; overflow: hidden; padding: 22px; border: 1px solid var(--line); border-radius: 24px; background: linear-gradient(145deg, rgba(255,255,255,.035), transparent 42%), var(--panel); box-shadow: 0 18px 60px rgba(0,0,0,.16); transition: border-color .25s ease, background .25s ease, opacity .45s ease, transform .45s cubic-bezier(.2,.8,.2,1); }
     .project-card:hover, .project-card:focus-within { border-color: rgba(255,255,255,.18); background-color: #191b20; }
@@ -64,15 +63,20 @@
     .notes { min-height: 90px; margin: 0; padding-left: 17px; color: #c6cad1; font-size: 12px; line-height: 1.55; }
     .notes li + li { margin-top: 5px; }
     .release-pending { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .download { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 9px; margin-top: 16px; padding: 0 14px; border: 1px solid transparent; border-radius: 12px; color: white; background: var(--accent); font-size: 12px; font-weight: 800; text-decoration: none; transition: background .2s ease, transform .2s ease, box-shadow .2s ease; }
-    .download:hover, .download:focus-visible { background: #ff4568; box-shadow: 0 8px 24px #f42e5535; transform: translateY(-1px); outline: none; }
-    .download svg { width: 15px; height: 15px; }
+    .download { position: relative; display: inline-flex; width: 100%; min-height: 48px; align-items: center; justify-content: space-between; gap: 9px; overflow: hidden; margin-top: 16px; padding: 6px 8px 6px 15px; border: 1px solid rgba(255,255,255,.18); border-radius: 14px; color: white; background: linear-gradient(125deg, #ff4266 0%, #ec2d55 54%, #c82048 100%); box-shadow: 0 7px 20px rgba(244,46,85,.16), inset 0 1px 0 rgba(255,255,255,.18); font-size: 12px; font-weight: 800; text-decoration: none; transition: filter .2s ease, transform .2s ease, box-shadow .2s ease; }
+    .download::before { position: absolute; inset: 0 auto 0 -70%; width: 45%; content: ""; background: linear-gradient(100deg, transparent, rgba(255,255,255,.18), transparent); transform: skewX(-18deg); transition: left .45s ease; }
+    .download:hover::before, .download:focus-visible::before { left: 130%; }
+    .download:hover, .download:focus-visible { filter: brightness(1.08); box-shadow: 0 10px 26px rgba(244,46,85,.27), inset 0 1px 0 rgba(255,255,255,.22); transform: translateY(-2px); outline: none; }
+    .download-label, .download-badge, .download-icon { position: relative; z-index: 1; }
+    .download-badge { margin-left: auto; padding: 4px 7px; border: 1px solid rgba(255,255,255,.2); border-radius: 7px; color: rgba(255,255,255,.88); background: rgba(73,8,23,.16); font-size: 9px; font-weight: 800; letter-spacing: .08em; }
+    .download-icon { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; background: rgba(255,255,255,.16); }
+    .download-icon svg { width: 15px; height: 15px; }
     .secondary-card { display: flex; flex-direction: column; }
     .secondary-card .project-head { margin-bottom: 12px; }
     .secondary-card .project-name { font-size: 20px; }
     .secondary-card .project-summary { margin: 0 0 12px; }
     .secondary-card .notes-label { margin-top: auto; padding-top: 8px; }
-    .secondary-card .download { align-self: flex-start; }
+    .secondary-card .download { align-self: stretch; }
     .feed-note { padding: 13px 0 25px; border-top: 1px solid var(--line); color: #777e89; font-size: 11px; line-height: 1.55; }
     .feed-note strong { color: #abb1bc; font-weight: 650; }
     footer { padding: 0 0 30px; color: #646b75; font-size: 11px; }
@@ -83,7 +87,7 @@
     @media (max-width: 760px) {
       .shell { width: min(100% - 28px, 560px); }
       .topbar { height: 70px; }
-      .hero { padding: 39px 0 27px; }
+      .hero { padding: 25px 0 20px; }
       .projects { grid-template-columns: 1fr; gap: 12px; }
       .lineup-card { grid-row: auto; }
       .project-card { padding: 18px; border-radius: 21px; }
@@ -103,9 +107,8 @@
 </head>
 <body>
   <header class="topbar shell">
-    <a class="brand" href="#top" aria-label="NullDev home">
-      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 18V6l12 12V6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      <span>NullDev</span>
+    <a class="brand" href="#top" aria-label="Null’s Apps home">
+      <span>Null’s Apps</span>
     </a>
     <button class="copy-repo" id="repo-copy" type="button" aria-live="polite" aria-label="Copy the AppSource repo URL for your signer" title="Copy AppSource URL">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
@@ -113,9 +116,8 @@
     </button>
   </header>
   <main class="shell" id="top">
-    <section class="hero" aria-labelledby="page-title">
-      <p class="eyebrow">NullDev · Latest releases</p>
-      <h1 id="page-title">My projects.<br>Latest builds.</h1>
+    <section class="hero">
+      <h1 class="sr-only">Null’s Apps</h1>
       <p class="intro">The newest Lineup, Aether and NullSign downloads, with notes for the current builds. Add the repo URL to your signer, or download an IPA directly.</p>
     </section>
 
@@ -135,7 +137,7 @@
               <li>AIOStreams episodes resolve through Jellyfin-wrapped servers.</li>
               <li>Auto Sync keeps live stats aligned with the stream.</li>
             </ul>
-            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-39530865422/Lineup-iPhone-unsigned.ipa" aria-label="Download the latest Lineup iPhone IPA">Download IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></a>
+            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-39530865422/Lineup-iPhone-unsigned.ipa" aria-label="Download the latest Lineup iPhone IPA"><span class="download-label">Download</span><span class="download-badge">IPA</span><span class="download-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></span></a>
           </section>
           <section class="build" data-bundle="com.nulldev85.NullSports" data-notes-build="0.19.0-86" aria-labelledby="tvos-build-title">
             <div class="build-top"><h3 id="tvos-build-title">Apple TV</h3><span class="build-number">Build <span data-build-number>86</span></span></div>
@@ -145,7 +147,7 @@
               <li>Choose a playback engine per tab; Library controls live in Settings.</li>
               <li>Live stats stay aligned with playback.</li>
             </ul>
-            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-39530865389/Lineup-tvOS-unsigned.ipa" aria-label="Download the latest Lineup Apple TV IPA">Download IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></a>
+            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-39530865389/Lineup-tvOS-unsigned.ipa" aria-label="Download the latest Lineup Apple TV IPA"><span class="download-label">Download</span><span class="download-badge">IPA</span><span class="download-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></span></a>
           </section>
         </div>
       </article>
@@ -159,7 +161,7 @@
         <p class="project-summary">A focused app for listening to IPTV audio channels.</p>
         <p class="notes-label">Latest build · <span data-version-build>1.0.0 · Build 1</span></p>
         <p class="release-pending">No detailed release notes were included with this build.</p>
-        <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-aether-source-39529689019/IPTVRadio-unsigned-device.ipa" aria-label="Download the latest Aether IPA">Download IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></a>
+        <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-aether-source-39529689019/IPTVRadio-unsigned-device.ipa" aria-label="Download the latest Aether IPA"><span class="download-label">Download</span><span class="download-badge">IPA</span><span class="download-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></span></a>
       </article>
 
       <article class="project-card secondary-card" data-project-card data-bundle="com.elmat.NullSign">
@@ -171,13 +173,13 @@
         <p class="project-summary">Sign and install IPAs on-device with your own signing certificate.</p>
         <p class="notes-label">Latest build · <span data-version-build>1.4.0 · Build 29</span></p>
         <p class="release-pending">No detailed release notes were included with this build.</p>
-        <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-39530787902/NullSign-unsigned.ipa" aria-label="Download the latest NullSign IPA">Download IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></a>
+        <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-39530787902/NullSign-unsigned.ipa" aria-label="Download the latest NullSign IPA"><span class="download-label">Download</span><span class="download-badge">IPA</span><span class="download-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></span></a>
       </article>
     </section>
 
     <p class="feed-note"><strong>Unsigned IPAs:</strong> install through a compatible signer. The Repo URL button copies the public AppSource feed.</p>
   </main>
-  <footer class="shell">© NullDev</footer>
+  <footer class="shell">© Null’s Apps</footer>
 
   <script>
     (() => {
