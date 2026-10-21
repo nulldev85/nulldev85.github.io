@@ -106,8 +106,10 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 .nav { margin-left: auto; display: flex; gap: 2px; }
 .nav a { padding: 7px 11px; border-radius: 6px; text-decoration: none; transition: color .2s, background-color .2s; }
 .nav a:hover { color: var(--ink); background: var(--panel); }
+.nav-source { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid var(--line-2); border-radius: 7px; background: var(--panel); color: var(--ink); font: 500 10px/1 var(--mono); letter-spacing: .07em; text-decoration: none; text-transform: uppercase; white-space: nowrap; transition: border-color .2s, background .2s; }
+.nav-source:hover { border-color: var(--line-3); background: var(--raise); }
 .tb-build { padding-left: 18px; border-left: 1px solid var(--line-2); color: var(--ink-2); white-space: nowrap; }
-@media (max-width: 760px) { .nav { display: none; } .tb-build { margin-left: auto; border-left: 0; padding-left: 0; } }
+@media (max-width: 760px) { .nav { display: none; } .tb-build { display: none; } .nav-source { margin-left: auto; } }
 
 /* Read out, not shown. */
 .vh { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -159,6 +161,11 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 .project-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .project-icon { display: grid; place-items: center; width: 42px; height: 42px; flex: none; overflow: hidden; border: 1px solid var(--line-2); border-radius: 11px; background: #1c1c1b; color: var(--project-accent); font: 800 14px/1 var(--mono); }
 .project-icon img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@media (prefers-reduced-motion: no-preference) {
+  .project-icon img { transition: transform .65s var(--expo), filter .5s var(--ease), opacity .7s var(--expo); }
+  .js .project-card:not(.is-in) .project-icon img { opacity: 0; transform: scale(.78) rotate(-8deg); }
+  .project-card:hover .project-icon img, .project-card:focus-within .project-icon img { transform: scale(1.12) rotate(4deg); filter: drop-shadow(0 0 12px color-mix(in srgb, var(--project-accent) 60%, transparent)); }
+}
 .project-tag { color: var(--muted); }
 .project-copy h3 { margin: 0 0 7px; font: 800 23px/1 var(--wide); font-stretch: 116%; letter-spacing: -.02em; text-transform: uppercase; }
 .project-copy p { max-width: 38ch; margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.55; }
@@ -169,22 +176,28 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 .project-links a.primary:hover { background: #fff; }
 .project-note { margin: 12px 0 0 !important; color: var(--muted) !important; font: 500 10px/1.5 var(--mono) !important; letter-spacing: .02em; }
 @media (prefers-reduced-motion: reduce) { .project-card { transition: border-color .2s; } }
-.build-notes { margin-top: 48px; padding-top: 26px; border-top: 1px solid var(--line-2); }
-.build-notes-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; margin-bottom: 16px; }
-.build-notes-head .cap { color: var(--muted); }
-.build-notes-head h3 { margin: 0; font: 800 clamp(22px, 3vw, 32px)/1 var(--wide); font-stretch: 120%; text-transform: uppercase; }
-.build-notes-head p { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 13px; }
-.build-note-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 10px; }
-.build-note { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: #10100f; }
-.build-note .cap { color: var(--muted); font-size: 9px; }
-.build-note h4 { margin: 11px 0 9px; font: 700 17px/1.2 var(--wide); }
-.build-note ul { margin: 0; padding-left: 17px; color: var(--ink-2); font-size: 13px; line-height: 1.55; }
-.build-note li + li { margin-top: 7px; }
-.build-note p { margin: 0; color: var(--ink-2); font-size: 13px; line-height: 1.55; }
-.archive-intro { grid-column: 1 / -1; padding-top: 24px; border-top: 1px solid var(--line-2); }
-.archive-intro .cap { color: var(--muted); }
-.archive-intro h2 { margin: 8px 0; font: 800 clamp(23px, 3.8vw, 40px)/1 var(--wide); font-stretch: 125%; text-transform: uppercase; }
-.archive-intro p { max-width: 65ch; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.app-release-note { border-top: 1px solid var(--line); }
+.app-release-note summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; color: var(--ink-2); font: 500 11px/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase; cursor: pointer; list-style: none; }
+.app-release-note summary::-webkit-details-marker { display: none; }
+.app-release-note summary::after { content: "+"; color: var(--muted); font: 400 20px/1 var(--sans); transition: transform .25s var(--ease); }
+.app-release-note[open] summary::after { content: "−"; color: var(--ink); }
+.app-release-note summary:hover { color: var(--ink); }
+.app-release-note ul, .app-release-note p { margin: 12px 0 0; padding-left: 17px; color: var(--ink-2); font-size: 12px; line-height: 1.55; }
+.app-release-note li + li { margin-top: 6px; }
+.app-release-note p { padding-left: 0; }
+.history-archive { max-width: var(--max); margin: clamp(36px, 6vw, 72px) auto 0; border: 1px solid var(--line-2); border-radius: 14px; overflow: clip; background: #0d0d0c; }
+.history-archive > summary { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px clamp(16px, 3vw, 26px); cursor: pointer; list-style: none; }
+.history-archive > summary::-webkit-details-marker { display: none; }
+.history-archive > summary::after { content: "+"; color: var(--muted); font: 300 26px/1 var(--sans); }
+.history-archive[open] > summary { border-bottom: 1px solid var(--line); }
+.history-archive[open] > summary::after { content: "−"; }
+.history-title { display: grid; gap: 5px; }
+.history-title b { font: 700 clamp(16px, 2vw, 20px)/1.15 var(--wide); text-transform: uppercase; }
+.history-title .cap, .history-count { color: var(--muted); font-size: 9px; }
+.history-count { margin-left: auto; white-space: nowrap; }
+.history-archive .toolbar { margin-top: 0; }
+.history-archive .wrap.notes { padding-inline: var(--gutter); }
+@media (max-width: 560px) { .history-count { display: none; } }
 
 /* ---------------- public signer source ---------------- */
 .source-callout { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 28px; margin-top: 18px; padding: clamp(20px, 4vw, 34px); border: 1px solid var(--line-2); border-radius: 16px; background: radial-gradient(70% 170% at 0% 0%, rgb(255 255 255 / .07), transparent 60%), linear-gradient(135deg, #171716, #0e0e0d 72%); }
@@ -255,7 +268,12 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
     linear-gradient(90deg, rgb(255 255 255 / .025) 1px, transparent 1px) 0 0 / 24px 100%;
 }
 .dl-art svg { display: block; height: calc(var(--art-h) * .78); width: auto; max-width: 88%; overflow: visible; transform: translate(calc(var(--px, 0) * 6px), calc(var(--py, 0) * 4px)); transition: transform .8s var(--expo); }
-.dl-art .app-logo { width: clamp(76px, 10vw, 112px); height: auto; aspect-ratio: 1; border: 1px solid rgb(255 255 255 / .16); border-radius: 23%; box-shadow: 0 18px 50px rgb(0 0 0 / .5), 0 0 60px color-mix(in srgb, var(--logo-accent, #fff) 20%, transparent); transform: translate(calc(var(--px, 0) * 6px), calc(var(--py, 0) * 4px)); transition: transform .8s var(--expo); }
+.dl-art .app-logo-reveal { display: block; width: clamp(76px, 10vw, 112px); aspect-ratio: 1; overflow: hidden; border: 1px solid rgb(255 255 255 / .16); border-radius: 23%; background: #131313; box-shadow: 0 18px 50px rgb(0 0 0 / .5), 0 0 60px color-mix(in srgb, var(--logo-accent, #fff) 20%, transparent); }
+.dl-art .app-logo { display: block; width: 100%; height: 100%; object-fit: cover; transform: translate(calc(var(--px, 0) * 6px), calc(var(--py, 0) * 4px)); transition: transform .8s var(--expo); }
+@media (prefers-reduced-motion: no-preference) {
+  .js .dl-card:not(.is-in) .app-logo-reveal { opacity: 0; transform: scale(.82); }
+  .js .dl-card.is-in .app-logo-reveal { animation: pop 1s .9s var(--expo) both; }
+}
 .dl-art .app-mark { position: absolute; left: 22px; bottom: 18px; color: var(--muted); font: 500 10px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
 .dl-art .draw { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .dl-art .glow { opacity: .55; }
@@ -352,13 +370,6 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 .js .dl-card.is-in { opacity: 1; transform: none; }
 .js .dl-card[data-app="lineup-tvos"] { transition-delay: .12s; }
 
-.install { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); border-top: 1px solid var(--line-2); }
-.install li { display: grid; grid-template-columns: 40px minmax(0, 1fr); padding: 18px 20px 18px 0; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
-.install li + li { border-left: 1px solid var(--line); padding-left: 20px; }
-@media (max-width: 760px) { .install li + li { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); } }
-.install .n { font: 500 11px/2 var(--mono); color: var(--faint); }
-.install b { display: block; color: var(--ink); font-weight: 600; margin-bottom: 2px; }
-.fine { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: var(--faint); }
 
 /* ---------------- filter bar ---------------- */
 .toolbar {
@@ -625,10 +636,10 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
     <nav class="nav cap" aria-label="Page">
       <a href="#projects">Projects</a>
       <a href="#build-files">Downloads</a>
-      <a href="#changes">Lineup notes</a>
-      <a href="#source">AppSource</a>
+      <a href="#changes">Release history</a>
     </nav>
     <span class="cap tb-build" id="tb-build">AppSource · Live</span>
+    <a class="nav-source" href="https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json" target="_blank" rel="noopener" aria-label="Open AppSource signer feed">AppSource ↗</a>
   </div>
 </header>
 
@@ -641,7 +652,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
       <div class="hero-foot">
         <div>
           <p class="intro">Lineup for iPhone and Apple TV, Aether, and NullSign. Download the IPA you need, or add one public feed to your signer.</p>
-          <div class="intro-links"><a href="#projects">Explore projects ↓</a><a href="#changes">Lineup release notes ↓</a><a data-app-download="lineup-iphone" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-39530865422/Lineup-iPhone-unsigned.ipa">Lineup iPhone IPA ↓</a><a data-app-download="lineup-tvos" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-39530865389/Lineup-tvOS-unsigned.ipa">Lineup Apple TV IPA ↓</a></div>
+          <div class="intro-links"><a href="#projects">Explore projects ↓</a><a href="#build-files">Browse downloads ↓</a><a href="https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json" target="_blank" rel="noopener">Add signer feed ↗</a></div>
         </div>
         <dl class="specs">
           <div><dt>Apps</dt><dd><b id="sp-apps">4</b>latest builds</dd></div>
@@ -675,7 +686,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 
     <!-- ================= DOWNLOAD ================= -->
     <section class="downloads" id="build-files" aria-labelledby="download-h">
-      <header class="sec-head"><span class="sec-no">01</span><h2 id="download-h">Downloads</h2><span class="sec-count">Direct IPA files</span><p class="sec-sub">Choose a device and the IPA downloads directly. Every file is unsigned and ready for your signer.</p></header>
+      <header class="sec-head"><span class="sec-no">01</span><h2 id="download-h">Downloads</h2><span class="sec-count">Direct IPA files</span><p class="sec-sub">Choose an app, download its IPA, and expand “What’s new” for that build.</p></header>
       <div class="dl-grid">
         <article class="dl-card is-loading" id="download-iphone" data-app="lineup-iphone" data-bundle="com.nulldev85.NullSports.iOS">
           <div class="dl-art" aria-hidden="true">
@@ -716,6 +727,10 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
               <button type="button" class="ghost" data-copy="dl-iphone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
             </div>
             <div class="dl-hash"><span class="cap">Distribution</span><span class="dl-source-note">AppSource · unsigned IPA</span></div>
+            <details class="app-release-note">
+              <summary>What’s new · iPhone</summary>
+              <ul><li>AIOStreams episodes now resolve through a Jellyfin layer even when episode metadata is missing.</li><li>Auto Sync and live stats stay aligned with the video on screen.</li></ul>
+            </details>
           </div>
         </article>
 
@@ -790,12 +805,16 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
               <button type="button" class="ghost" data-copy="dl-tv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
             </div>
             <div class="dl-hash"><span class="cap">Distribution</span><span class="dl-source-note">AppSource · unsigned IPA</span></div>
+            <details class="app-release-note">
+              <summary>What’s new · Apple TV</summary>
+              <ul><li>Browse and play season episodes from the player.</li><li>Library controls live together in Settings, with a playback engine choice for each video tab.</li><li>Live stats wait for the moment shown in the stream.</li></ul>
+            </details>
           </div>
         </article>
 
         <article class="dl-card is-loading" id="download-nullsign" data-app="nullsign" data-bundle="com.elmat.NullSign">
-          <div class="dl-art" aria-hidden="true" style="--logo-accent:#148bf4">
-            <img class="app-logo" src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/nullsign.png" alt="" loading="lazy">
+            <div class="dl-art" aria-hidden="true" style="--logo-accent:#148bf4">
+            <span class="app-logo-reveal"><img class="app-logo" src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/nullsign.png" alt="" loading="lazy"></span>
             <span class="app-mark">NullDev · iOS signing</span>
           </div>
           <div class="dl-body">
@@ -811,12 +830,16 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
               <button type="button" class="ghost" data-copy="dl-nullsign"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
             </div>
             <div class="dl-hash"><span class="cap">Distribution</span><span class="dl-source-note">AppSource · unsigned IPA</span></div>
+            <details class="app-release-note">
+              <summary>What’s new · NullSign</summary>
+              <p>The AppSource feed provides this build’s version and IPA, but no detailed change summary.</p>
+            </details>
           </div>
         </article>
 
         <article class="dl-card is-loading" id="download-aether" data-app="aether" data-bundle="com.example.IPTVRadio">
           <div class="dl-art" aria-hidden="true" style="--logo-accent:#5277e8">
-            <img class="app-logo" src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/aether.png" alt="" loading="lazy">
+            <span class="app-logo-reveal"><img class="app-logo" src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/aether.png" alt="" loading="lazy"></span>
             <span class="app-mark">NullDev · IPTV radio</span>
           </div>
           <div class="dl-body">
@@ -832,39 +855,18 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
               <button type="button" class="ghost" data-copy="dl-aether"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
             </div>
             <div class="dl-hash"><span class="cap">Distribution</span><span class="dl-source-note">AppSource · unsigned IPA</span></div>
+            <details class="app-release-note">
+              <summary>What’s new · Aether</summary>
+              <p>The AppSource feed provides this build’s version and IPA, but no detailed change summary.</p>
+            </details>
           </div>
         </article>
       </div>
-      <section class="build-notes" aria-labelledby="build-notes-h">
-        <div class="build-notes-head"><span class="cap">RELEASE NOTES · BY APP BUILD</span><h3 id="build-notes-h">What’s new</h3><p>Each app has its own notes. The Lineup archive below stays separate.</p></div>
-        <div class="build-note-grid">
-          <section class="build-note" aria-labelledby="note-lineup-iphone">
-            <span class="cap">LINEUP · IPHONE</span>
-            <h4 id="note-lineup-iphone">iPhone <span data-note-build="lineup-iphone">0.19.0 · Build 126</span></h4>
-            <ul><li>AIOStreams episodes now resolve through a Jellyfin layer even when episode metadata is missing.</li><li>Auto Sync and live stats stay aligned with the video on screen.</li></ul>
-          </section>
-          <section class="build-note" aria-labelledby="note-lineup-tvos">
-            <span class="cap">LINEUP · APPLE TV</span>
-            <h4 id="note-lineup-tvos">Apple TV <span data-note-build="lineup-tvos">0.19.0 · Build 86</span></h4>
-            <ul><li>Browse and play season episodes from the player.</li><li>Library controls live together in Settings, with a playback engine choice for each video tab.</li><li>Live stats wait for the moment shown in the stream.</li></ul>
-          </section>
-          <section class="build-note" aria-labelledby="note-nullsign">
-            <span class="cap">NULLSIGN · IPHONE</span>
-            <h4 id="note-nullsign">NullSign <span data-note-build="nullsign">1.4.0 · Build 29</span></h4>
-            <p>The AppSource feed provides this build’s version and IPA. It does not include a change summary.</p>
-          </section>
-          <section class="build-note" aria-labelledby="note-aether">
-            <span class="cap">AETHER · IPHONE</span>
-            <h4 id="note-aether">Aether <span data-note-build="aether">1.0.0 · Build 1</span></h4>
-            <p>The AppSource feed provides this build’s version and IPA. It does not include a change summary.</p>
-          </section>
-        </div>
-      </section>
       <section class="source-callout" id="source" aria-labelledby="source-h">
         <div>
           <p class="cap source-kicker">AppSource · AltStore compatible</p>
-          <h3 id="source-h">One feed. Four current builds.</h3>
-          <p>Add the public AppSource feed to AltStore or Feather to browse Lineup, NullSign, and Aether. The feed mirrors unsigned IPAs from successful main-branch builds; your signer handles signing and installation.</p>
+          <h3 id="source-h">Signer feed</h3>
+          <p>Copy this URL into AltStore or Feather to browse unsigned Lineup, NullSign, and Aether builds.</p>
           <div class="source-url"><code id="source-url">https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json</code></div>
         </div>
         <div class="source-actions">
@@ -872,15 +874,14 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
           <a class="ghost" href="https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json" target="_blank" rel="noopener">Open signer feed ↗</a>
         </div>
       </section>
-      <ol class="install">
-        <li><span class="n">01</span><span><b>Pick your build</b>Choose Lineup for iPhone or Apple TV, NullSign, or Aether.</span></li>
-        <li><span class="n">02</span><span><b>Open it in your signer</b>These IPAs are unsigned. Your signer applies your certificate and installs the app.</span></li>
-        <li><span class="n">03</span><span><b>Add the source once</b>Use the AppSource URL above in AltStore or Feather to browse future builds.</span></li>
-      </ol>
-      <p class="fine">AppSource is a public AltStore-compatible repository. Its feed includes unsigned builds mirrored from verified successful main-branch builds.</p>
     </section>
   </div>
 
+  <details class="history-archive" id="changes">
+    <summary>
+      <span class="history-title"><span class="cap">OPTIONAL · LINEUP ONLY</span><b>Browse the full release history</b></span>
+      <span class="history-count">PR #95–84 · detailed feature notes</span>
+    </summary>
   <!-- ================= FILTER BAR ================= -->
   <div class="toolbar">
     <div class="wrap">
@@ -895,8 +896,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
     </div>
   </div>
 
-  <div class="wrap notes" id="changes">
-    <header class="archive-intro"><span class="cap">LINEUP ONLY · BUILD HISTORY</span><h2>Earlier Lineup release notes</h2><p>These are Lineup’s previous release notes, kept apart from the current iPhone, Apple TV, NullSign, and Aether build notes above. Select a release to show only the changes shipped in it.</p></header>
+  <div class="wrap notes">
     <aside class="side">
       <!-- ================= RELEASES ================= -->
       <section class="releases" id="releases" aria-labelledby="releases-h">
@@ -1493,6 +1493,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
       </div>
     </div>
   </div>
+  </details>
 </main>
 
 <footer class="site-foot">
@@ -1542,6 +1543,8 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
   const query = new URLSearchParams(location.search);
   if (["iphone", "tv"].includes(query.get("app"))) state.plat = query.get("app");
   if (relButtons.some(b => b.dataset.release === query.get("release"))) state.rel = query.get("release");
+  if (state.plat !== "all" || state.rel) $("#changes").open = true;
+  $$('a[href="#changes"]').forEach(link => link.addEventListener("click", () => { $("#changes").open = true; }));
 
   function placeThumb() {
     const on = platButtons.find(b => b.dataset.plat === state.plat);
@@ -1737,6 +1740,8 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
   const APP_SOURCE_URL = "https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json";
   const APP_SOURCE_REPO = "https://github.com/nulldev85/AppSource";
   const cards = $$(".dl-card");
+  const projectCards = $$(".project-card");
+  const revealCards = [...cards, ...projectCards];
   const day = iso => iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
   const fill = (card, values) => {
     card.classList.remove("is-loading");
@@ -1791,12 +1796,6 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
           link.setAttribute("aria-label", "Download " + link.textContent.trim().replace(/\s+↓$/, ""));
         }
       });
-      $$("[data-note-build]").forEach(note => {
-        const card = cards.find(item => item.dataset.app === note.dataset.noteBuild);
-        const version = card && $('[data-f="version"]', card)?.textContent;
-        const build = card && $('[data-f="build"]', card)?.textContent;
-        if (version && build && version !== "—" && build !== "—") note.textContent = version + " · Build " + build;
-      });
       const iphoneBuild = cards.find(card => card.dataset.app === "lineup-iphone");
       const tvBuild = cards.find(card => card.dataset.app === "lineup-tvos");
       const iphoneVersion = iphoneBuild && $('[data-f="build"]', iphoneBuild)?.textContent;
@@ -1827,7 +1826,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
       if (it.intersectionRatio >= .25) it.target.classList.add("is-in");
       else if (!it.isIntersecting) it.target.classList.remove("is-in");
     }), { threshold: [0, .25] });
-    cards.forEach(c => io.observe(c));
+    revealCards.forEach(c => io.observe(c));
 
     // Back from another tab, app or window: the card stays put and its
     // drawing starts over.
@@ -1837,12 +1836,12 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
     const back = () => {
       if (!away || document.hidden) return;
       away = false;
-      cards.filter(c => c.classList.contains("is-in")).forEach(redraw);
+      revealCards.filter(c => c.classList.contains("is-in")).forEach(redraw);
     };
     addEventListener("blur", leave);
     addEventListener("focus", back);
     document.addEventListener("visibilitychange", () => document.hidden ? leave() : back());
-  } else cards.forEach(c => c.classList.add("is-in"));
+  } else revealCards.forEach(c => c.classList.add("is-in"));
 
   cards.forEach(card => {
     // Light on the border and a slight lean of the drawing, toward the pointer.
