@@ -55,6 +55,7 @@
     .latest-dot { width: 6px; height: 6px; border-radius: 50%; background: #57d6a2; box-shadow: 0 0 10px #57d6a280; }
     .project-summary { margin: -5px 0 19px; color: var(--muted); font-size: 13px; line-height: 1.55; }
     .build-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    .single-build { grid-template-columns: 1fr; }
     .build { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: rgba(0,0,0,.16); }
     .build-top { display: flex; align-items: baseline; justify-content: space-between; gap: 9px; }
     .build h3 { margin: 0; font-size: 14px; }
@@ -70,8 +71,6 @@
     .secondary-card .project-head { margin-bottom: 12px; }
     .secondary-card .project-name { font-size: 20px; }
     .secondary-card .project-summary { margin: 0 0 12px; }
-    .secondary-card .notes-label { margin-top: auto; padding-top: 8px; }
-    .secondary-card .download { align-self: flex-start; }
     .feed-note { padding: 13px 0 25px; border-top: 1px solid var(--line); color: #777e89; font-size: 11px; line-height: 1.55; }
     .feed-note strong { color: #abb1bc; font-weight: 650; }
     footer { padding: 0 0 30px; color: #646b75; font-size: 11px; }
@@ -147,28 +146,38 @@
         </div>
       </article>
 
-      <article class="project-card secondary-card" data-project-card data-bundle="com.example.IPTVRadio">
+      <article class="project-card secondary-card" data-project-card>
         <header class="project-head">
           <span class="icon-shell"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/aether.png" alt="" width="58" height="58" loading="lazy"></span>
           <div><h2 class="project-name">Aether</h2><p class="project-kind">IPTV radio</p></div>
           <span class="latest"><i class="latest-dot"></i>Latest</span>
         </header>
         <p class="project-summary">A focused app for listening to IPTV audio channels.</p>
-        <p class="notes-label">Latest build · <span data-version-build>1.0.0 · Build 1</span></p>
-        <p class="release-pending">No detailed release notes were included with this build.</p>
-        <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-aether-source-39529689019/IPTVRadio-unsigned-device.ipa" aria-label="Download the latest Aether IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+        <div class="build-grid single-build">
+          <section class="build" data-bundle="com.example.IPTVRadio" aria-label="Latest Aether build">
+            <div class="build-top"><h3>Latest build</h3><span class="build-number" data-version-build>1.0.0 · Build 1</span></div>
+            <p class="notes-label">Latest build notes</p>
+            <p class="release-pending">No detailed release notes were included with this build.</p>
+            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-aether-source-39529689019/IPTVRadio-unsigned-device.ipa" aria-label="Download the latest Aether IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+          </section>
+        </div>
       </article>
 
-      <article class="project-card secondary-card" data-project-card data-bundle="com.elmat.NullSign">
+      <article class="project-card secondary-card" data-project-card>
         <header class="project-head">
           <span class="icon-shell"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/nullsign.png" alt="" width="58" height="58" loading="lazy"></span>
           <div><h2 class="project-name">NullSign</h2><p class="project-kind">iOS signing &amp; install</p></div>
           <span class="latest"><i class="latest-dot"></i>Latest</span>
         </header>
         <p class="project-summary">Sign and install IPAs on-device with your own signing certificate.</p>
-        <p class="notes-label">Latest build · <span data-version-build>1.4.0 · Build 29</span></p>
-        <p class="release-pending">No detailed release notes were included with this build.</p>
-        <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-39530787902/NullSign-unsigned.ipa" aria-label="Download the latest NullSign IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+        <div class="build-grid single-build">
+          <section class="build" data-bundle="com.elmat.NullSign" aria-label="Latest NullSign build">
+            <div class="build-top"><h3>Latest build</h3><span class="build-number" data-version-build>1.4.0 · Build 29</span></div>
+            <p class="notes-label">Latest build notes</p>
+            <p class="release-pending">No detailed release notes were included with this build.</p>
+            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-39530787902/NullSign-unsigned.ipa" aria-label="Download the latest NullSign IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+          </section>
+        </div>
       </article>
     </section>
 
