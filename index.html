@@ -169,6 +169,22 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 .project-links a.primary:hover { background: #fff; }
 .project-note { margin: 12px 0 0 !important; color: var(--muted) !important; font: 500 10px/1.5 var(--mono) !important; letter-spacing: .02em; }
 @media (prefers-reduced-motion: reduce) { .project-card { transition: border-color .2s; } }
+.build-notes { margin-top: 48px; padding-top: 26px; border-top: 1px solid var(--line-2); }
+.build-notes-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; margin-bottom: 16px; }
+.build-notes-head .cap { color: var(--muted); }
+.build-notes-head h3 { margin: 0; font: 800 clamp(22px, 3vw, 32px)/1 var(--wide); font-stretch: 120%; text-transform: uppercase; }
+.build-notes-head p { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 13px; }
+.build-note-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 10px; }
+.build-note { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: #10100f; }
+.build-note .cap { color: var(--muted); font-size: 9px; }
+.build-note h4 { margin: 11px 0 9px; font: 700 17px/1.2 var(--wide); }
+.build-note ul { margin: 0; padding-left: 17px; color: var(--ink-2); font-size: 13px; line-height: 1.55; }
+.build-note li + li { margin-top: 7px; }
+.build-note p { margin: 0; color: var(--ink-2); font-size: 13px; line-height: 1.55; }
+.archive-intro { grid-column: 1 / -1; padding-top: 24px; border-top: 1px solid var(--line-2); }
+.archive-intro .cap { color: var(--muted); }
+.archive-intro h2 { margin: 8px 0; font: 800 clamp(23px, 3.8vw, 40px)/1 var(--wide); font-stretch: 125%; text-transform: uppercase; }
+.archive-intro p { max-width: 65ch; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
 
 /* ---------------- public signer source ---------------- */
 .source-callout { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 28px; margin-top: 18px; padding: clamp(20px, 4vw, 34px); border: 1px solid var(--line-2); border-radius: 16px; background: radial-gradient(70% 170% at 0% 0%, rgb(255 255 255 / .07), transparent 60%), linear-gradient(135deg, #171716, #0e0e0d 72%); }
@@ -407,7 +423,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
 /* ---------------- releases + features ---------------- */
 .notes { display: grid; grid-template-columns: minmax(0, 1fr); }
 .side, .feed { min-width: 0; }
-#releases, #changes { scroll-margin-top: calc(var(--bar-h) + 8px); }
+#releases, #changes, #build-files { scroll-margin-top: calc(var(--bar-h) + 8px); }
 @media (min-width: 1040px) {
   .notes { grid-template-columns: 280px minmax(0, 1fr); gap: 64px; }
   .side {
@@ -608,7 +624,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
     </a>
     <nav class="nav cap" aria-label="Page">
       <a href="#projects">Projects</a>
-      <a href="#download">Downloads</a>
+      <a href="#build-files">Downloads</a>
       <a href="#changes">Lineup notes</a>
       <a href="#source">AppSource</a>
     </nav>
@@ -624,12 +640,12 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
       <h1 class="hero-title">Small apps.<br><span>Serious tools.</span></h1>
       <div class="hero-foot">
         <div>
-          <p class="intro">Independent projects for live sports and media, on-device signing, IPTV radio, self-hosted libraries, and Windows TV. Find the right tool, pull the latest build, or add the public source to your signer.</p>
-          <div class="intro-links"><a href="#projects">Explore projects ↓</a><a href="#download">Get the builds ↓</a><a href="#changes">Lineup release notes ↓</a></div>
+          <p class="intro">Lineup for iPhone and Apple TV, Aether, and NullSign. Download the IPA you need, or add one public feed to your signer.</p>
+          <div class="intro-links"><a href="#projects">Explore projects ↓</a><a href="#changes">Lineup release notes ↓</a><a data-app-download="lineup-iphone" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-39530865422/Lineup-iPhone-unsigned.ipa">Lineup iPhone IPA ↓</a><a data-app-download="lineup-tvos" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-39530865389/Lineup-tvOS-unsigned.ipa">Lineup Apple TV IPA ↓</a></div>
         </div>
         <dl class="specs">
           <div><dt>Apps</dt><dd><b id="sp-apps">4</b>latest builds</dd></div>
-          <div><dt>Projects</dt><dd><b>6</b>apps, server &amp; tools</dd></div>
+          <div><dt>Projects</dt><dd><b>3</b>apps · 4 builds</dd></div>
           <div><dt>Signer feed</dt><dd><b id="sp-source">Loading</b>AppSource JSON</dd></div>
           <div><dt>Updated</dt><dd><b id="sp-day">Oct 20</b><span id="sp-year">2026</span></dd></div>
         </dl>
@@ -637,44 +653,29 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
     </section>
 
     <section class="projects" id="projects" aria-labelledby="projects-h">
-      <header class="sec-head"><span class="sec-no">00</span><h2 id="projects-h">Projects</h2><span class="sec-count">NullDev85</span><p class="sec-sub">A small ecosystem of apps and tools. Builds and repositories stay close to their source.</p></header>
+      <header class="sec-head"><span class="sec-no">00</span><h2 id="projects-h">Projects</h2><span class="sec-count">3 apps · 4 builds</span><p class="sec-sub">Lineup for iPhone and Apple TV, plus Aether and NullSign. Each build button downloads its IPA directly.</p></header>
       <div class="project-grid">
         <article class="project-card" style="--project-accent:#168cff">
           <div class="project-top"><span class="project-icon"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/lineup.png" alt="" loading="lazy"></span><span class="cap project-tag">Sports · iOS / tvOS</span></div>
           <div class="project-copy"><h3>Lineup</h3><p>Live sports, TV, and your media library in one native player for iPhone and Apple TV.</p></div>
-          <div class="project-links"><a class="primary" href="#download">Get builds</a><a href="https://github.com/nulldev85/NullSports" target="_blank" rel="noopener">Repository ↗</a></div>
+          <div class="project-links"><a class="primary" data-app-download="lineup-iphone" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-39530865422/Lineup-iPhone-unsigned.ipa">iPhone IPA ↓</a><a data-app-download="lineup-tvos" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-39530865389/Lineup-tvOS-unsigned.ipa">Apple TV IPA ↓</a></div>
         </article>
         <article class="project-card" style="--project-accent:#148bf4">
           <div class="project-top"><span class="project-icon"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/nullsign.png" alt="" loading="lazy"></span><span class="cap project-tag">On-device · iOS</span></div>
           <div class="project-copy"><h3>NullSign</h3><p>A local iOS IPA signer and installer. Bring your own signing certificate and install on-device.</p></div>
-          <div class="project-links"><a class="primary" href="#download-nullsign">Get NullSign</a><a href="#source">Signer source</a></div>
+          <div class="project-links"><a class="primary" data-app-download="nullsign" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-39530787902/NullSign-unsigned.ipa">Download IPA ↓</a></div>
         </article>
         <article class="project-card" style="--project-accent:#5277e8">
           <div class="project-top"><span class="project-icon"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/aether.png" alt="" loading="lazy"></span><span class="cap project-tag">IPTV radio · iOS</span></div>
           <div class="project-copy"><h3>Aether</h3><p>A radio-only IPTV app for listening to audio channels. Lineup’s AetherEngine is a separate playback component.</p></div>
-          <div class="project-links"><a class="primary" href="#download-aether">Get Aether</a><a href="#source">Signer source</a></div>
-        </article>
-        <article class="project-card" style="--project-accent:#91c7ad">
-          <div class="project-top"><span class="project-icon" aria-hidden="true">NF</span><span class="cap project-tag">Self-hosted · Server</span></div>
-          <div class="project-copy"><h3>Nullfin</h3><p>A self-hosted media server with a Jellyfin-compatible API.</p></div>
-          <div class="project-links"><a class="primary" href="https://github.com/nulldev85/nullfin/releases/latest" target="_blank" rel="noopener">Latest release ↗</a><a href="https://github.com/nulldev85/nullfin" target="_blank" rel="noopener">Repository ↗</a></div>
-        </article>
-        <article class="project-card" style="--project-accent:#55b6a5">
-          <div class="project-top"><span class="project-icon" aria-hidden="true">NT</span><span class="cap project-tag">Windows · ARM64</span></div>
-          <div class="project-copy"><h3>NullTV</h3><p>A native Windows 11 IPTV client built with WinUI 3 and libmpv. Bring your own sources.</p></div>
-          <div class="project-links"><a class="primary" href="https://github.com/nulldev85/NullTV-updates/releases/latest" target="_blank" rel="noopener">Windows builds ↗</a><a href="https://github.com/nulldev85/NullTV" target="_blank" rel="noopener">Repository ↗</a></div>
-        </article>
-        <article class="project-card" style="--project-accent:#d1b7ff">
-          <div class="project-top"><span class="project-icon" aria-hidden="true">ID</span><span class="cap project-tag">Open source</span></div>
-          <div class="project-copy"><h3>IDeviceKit</h3><p>Project code and current details are available in the public repository.</p></div>
-          <div class="project-links"><a class="primary" href="https://github.com/nulldev85/IDeviceKit" target="_blank" rel="noopener">Open repository ↗</a></div>
+          <div class="project-links"><a class="primary" data-app-download="aether" href="https://github.com/nulldev85/AppSource/releases/download/dist-aether-source-39529689019/IPTVRadio-unsigned-device.ipa">Download IPA ↓</a></div>
         </article>
       </div>
     </section>
 
     <!-- ================= DOWNLOAD ================= -->
-    <section class="downloads" id="download" aria-labelledby="download-h">
-      <header class="sec-head"><span class="sec-no">01</span><h2 id="download-h">Downloads</h2><span class="sec-count">Official feed</span><p class="sec-sub">Live IPA links from the public AppSource repository. The feed updates as new builds are published.</p></header>
+    <section class="downloads" id="build-files" aria-labelledby="download-h">
+      <header class="sec-head"><span class="sec-no">01</span><h2 id="download-h">Downloads</h2><span class="sec-count">Direct IPA files</span><p class="sec-sub">Choose a device and the IPA downloads directly. Every file is unsigned and ready for your signer.</p></header>
       <div class="dl-grid">
         <article class="dl-card is-loading" id="download-iphone" data-app="lineup-iphone" data-bundle="com.nulldev85.NullSports.iOS">
           <div class="dl-art" aria-hidden="true">
@@ -707,7 +708,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
               <div><dt>Published</dt><dd data-f="date">Oct 00</dd></div>
             </dl>
             <div class="dl-actions">
-              <a class="dl-btn" id="dl-iphone" data-direct="false" href="https://github.com/nulldev85/AppSource/releases" aria-label="Open the official AppSource releases">
+              <a class="dl-btn" id="dl-iphone" data-direct="true" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-39530865422/Lineup-iPhone-unsigned.ipa" aria-label="Download Lineup for iPhone IPA">
                 <span class="ico" aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/></svg><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
                 <span class="lbl">Download IPA</span>
                 <span class="bar" aria-hidden="true"></span>
@@ -781,7 +782,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
               <div><dt>Published</dt><dd data-f="date">Oct 00</dd></div>
             </dl>
             <div class="dl-actions">
-              <a class="dl-btn" id="dl-tv" data-direct="false" href="https://github.com/nulldev85/AppSource/releases" aria-label="Open the official AppSource releases">
+              <a class="dl-btn" id="dl-tv" data-direct="true" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-39530865389/Lineup-tvOS-unsigned.ipa" aria-label="Download Lineup for Apple TV IPA">
                 <span class="ico" aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/></svg><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
                 <span class="lbl">Download IPA</span>
                 <span class="bar" aria-hidden="true"></span>
@@ -806,7 +807,7 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
               <div><dt>Published</dt><dd data-f="date">—</dd></div>
             </dl>
             <div class="dl-actions">
-              <a class="dl-btn" id="dl-nullsign" data-direct="false" href="https://github.com/nulldev85/AppSource/releases" aria-label="Open the official AppSource releases"><span class="ico" aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/></svg><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="lbl">Open AppSource</span><span class="bar" aria-hidden="true"></span></a>
+              <a class="dl-btn" id="dl-nullsign" data-direct="true" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-39530787902/NullSign-unsigned.ipa" aria-label="Download NullSign IPA"><span class="ico" aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/></svg><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="lbl">Download IPA</span><span class="bar" aria-hidden="true"></span></a>
               <button type="button" class="ghost" data-copy="dl-nullsign"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
             </div>
             <div class="dl-hash"><span class="cap">Distribution</span><span class="dl-source-note">AppSource · unsigned IPA</span></div>
@@ -827,23 +828,48 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
               <div><dt>Published</dt><dd data-f="date">—</dd></div>
             </dl>
             <div class="dl-actions">
-              <a class="dl-btn" id="dl-aether" data-direct="false" href="https://github.com/nulldev85/AppSource/releases" aria-label="Open the official AppSource releases"><span class="ico" aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/></svg><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="lbl">Open AppSource</span><span class="bar" aria-hidden="true"></span></a>
+              <a class="dl-btn" id="dl-aether" data-direct="true" href="https://github.com/nulldev85/AppSource/releases/download/dist-aether-source-39529689019/IPTVRadio-unsigned-device.ipa" aria-label="Download Aether IPA"><span class="ico" aria-hidden="true"><svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/></svg><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="lbl">Download IPA</span><span class="bar" aria-hidden="true"></span></a>
               <button type="button" class="ghost" data-copy="dl-aether"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg><span class="idle">Copy link</span><span class="done">Copied</span></button>
             </div>
             <div class="dl-hash"><span class="cap">Distribution</span><span class="dl-source-note">AppSource · unsigned IPA</span></div>
           </div>
         </article>
       </div>
+      <section class="build-notes" aria-labelledby="build-notes-h">
+        <div class="build-notes-head"><span class="cap">RELEASE NOTES · BY APP BUILD</span><h3 id="build-notes-h">What’s new</h3><p>Each app has its own notes. The Lineup archive below stays separate.</p></div>
+        <div class="build-note-grid">
+          <section class="build-note" aria-labelledby="note-lineup-iphone">
+            <span class="cap">LINEUP · IPHONE</span>
+            <h4 id="note-lineup-iphone">iPhone <span data-note-build="lineup-iphone">0.19.0 · Build 126</span></h4>
+            <ul><li>AIOStreams episodes now resolve through a Jellyfin layer even when episode metadata is missing.</li><li>Auto Sync and live stats stay aligned with the video on screen.</li></ul>
+          </section>
+          <section class="build-note" aria-labelledby="note-lineup-tvos">
+            <span class="cap">LINEUP · APPLE TV</span>
+            <h4 id="note-lineup-tvos">Apple TV <span data-note-build="lineup-tvos">0.19.0 · Build 86</span></h4>
+            <ul><li>Browse and play season episodes from the player.</li><li>Library controls live together in Settings, with a playback engine choice for each video tab.</li><li>Live stats wait for the moment shown in the stream.</li></ul>
+          </section>
+          <section class="build-note" aria-labelledby="note-nullsign">
+            <span class="cap">NULLSIGN · IPHONE</span>
+            <h4 id="note-nullsign">NullSign <span data-note-build="nullsign">1.4.0 · Build 29</span></h4>
+            <p>The AppSource feed provides this build’s version and IPA. It does not include a change summary.</p>
+          </section>
+          <section class="build-note" aria-labelledby="note-aether">
+            <span class="cap">AETHER · IPHONE</span>
+            <h4 id="note-aether">Aether <span data-note-build="aether">1.0.0 · Build 1</span></h4>
+            <p>The AppSource feed provides this build’s version and IPA. It does not include a change summary.</p>
+          </section>
+        </div>
+      </section>
       <section class="source-callout" id="source" aria-labelledby="source-h">
         <div>
           <p class="cap source-kicker">AppSource · AltStore compatible</p>
           <h3 id="source-h">One feed. Four current builds.</h3>
-          <p>Add the public source to AltStore or Feather to browse Lineup, NullSign, and Aether in your signer. The feed mirrors unsigned IPAs from successful main-branch builds; your signer handles signing and installation.</p>
+          <p>Add the public AppSource feed to AltStore or Feather to browse Lineup, NullSign, and Aether. The feed mirrors unsigned IPAs from successful main-branch builds; your signer handles signing and installation.</p>
           <div class="source-url"><code id="source-url">https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json</code></div>
         </div>
         <div class="source-actions">
           <button type="button" class="dl-btn" data-copy-source><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></span><span class="lbl">Copy source URL</span></button>
-          <a class="ghost" href="https://github.com/nulldev85/AppSource" target="_blank" rel="noopener">View source repo ↗</a>
+          <a class="ghost" href="https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json" target="_blank" rel="noopener">Open signer feed ↗</a>
         </div>
       </section>
       <ol class="install">
@@ -870,12 +896,13 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
   </div>
 
   <div class="wrap notes" id="changes">
+    <header class="archive-intro"><span class="cap">LINEUP ONLY · BUILD HISTORY</span><h2>Earlier Lineup release notes</h2><p>These are Lineup’s previous release notes, kept apart from the current iPhone, Apple TV, NullSign, and Aether build notes above. Select a release to show only the changes shipped in it.</p></header>
     <aside class="side">
       <!-- ================= RELEASES ================= -->
       <section class="releases" id="releases" aria-labelledby="releases-h">
-        <h2 class="side-h" id="releases-h">Releases <span>Tap to filter</span></h2>
+        <h2 class="side-h" id="releases-h">Lineup releases <span>Choose one build</span></h2>
         <div class="ledger-list">
-          <button type="button" class="rel" data-release="95" aria-pressed="false"><span class="pr">#95</span><span class="when">Oct 20 · 2:10 PM PT</span><span class="what">Episodes in the Apple TV player, Settings › Library, an engine per tab, stats never ahead of the picture</span><span class="n">6 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
+          <button type="button" class="rel" data-release="95" aria-pressed="false"><span class="pr">LATEST</span><span class="when" data-build-label>iPhone 126 · Apple TV 86 · PR 95</span><span class="what">Episodes on Apple TV, clearer Library settings, an engine per tab, stats stay in sync</span><span class="n">6 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
           <button type="button" class="rel" data-release="93" aria-pressed="false"><span class="pr">#93</span><span class="when">Oct 19 · 11:49 PM PT</span><span class="what">Apple TV gets the iPhone's features; Auto Sync reads small scoreboards and late plays</span><span class="n">15 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
           <button type="button" class="rel" data-release="91" aria-pressed="false"><span class="pr">#91</span><span class="when">Oct 19 · 1:40 PM PT</span><span class="what">Auto Sync, team pages, more ratings, per-show tracks, performance sweep</span><span class="n">7 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
           <button type="button" class="rel" data-release="89" aria-pressed="false"><span class="pr">#89</span><span class="when">Oct 19 · 1:56 AM PT</span><span class="what">Live stats for soccer, tennis, UFC and racing; AetherEngine 7.40.1; engine logos</span><span class="n">3 features</span><svg class="chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5"/></svg></button>
@@ -1717,11 +1744,13 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
   };
   const sourceFallback = (card, message = "Feed offline") => {
     const button = $(".dl-btn", card);
-    button.href = APP_SOURCE_REPO + "/releases";
-    button.dataset.direct = "false";
-    button.setAttribute("aria-label", "Open the official AppSource releases");
-    $(".lbl", button).textContent = "Open AppSource";
-    fill(card, { version: message, build: "—", size: "—", date: "—", label: "AppSource" });
+    const hasSavedFile = button.href.startsWith(APP_SOURCE_REPO + "/releases/download/") && button.href.toLowerCase().endsWith(".ipa");
+    button.dataset.direct = String(hasSavedFile);
+    button.setAttribute("aria-label", hasSavedFile ? "Download the last listed IPA" : "Build link unavailable");
+    $(".lbl", button).textContent = hasSavedFile ? "Download last listed IPA" : "Unavailable";
+    const note = $(".dl-source-note", card);
+    if (note) note.textContent = hasSavedFile ? "Feed offline · last listed file" : "AppSource feed unavailable";
+    fill(card, { version: message, build: "—", size: "—", date: "—", label: hasSavedFile ? "Last listed" : "Unavailable" });
   };
   async function loadAppSource() {
     try {
@@ -1754,6 +1783,25 @@ code { font: 500 .88em var(--mono); padding: 1px 6px; border-radius: 4px; backgr
         });
         if (release.date && release.date > newestDate) newestDate = release.date;
       });
+      $$("[data-app-download]").forEach(link => {
+        const card = cards.find(item => item.dataset.app === link.dataset.appDownload);
+        const button = card && $(".dl-btn", card);
+        if (button && button.href.startsWith(APP_SOURCE_REPO + "/releases/download/") && button.href.toLowerCase().endsWith(".ipa")) {
+          link.href = button.href;
+          link.setAttribute("aria-label", "Download " + link.textContent.trim().replace(/\s+↓$/, ""));
+        }
+      });
+      $$("[data-note-build]").forEach(note => {
+        const card = cards.find(item => item.dataset.app === note.dataset.noteBuild);
+        const version = card && $('[data-f="version"]', card)?.textContent;
+        const build = card && $('[data-f="build"]', card)?.textContent;
+        if (version && build && version !== "—" && build !== "—") note.textContent = version + " · Build " + build;
+      });
+      const iphoneBuild = cards.find(card => card.dataset.app === "lineup-iphone");
+      const tvBuild = cards.find(card => card.dataset.app === "lineup-tvos");
+      const iphoneVersion = iphoneBuild && $('[data-f="build"]', iphoneBuild)?.textContent;
+      const tvVersion = tvBuild && $('[data-f="build"]', tvBuild)?.textContent;
+      if (iphoneVersion && tvVersion) $("#releases [data-build-label]").textContent = "iPhone " + iphoneVersion + " · Apple TV " + tvVersion + " · PR 95";
       $("#sp-apps").textContent = String(cards.filter(card => $(".dl-btn", card).dataset.direct === "true").length);
       $("#tb-build").textContent = "AppSource · " + $("#sp-apps").textContent + " apps";
       if (newestDate) {
