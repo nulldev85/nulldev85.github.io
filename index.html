@@ -63,20 +63,15 @@
     .notes { min-height: 90px; margin: 0; padding-left: 17px; color: #c6cad1; font-size: 12px; line-height: 1.55; }
     .notes li + li { margin-top: 5px; }
     .release-pending { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .download { position: relative; display: inline-flex; width: 100%; min-height: 48px; align-items: center; justify-content: space-between; gap: 9px; overflow: hidden; margin-top: 16px; padding: 6px 8px 6px 15px; border: 1px solid rgba(255,255,255,.18); border-radius: 14px; color: white; background: linear-gradient(125deg, #ff4266 0%, #ec2d55 54%, #c82048 100%); box-shadow: 0 7px 20px rgba(244,46,85,.16), inset 0 1px 0 rgba(255,255,255,.18); font-size: 12px; font-weight: 800; text-decoration: none; transition: filter .2s ease, transform .2s ease, box-shadow .2s ease; }
-    .download::before { position: absolute; inset: 0 auto 0 -70%; width: 45%; content: ""; background: linear-gradient(100deg, transparent, rgba(255,255,255,.18), transparent); transform: skewX(-18deg); transition: left .45s ease; }
-    .download:hover::before, .download:focus-visible::before { left: 130%; }
-    .download:hover, .download:focus-visible { filter: brightness(1.08); box-shadow: 0 10px 26px rgba(244,46,85,.27), inset 0 1px 0 rgba(255,255,255,.22); transform: translateY(-2px); outline: none; }
-    .download-label, .download-badge, .download-icon { position: relative; z-index: 1; }
-    .download-badge { margin-left: auto; padding: 4px 7px; border: 1px solid rgba(255,255,255,.2); border-radius: 7px; color: rgba(255,255,255,.88); background: rgba(73,8,23,.16); font-size: 9px; font-weight: 800; letter-spacing: .08em; }
-    .download-icon { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; background: rgba(255,255,255,.16); }
-    .download-icon svg { width: 15px; height: 15px; }
+    .download { display: inline-flex; width: max-content; min-height: 40px; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; padding: 0 14px; border: 1px solid rgba(255,255,255,.2); border-radius: 13px; color: white; background: linear-gradient(135deg, #f74365, #cf2148); box-shadow: 0 5px 15px rgba(244,46,85,.16), inset 0 1px 0 rgba(255,255,255,.17); font-size: 12px; font-weight: 800; text-decoration: none; transition: filter .2s ease, transform .2s ease, box-shadow .2s ease; }
+    .download:hover, .download:focus-visible { filter: brightness(1.1); box-shadow: 0 8px 20px rgba(244,46,85,.24), inset 0 1px 0 rgba(255,255,255,.22); transform: translateY(-1px); outline: none; }
+    .download svg { width: 15px; height: 15px; }
     .secondary-card { display: flex; flex-direction: column; }
     .secondary-card .project-head { margin-bottom: 12px; }
     .secondary-card .project-name { font-size: 20px; }
     .secondary-card .project-summary { margin: 0 0 12px; }
     .secondary-card .notes-label { margin-top: auto; padding-top: 8px; }
-    .secondary-card .download { align-self: stretch; }
+    .secondary-card .download { align-self: flex-start; }
     .feed-note { padding: 13px 0 25px; border-top: 1px solid var(--line); color: #777e89; font-size: 11px; line-height: 1.55; }
     .feed-note strong { color: #abb1bc; font-weight: 650; }
     footer { padding: 0 0 30px; color: #646b75; font-size: 11px; }
@@ -137,7 +132,7 @@
               <li>AIOStreams episodes resolve through Jellyfin-wrapped servers.</li>
               <li>Auto Sync keeps live stats aligned with the stream.</li>
             </ul>
-            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-39530865422/Lineup-iPhone-unsigned.ipa" aria-label="Download the latest Lineup iPhone IPA"><span class="download-label">Download</span><span class="download-badge">IPA</span><span class="download-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></span></a>
+            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-39530865422/Lineup-iPhone-unsigned.ipa" aria-label="Download the latest Lineup iPhone IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
           </section>
           <section class="build" data-bundle="com.nulldev85.NullSports" data-notes-build="0.19.0-86" aria-labelledby="tvos-build-title">
             <div class="build-top"><h3 id="tvos-build-title">Apple TV</h3><span class="build-number">Build <span data-build-number>86</span></span></div>
@@ -147,7 +142,7 @@
               <li>Choose a playback engine per tab; Library controls live in Settings.</li>
               <li>Live stats stay aligned with playback.</li>
             </ul>
-            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-39530865389/Lineup-tvOS-unsigned.ipa" aria-label="Download the latest Lineup Apple TV IPA"><span class="download-label">Download</span><span class="download-badge">IPA</span><span class="download-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></span></a>
+            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-39530865389/Lineup-tvOS-unsigned.ipa" aria-label="Download the latest Lineup Apple TV IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
           </section>
         </div>
       </article>
@@ -161,7 +156,7 @@
         <p class="project-summary">A focused app for listening to IPTV audio channels.</p>
         <p class="notes-label">Latest build · <span data-version-build>1.0.0 · Build 1</span></p>
         <p class="release-pending">No detailed release notes were included with this build.</p>
-        <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-aether-source-39529689019/IPTVRadio-unsigned-device.ipa" aria-label="Download the latest Aether IPA"><span class="download-label">Download</span><span class="download-badge">IPA</span><span class="download-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></span></a>
+        <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-aether-source-39529689019/IPTVRadio-unsigned-device.ipa" aria-label="Download the latest Aether IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
       </article>
 
       <article class="project-card secondary-card" data-project-card data-bundle="com.elmat.NullSign">
@@ -173,7 +168,7 @@
         <p class="project-summary">Sign and install IPAs on-device with your own signing certificate.</p>
         <p class="notes-label">Latest build · <span data-version-build>1.4.0 · Build 29</span></p>
         <p class="release-pending">No detailed release notes were included with this build.</p>
-        <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-39530787902/NullSign-unsigned.ipa" aria-label="Download the latest NullSign IPA"><span class="download-label">Download</span><span class="download-badge">IPA</span><span class="download-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/></svg></span></a>
+        <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-39530787902/NullSign-unsigned.ipa" aria-label="Download the latest NullSign IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
       </article>
     </section>
 
