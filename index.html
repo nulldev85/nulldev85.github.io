@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0c0d10">
-  <meta name="description" content="Latest builds and release notes for Lineup, Aether and NullSign.">
+  <meta name="description" content="Explore Lineup, Aether and NullSign: what each app does, its key features, and the latest builds.">
   <title>Null’s Apps</title>
   <style>
     :root {
@@ -51,9 +51,14 @@
     .project-card:hover .icon-shell img, .project-card:focus-within .icon-shell img { transform: scale(1.13); filter: saturate(1.12); }
     .project-name { margin: 0; font-size: 23px; letter-spacing: -.035em; }
     .project-kind { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
-    .latest { display: inline-flex; align-items: center; gap: 7px; margin-left: auto; padding: 7px 9px; border: 1px solid rgba(255,255,255,.09); border-radius: 999px; color: #c4cad4; background: rgba(255,255,255,.045); font-size: 10px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
-    .latest-dot { width: 6px; height: 6px; border-radius: 50%; background: #57d6a2; box-shadow: 0 0 10px #57d6a280; }
-    .project-summary { margin: -5px 0 19px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .release-trigger { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; gap: 7px; margin-left: auto; padding: 0 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 11px; color: #dce0e7; background: rgba(255,255,255,.055); font: inherit; font-size: 10px; font-weight: 750; white-space: nowrap; cursor: pointer; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+    .release-trigger:hover, .release-trigger:focus-visible { border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.11); transform: translateY(-1px); outline: none; }
+    .release-trigger svg { width: 14px; height: 14px; color: #ff7b93; }
+    .project-summary { margin: 0 0 16px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .feature-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-bottom: 17px; }
+    .feature { min-width: 0; padding: 11px 12px; border: 1px solid rgba(255,255,255,.065); border-radius: 13px; background: rgba(255,255,255,.025); }
+    .feature h3 { margin: 0 0 4px; color: #e6e8ed; font-size: 11px; font-weight: 750; }
+    .feature p { margin: 0; color: #a0a5af; font-size: 10.5px; line-height: 1.5; }
     .build-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
     .single-build { grid-template-columns: 1fr; }
     .build { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: rgba(0,0,0,.16); }
@@ -64,13 +69,31 @@
     .notes { min-height: 90px; margin: 0; padding-left: 17px; color: #c6cad1; font-size: 12px; line-height: 1.55; }
     .notes li + li { margin-top: 5px; }
     .release-pending { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .release-dialog { width: min(640px, calc(100% - 28px)); max-width: none; max-height: min(86dvh, 780px); padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.14); border-radius: 23px; color: var(--text); background: linear-gradient(145deg, rgba(255,255,255,.035), transparent 38%), #17191e; box-shadow: 0 30px 100px rgba(0,0,0,.55); }
+    .release-dialog::backdrop { background: rgba(4,5,8,.72); backdrop-filter: blur(10px); }
+    .dialog-body { max-height: min(86dvh, 780px); overflow: auto; padding: 24px; }
+    .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 16px; }
+    .dialog-kicker { margin: 0 0 6px; color: #ff7891; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .dialog-head h2 { margin: 0; font-size: 25px; letter-spacing: -.035em; }
+    .dialog-close { display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; color: #e7e9ee; background: rgba(255,255,255,.06); font: inherit; font-size: 20px; line-height: 1; cursor: pointer; }
+    .dialog-close:hover, .dialog-close:focus-visible { background: rgba(255,255,255,.13); outline: 2px solid rgba(255,255,255,.25); outline-offset: 2px; }
+    .dialog-intro { margin: 0 0 18px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .release-build { padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: rgba(0,0,0,.16); }
+    .release-build + .release-build { margin-top: 10px; }
+    .release-build-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 11px; border-bottom: 1px solid var(--line); }
+    .release-build-head h3 { margin: 0; font-size: 14px; }
+    .release-build-version { color: #aeb4bf; font-size: 11px; font-variant-numeric: tabular-nums; text-align: right; }
+    .release-build-info { margin: 11px 0 0; color: #858c98; font-size: 10px; line-height: 1.5; }
+    .release-list { margin: 12px 0 0; padding-left: 18px; color: #c5cad2; font-size: 12px; line-height: 1.65; }
+    .release-list li + li { margin-top: 7px; }
+    .notes-pending { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
     .download { display: inline-flex; width: max-content; min-height: 40px; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; padding: 0 14px; border: 1px solid rgba(255,255,255,.2); border-radius: 13px; color: white; background: linear-gradient(135deg, #f74365, #cf2148); box-shadow: 0 5px 15px rgba(244,46,85,.16), inset 0 1px 0 rgba(255,255,255,.17); font-size: 12px; font-weight: 800; text-decoration: none; transition: filter .2s ease, transform .2s ease, box-shadow .2s ease; }
     .download:hover, .download:focus-visible { filter: brightness(1.1); box-shadow: 0 8px 20px rgba(244,46,85,.24), inset 0 1px 0 rgba(255,255,255,.22); transform: translateY(-1px); outline: none; }
     .download svg { width: 15px; height: 15px; }
     .secondary-card { display: flex; flex-direction: column; }
     .secondary-card .project-head { margin-bottom: 12px; }
     .secondary-card .project-name { font-size: 20px; }
-    .secondary-card .project-summary { margin: 0 0 12px; }
+    .secondary-card .project-summary { margin: 0 0 13px; }
     .feed-note { padding: 13px 0 25px; border-top: 1px solid var(--line); color: #777e89; font-size: 11px; line-height: 1.55; }
     .feed-note strong { color: #abb1bc; font-weight: 650; }
     footer { padding: 0 0 30px; color: #646b75; font-size: 11px; }
@@ -91,7 +114,11 @@
       .copy-repo { min-width: 100px; min-height: 40px; }
       .build-grid { grid-template-columns: 1fr; }
       .notes { min-height: 0; }
-      .latest { font-size: 9px; padding: 6px 7px; }
+      .project-head { gap: 9px; }
+      .release-trigger { min-height: 32px; padding: 0 8px; font-size: 9px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .dialog-body { padding: 18px; }
+      .release-build { padding: 13px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -112,35 +139,32 @@
   <main class="shell" id="top">
     <section class="hero">
       <h1 class="sr-only">Null’s Apps</h1>
-      <p class="intro">The newest Lineup, Aether and NullSign downloads, with notes for the current builds. Add the repo URL to your signer, or download an IPA directly.</p>
+      <p class="intro">Explore what Lineup, Aether and NullSign do, browse their features, and get the latest builds. Open each app’s release notes for the changes in its current release, add the repo URL to your signer, or download an IPA directly.</p>
     </section>
 
-    <section class="projects" aria-label="Latest project builds">
+    <section class="projects" aria-label="NullDev apps">
       <article class="project-card lineup-card" data-project-card>
         <header class="project-head">
           <span class="icon-shell"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/lineup.png" alt="" width="58" height="58"></span>
           <div><h2 class="project-name">Lineup</h2><p class="project-kind">Live sports · iPhone &amp; Apple TV</p></div>
-          <span class="latest"><i class="latest-dot"></i>Latest</span>
+          <button class="release-trigger" type="button" data-open-dialog="lineup-release" aria-haspopup="dialog" aria-controls="lineup-release"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.75h7l4.25 4.5v12H7a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2Z"/><path d="M14 4v5h4M9 13h6M9 16.5h6"/></svg>Release notes</button>
         </header>
-        <p class="project-summary">Live sports, TV, and your media library in one place.</p>
+        <p class="project-summary">Lineup brings live sports, live television, and your personal media library together on iPhone and Apple TV. Connect your own IPTV provider and media servers, follow the teams and titles you care about, then watch through one consistent interface.</p>
+        <div class="feature-grid" aria-label="Lineup features">
+          <section class="feature"><h3>Live sports &amp; teams</h3><p>Follow pro leagues, college football, soccer leagues and tournaments, Formula 1, and NASCAR. See schedules, scores, standings and team pages, then find event channels or provider catch-up when available. On iPhone, followed NFL teams also get a Game Replays shelf when recordings are offered.</p></section>
+          <section class="feature"><h3>Live TV guide</h3><p>Browse and search your provider’s channels and program listings, keep channel favorites, and start live TV or an available catch-up recording from the guide.</p></section>
+          <section class="feature"><h3>Media servers &amp; progress</h3><p>Browse Jellyfin and Nullfin libraries, including AIOStreams catalogs and streams delivered through a Jellyfin layer. Continue Watching and episode progress help you resume across supported sources.</p></section>
+          <section class="feature"><h3>Metadata &amp; artwork</h3><p>Choose provider, TMDB or TVDB metadata sources, organize library rows and collections, and use BetterPosters and Fanart.tv artwork where a match is available.</p></section>
+          <section class="feature"><h3>Playback tools</h3><p>Choose VLC or AetherEngine by app section. Depending on the device and stream, use live stats with Auto Sync, picture-in-picture, multiview, responsive seeking, subtitles and IntroDB-powered Skip Intro for library episodes.</p></section>
+          <section class="feature"><h3>Built for each screen</h3><p>Lineup has touch-first iPhone controls and a remote-friendly Apple TV interface, with settings and playback choices adapted to each platform.</p></section>
+        </div>
         <div class="build-grid">
-          <section class="build" data-bundle="com.nulldev85.NullSports.iOS" data-notes-build="0.19.0-126" aria-labelledby="iphone-build-title">
-            <div class="build-top"><h3 id="iphone-build-title">iPhone</h3><span class="build-number">Build <span data-build-number>126</span></span></div>
-            <p class="notes-label">Latest build notes</p>
-            <ul class="notes" data-release-notes>
-              <li>AIOStreams episodes resolve through Jellyfin-wrapped servers.</li>
-              <li>Auto Sync keeps live stats aligned with the stream.</li>
-            </ul>
+          <section class="build" data-bundle="com.nulldev85.NullSports.iOS" aria-labelledby="iphone-build-title">
+            <div class="build-top"><h3 id="iphone-build-title">iPhone</h3><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>126</span></span></div>
             <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-39530865422/Lineup-iPhone-unsigned.ipa" aria-label="Download the latest Lineup iPhone IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
           </section>
-          <section class="build" data-bundle="com.nulldev85.NullSports" data-notes-build="0.19.0-86" aria-labelledby="tvos-build-title">
-            <div class="build-top"><h3 id="tvos-build-title">Apple TV</h3><span class="build-number">Build <span data-build-number>86</span></span></div>
-            <p class="notes-label">Latest build notes</p>
-            <ul class="notes" data-release-notes>
-              <li>Browse season episodes from the player.</li>
-              <li>Choose a playback engine per tab; Library controls live in Settings.</li>
-              <li>Live stats stay aligned with playback.</li>
-            </ul>
+          <section class="build" data-bundle="com.nulldev85.NullSports" aria-labelledby="tvos-build-title">
+            <div class="build-top"><h3 id="tvos-build-title">Apple TV</h3><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>86</span></span></div>
             <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-39530865389/Lineup-tvOS-unsigned.ipa" aria-label="Download the latest Lineup Apple TV IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
           </section>
         </div>
@@ -150,14 +174,19 @@
         <header class="project-head">
           <span class="icon-shell"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/aether.png" alt="" width="58" height="58" loading="lazy"></span>
           <div><h2 class="project-name">Aether</h2><p class="project-kind">IPTV radio</p></div>
-          <span class="latest"><i class="latest-dot"></i>Latest</span>
+          <button class="release-trigger" type="button" data-open-dialog="aether-release" aria-haspopup="dialog" aria-controls="aether-release"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.75h7l4.25 4.5v12H7a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2Z"/><path d="M14 4v5h4M9 13h6M9 16.5h6"/></svg>Release notes</button>
         </header>
-        <p class="project-summary">A focused app for listening to IPTV audio channels.</p>
+        <p class="project-summary">Aether is a radio-first iPhone app for listening to audio stations from your own IPTV subscription, imported playlists, and public radio directories. It filters out TV channels and gives listening, discovery, and now-playing information their own focused experience.</p>
+        <div class="feature-grid" aria-label="Aether features">
+          <section class="feature"><h3>Bring your stations</h3><p>Connect with Xtream credentials or import an M3U/M3U8 playlist. Account credentials are stored in the iOS Keychain.</p></section>
+          <section class="feature"><h3>Radio-only library</h3><p>Automatically detect audio stations, tune the filter rules, search by station or genre, and choose whether to include every detected station.</p></section>
+          <section class="feature"><h3>Discover with Aether Dial</h3><p>Explore public radio by country, state, station name or genre, preview a station, and save it without pasting a stream URL.</p></section>
+          <section class="feature"><h3>Now playing &amp; background audio</h3><p>See track and artist details with available album art. Listen in the background with Lock Screen and Control Center controls, AirPlay and Bluetooth routing.</p></section>
+          <section class="feature"><h3>Everyday listening</h3><p>Keep favorites and recent plays, use the mini-player or full Now Playing screen, set a sleep timer, and recover from temporary stream drops with automatic reconnect.</p></section>
+        </div>
         <div class="build-grid single-build">
           <section class="build" data-bundle="com.example.IPTVRadio" aria-label="Latest Aether build">
-            <div class="build-top"><h3>Latest build</h3><span class="build-number" data-version-build>1.0.0 · Build 1</span></div>
-            <p class="notes-label">Latest build notes</p>
-            <p class="release-pending">No detailed release notes were included with this build.</p>
+            <div class="build-top"><h3>Latest build</h3><span class="build-number">v<span data-version-number>1.0.0</span> · Build <span data-build-number>1</span></span></div>
             <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-aether-source-39529689019/IPTVRadio-unsigned-device.ipa" aria-label="Download the latest Aether IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
           </section>
         </div>
@@ -167,19 +196,78 @@
         <header class="project-head">
           <span class="icon-shell"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/nullsign.png" alt="" width="58" height="58" loading="lazy"></span>
           <div><h2 class="project-name">NullSign</h2><p class="project-kind">iOS signing &amp; install</p></div>
-          <span class="latest"><i class="latest-dot"></i>Latest</span>
+          <button class="release-trigger" type="button" data-open-dialog="nullsign-release" aria-haspopup="dialog" aria-controls="nullsign-release"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.75h7l4.25 4.5v12H7a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2Z"/><path d="M14 4v5h4M9 13h6M9 16.5h6"/></svg>Release notes</button>
         </header>
-        <p class="project-summary">Sign and install IPAs on-device with your own signing certificate.</p>
+        <p class="project-summary">NullSign signs and installs iOS apps directly on your device using your own Apple signing certificate and provisioning profile. Import an IPA, choose a saved signing identity, and complete the signing workflow locally instead of uploading your app and certificate to a signing website.</p>
+        <div class="feature-grid" aria-label="NullSign features">
+          <section class="feature"><h3>Sign on your device</h3><p>Use your own .p12 certificate and matching .mobileprovision profile to sign an IPA locally. NullSign does not need your certificate uploaded to a remote signing service.</p></section>
+          <section class="feature"><h3>Import IPAs easily</h3><p>Bring an IPA in from the Files app or from a URL, then select it from the Signer tab.</p></section>
+          <section class="feature"><h3>Manage signing identities</h3><p>Save multiple certificate and profile pairs, give them names, inspect them, select the one you need, or remove an old identity.</p></section>
+          <section class="feature"><h3>Browse app sources</h3><p>Add AltStore-compatible repositories to browse their apps and releases from inside NullSign.</p></section>
+          <section class="feature"><h3>Optional tweaks</h3><p>Import .deb and .dylib tweaks for supported signing workflows, including ElleKit support when required.</p></section>
+        </div>
         <div class="build-grid single-build">
           <section class="build" data-bundle="com.elmat.NullSign" aria-label="Latest NullSign build">
-            <div class="build-top"><h3>Latest build</h3><span class="build-number" data-version-build>1.4.0 · Build 29</span></div>
-            <p class="notes-label">Latest build notes</p>
-            <p class="release-pending">No detailed release notes were included with this build.</p>
+            <div class="build-top"><h3>Latest build</h3><span class="build-number">v<span data-version-number>1.4.0</span> · Build <span data-build-number>29</span></span></div>
             <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-39530787902/NullSign-unsigned.ipa" aria-label="Download the latest NullSign IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
           </section>
         </div>
       </article>
     </section>
+
+    <dialog class="release-dialog" id="lineup-release" aria-labelledby="lineup-release-title">
+      <div class="dialog-body">
+        <header class="dialog-head"><div><p class="dialog-kicker">Lineup · latest release</p><h2 id="lineup-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes">×</button></header>
+        <p class="dialog-intro">The latest iPhone and Apple TV builds add improvements to live playback, server episode matching, and the Library experience.</p>
+        <section class="release-build" data-release-notes-bundle="com.nulldev85.NullSports.iOS" data-notes-build="0.19.0-126">
+          <div class="release-build-head"><h3>iPhone</h3><span class="release-build-version">Version <span data-release-version-for="com.nulldev85.NullSports.iOS">0.19.0</span> · Build <span data-release-build-for="com.nulldev85.NullSports.iOS">126</span></span></div>
+          <p class="release-build-info" data-feed-description-for="com.nulldev85.NullSports.iOS">Published from the latest successful main-branch build.</p>
+          <ul class="release-list" data-release-notes-list>
+            <li><strong>AIOStreams episode matching:</strong> episodes continue to resolve through an AIOStreams Jellyfin layer when its metadata response omits the episode list. Lineup uses the episode-specific identifier to request the right streams.</li>
+            <li><strong>Auto Sync and live stats:</strong> the player reads the broadcast scoreboard and keeps game state, score and play-by-play aligned with the picture.</li>
+          </ul>
+        </section>
+        <section class="release-build" data-release-notes-bundle="com.nulldev85.NullSports" data-notes-build="0.19.0-86">
+          <div class="release-build-head"><h3>Apple TV</h3><span class="release-build-version">Version <span data-release-version-for="com.nulldev85.NullSports">0.19.0</span> · Build <span data-release-build-for="com.nulldev85.NullSports">86</span></span></div>
+          <p class="release-build-info" data-feed-description-for="com.nulldev85.NullSports">Published from the latest successful main-branch build.</p>
+          <ul class="release-list" data-release-notes-list>
+            <li><strong>Episodes in the player:</strong> open the season episode row from fullscreen playback and start another episode from its best available stream.</li>
+            <li><strong>Playback choices by tab:</strong> choose VLC or AetherEngine independently for Sports, TV Guide, Library and Search.</li>
+            <li><strong>Library settings:</strong> Library controls are grouped in Settings, and live stats remain synchronized with playback.</li>
+          </ul>
+        </section>
+      </div>
+    </dialog>
+
+    <dialog class="release-dialog" id="aether-release" aria-labelledby="aether-release-title">
+      <div class="dialog-body">
+        <header class="dialog-head"><div><p class="dialog-kicker">Aether · latest release</p><h2 id="aether-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes">×</button></header>
+        <p class="dialog-intro">The latest Aether release introduces its AetherEngine-based audio playback runtime and refreshes the listening experience.</p>
+        <section class="release-build" data-release-notes-bundle="com.example.IPTVRadio" data-notes-build="1.0.0-1">
+          <div class="release-build-head"><h3>Aether</h3><span class="release-build-version">Version <span data-release-version-for="com.example.IPTVRadio">1.0.0</span> · Build <span data-release-build-for="com.example.IPTVRadio">1</span></span></div>
+          <p class="release-build-info" data-feed-description-for="com.example.IPTVRadio">Published from the latest successful main-branch build.</p>
+          <ul class="release-list" data-release-notes-list>
+            <li><strong>AetherEngine audio playback:</strong> radio streams use the Aether audio runtime; raw audio streams use FFmpeg decoding, with native HLS handling retained for compatible formats.</li>
+            <li><strong>Clearer playback diagnostics:</strong> stream diagnostics identify the actual audio path in use while preserving provider candidate order.</li>
+            <li><strong>Listening experience polish:</strong> the Now Playing screen, controls, station browsing and Aether visual style were refined for focused radio listening.</li>
+          </ul>
+        </section>
+      </div>
+    </dialog>
+
+    <dialog class="release-dialog" id="nullsign-release" aria-labelledby="nullsign-release-title">
+      <div class="dialog-body">
+        <header class="dialog-head"><div><p class="dialog-kicker">NullSign · latest release</p><h2 id="nullsign-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes">×</button></header>
+        <p class="dialog-intro">The latest NullSign build is the current iOS signing and installation release.</p>
+        <section class="release-build" data-release-notes-bundle="com.elmat.NullSign" data-notes-build="1.4.0-29">
+          <div class="release-build-head"><h3>NullSign</h3><span class="release-build-version">Version <span data-release-version-for="com.elmat.NullSign">1.4.0</span> · Build <span data-release-build-for="com.elmat.NullSign">29</span></span></div>
+          <p class="release-build-info" data-feed-description-for="com.elmat.NullSign">Published from the latest successful main-branch build.</p>
+          <ul class="release-list" data-release-notes-list>
+            <li>No detailed changelog was attached to this build in AppSource.</li>
+          </ul>
+        </section>
+      </div>
+    </dialog>
 
     <p class="feed-note"><strong>Unsigned IPAs:</strong> install through a compatible signer. The Repo URL button copies the public AppSource feed.</p>
   </main>
@@ -197,7 +285,26 @@
       } else cards.forEach(card => card.classList.add("is-visible"));
 
       const appSourceURL = "https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json";
-      const appSourceReleaseRoot = "https://github.com/nulldev85/AppSource/releases/download/";
+      document.querySelectorAll("[data-open-dialog]").forEach(button => {
+        const dialog = document.getElementById(button.dataset.openDialog);
+        if (!dialog) return;
+        button.addEventListener("click", () => {
+          if (typeof dialog.showModal === "function") {
+            if (!dialog.open) dialog.showModal();
+          } else dialog.setAttribute("open", "");
+        });
+      });
+      document.querySelectorAll(".release-dialog").forEach(dialog => {
+        dialog.querySelector("[data-dialog-close]")?.addEventListener("click", () => {
+          if (typeof dialog.close === "function") dialog.close();
+          else dialog.removeAttribute("open");
+        });
+        dialog.addEventListener("click", event => {
+          if (event.target !== dialog) return;
+          if (typeof dialog.close === "function") dialog.close();
+          else dialog.removeAttribute("open");
+        });
+      });
       const repoButton = document.getElementById("repo-copy");
       const repoLabel = document.getElementById("repo-copy-label");
       let resetCopyLabel;
@@ -238,18 +345,32 @@
         if (link) link.href = url.href;
         const buildNumber = container.querySelector("[data-build-number]");
         if (buildNumber) buildNumber.textContent = release.buildVersion;
-        const versionBuild = container.querySelector("[data-version-build]");
-        if (versionBuild) versionBuild.textContent = release.version + " · Build " + release.buildVersion;
-        const notesFor = container.dataset.notesBuild;
-        if (notesFor && notesFor !== release.version + "-" + release.buildVersion) {
-          const notes = container.querySelector("[data-release-notes]");
-          if (notes) {
-            const message = document.createElement("p");
-            message.className = "release-pending";
-            message.textContent = "Release notes for this build are being prepared.";
-            notes.replaceWith(message);
-          }
-        }
+        const versionNumber = container.querySelector("[data-version-number]");
+        if (versionNumber) versionNumber.textContent = release.version;
+        const bundle = container.dataset.bundle;
+        document.querySelectorAll("[data-release-version-for]").forEach(node => {
+          if (node.dataset.releaseVersionFor === bundle) node.textContent = release.version;
+        });
+        document.querySelectorAll("[data-release-build-for]").forEach(node => {
+          if (node.dataset.releaseBuildFor === bundle) node.textContent = release.buildVersion;
+        });
+        document.querySelectorAll("[data-feed-description-for]").forEach(node => {
+          if (node.dataset.feedDescriptionFor !== bundle) return;
+          const date = release.date ? new Date(release.date) : null;
+          const dateLabel = date && !Number.isNaN(date.getTime())
+            ? new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date)
+            : "Latest build";
+          node.textContent = [dateLabel, release.localizedDescription].filter(Boolean).join(" · ");
+        });
+        document.querySelectorAll("[data-release-notes-bundle]").forEach(section => {
+          if (section.dataset.releaseNotesBundle !== bundle || section.dataset.notesBuild === release.version + "-" + release.buildVersion) return;
+          const notes = section.querySelector("[data-release-notes-list]");
+          const message = document.createElement("p");
+          message.className = "notes-pending";
+          message.textContent = "Release notes for this build are being prepared.";
+          if (notes) notes.replaceWith(message);
+          else section.querySelector(".notes-pending")?.replaceWith(message);
+        });
       };
       fetch(appSourceURL, { cache: "no-store" }).then(response => {
         if (!response.ok) throw new Error("AppSource unavailable");
