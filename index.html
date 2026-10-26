@@ -40,10 +40,11 @@
     .hero { padding: 34px 0 27px; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     .intro { max-width: 700px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
-    .projects { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(285px, .75fr); gap: 16px; padding-bottom: 28px; }
+    .projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding-bottom: 28px; }
     .project-card { position: relative; overflow: hidden; padding: 22px; border: 1px solid var(--line); border-radius: 24px; background: linear-gradient(145deg, rgba(255,255,255,.035), transparent 42%), var(--panel); box-shadow: 0 18px 60px rgba(0,0,0,.16); transition: border-color .25s ease, background .25s ease, opacity .45s ease, transform .45s cubic-bezier(.2,.8,.2,1); }
     .project-card:hover, .project-card:focus-within { border-color: rgba(255,255,255,.18); background-color: #191b20; }
-    .lineup-card { grid-row: span 2; }
+    .lineup-card { grid-column: 1 / -1; }
+    .lineup-card .feature-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
     .project-head { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
     .icon-shell { flex: 0 0 auto; width: 58px; height: 58px; overflow: hidden; border: 1px solid rgba(255,255,255,.12); border-radius: 16px; background: #22252b; box-shadow: 0 9px 28px rgba(0,0,0,.28); transition: transform .45s cubic-bezier(.2,.8,.2,1), opacity .45s ease; }
     .icon-shell img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .55s cubic-bezier(.2,.8,.2,1), filter .35s ease; }
@@ -96,6 +97,7 @@
     .secondary-card .project-head { margin-bottom: 12px; }
     .secondary-card .project-name { font-size: 20px; }
     .secondary-card .project-summary { margin: 0 0 13px; }
+    .secondary-card .build-grid { margin-top: auto; }
     .feed-note { padding: 13px 0 25px; border-top: 1px solid var(--line); color: #777e89; font-size: 11px; line-height: 1.55; }
     .feed-note strong { color: #abb1bc; font-weight: 650; }
     footer { padding: 0 0 30px; color: #646b75; font-size: 11px; }
@@ -108,7 +110,8 @@
       .topbar { height: 70px; }
       .hero { padding: 25px 0 20px; }
       .projects { grid-template-columns: 1fr; gap: 12px; }
-      .lineup-card { grid-row: auto; }
+      .lineup-card { grid-column: auto; }
+      .lineup-card .feature-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .project-card { padding: 18px; border-radius: 21px; }
     }
     @media (max-width: 480px) {
@@ -118,7 +121,7 @@
       .notes { min-height: 0; }
       .project-head { gap: 9px; }
       .release-trigger { min-height: 32px; padding: 0 8px; font-size: 9px; }
-      .feature-grid { grid-template-columns: 1fr; }
+      .feature-grid, .lineup-card .feature-grid { grid-template-columns: 1fr; }
       .dialog-body { padding: 18px; }
       .release-build { padding: 13px; }
     }
@@ -151,13 +154,13 @@
           <div><h2 class="project-name">Lineup</h2><p class="project-kind">Live sports · iPhone &amp; Apple TV</p></div>
           <button class="release-trigger" type="button" data-open-dialog="lineup-release" aria-haspopup="dialog" aria-controls="lineup-release"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.75h7l4.25 4.5v12H7a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2Z"/><path d="M14 4v5h4M9 13h6M9 16.5h6"/></svg>Release notes</button>
         </header>
-        <p class="project-summary">Lineup brings live sports, live television, and your personal media library together on iPhone and Apple TV. Connect your own IPTV provider and media servers, follow the teams and titles you care about, then watch through one consistent interface.</p>
+        <p class="project-summary">Lineup puts live sports, live TV and your own media library in one app on iPhone and Apple TV. Connect your IPTV provider and media servers, follow the teams you care about, and watch everything from one place.</p>
         <div class="feature-grid" aria-label="Lineup features">
-          <section class="feature"><h3>Live sports &amp; teams</h3><p>Follow pro leagues, college football, soccer leagues and tournaments, Formula 1, and NASCAR. See schedules, scores, standings and team pages, then find event channels or provider catch-up when available. On iPhone, followed NFL teams also get a Game Replays shelf when recordings are offered.</p></section>
-          <section class="feature"><h3>Live TV guide</h3><p>Browse and search your provider’s channels and program listings, keep channel favorites, and start live TV or an available catch-up recording from the guide.</p></section>
-          <section class="feature"><h3>Media servers &amp; progress</h3><p>Browse Jellyfin and Nullfin libraries, including AIOStreams catalogs and streams delivered through a Jellyfin layer. Continue Watching and episode progress help you resume across supported sources.</p></section>
-          <section class="feature"><h3>Metadata &amp; artwork</h3><p>Choose provider, TMDB or TVDB metadata sources, organize library rows and collections, and use BetterPosters and Fanart.tv artwork where a match is available.</p></section>
-          <section class="feature"><h3>Playback tools</h3><p>Choose VLC or AetherEngine by app section. Depending on the device and stream, use live stats with Auto Sync, picture-in-picture, multiview, responsive seeking, subtitles and IntroDB-powered Skip Intro for library episodes.</p></section>
+          <section class="feature"><h3>Live sports &amp; teams</h3><p>Follow the NFL, NBA, NHL, MLB, college sports, soccer, tennis, UFC, Formula 1 and NASCAR. Check schedules, live scores and team pages, then jump straight to the channel showing a game, or to your provider’s catch-up when it has one. NFL teams you follow also get Game Replays.</p></section>
+          <section class="feature"><h3>Live TV guide</h3><p>Browse and search channels and listings from one IPTV provider or several at once. Keep your favorite channels in the order you like, and start live TV or a catch-up recording right from the guide.</p></section>
+          <section class="feature"><h3>Media servers &amp; progress</h3><p>Connect Jellyfin, Emby, Plex or Silo, and add your IPTV provider’s movies and shows. Trending and streaming-service rows show what’s popular, and Seerr handles discovery and requests. Track progress on the device, with MDBList, or both, and pick up where you left off from Continue Watching.</p></section>
+          <section class="feature"><h3>Metadata &amp; artwork</h3><p>Choose where titles get their details: your server, TMDB or TVDB. Arrange your Library rows and collections, and get title logos and posters from Fanart.tv, TMDB and BetterPosters. Ratings from IMDb, TMDB, Rotten Tomatoes, Metacritic and Letterboxd show up where they’re available.</p></section>
+          <section class="feature"><h3>Playback tools</h3><p>Pick a player for each part of the app: AetherEngine, VLC or MPVKit, plus Apple’s own player on iPhone. Depending on the device and stream, you also get live stats with Auto Sync, multiview, online subtitle search and Skip Intro for library episodes, and picture-in-picture on iPhone.</p></section>
           <section class="feature"><h3>Built for each screen</h3><p>Lineup has touch-first iPhone controls and a remote-friendly Apple TV interface, with settings and playback choices adapted to each platform.</p></section>
         </div>
         <div class="build-grid">
