@@ -220,22 +220,27 @@
     <dialog class="release-dialog" id="lineup-release" aria-labelledby="lineup-release-title">
       <div class="dialog-body">
         <header class="dialog-head"><div><p class="dialog-kicker">Lineup · latest release</p><h2 id="lineup-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes">×</button></header>
-        <p class="dialog-intro">Build 127 adds genre-based TMDB discovery, refreshed live TV views, and centered Library artwork on iPhone. Both builds add MPVKit as a playback engine trial and update AetherEngine to 7.45.0; Apple TV also gets refined playback controls and remote seeking.</p>
+        <p class="dialog-intro">Here’s what’s new in Lineup on iPhone and Apple TV.</p>
         <section class="release-build" data-release-notes-bundle="com.nulldev85.NullSports.iOS" data-notes-build="0.19.0-127">
           <div class="release-build-head"><h3>iPhone</h3><span class="release-build-version">Version <span data-release-version-for="com.nulldev85.NullSports.iOS">0.19.0</span> · Build <span data-release-build-for="com.nulldev85.NullSports.iOS">127</span></span></div>
           <p class="release-build-info" data-feed-description-for="com.nulldev85.NullSports.iOS">Published from the latest successful main-branch build.</p>
           <ul class="release-list" data-release-notes-list>
-            <li><strong>Live TV redesign:</strong> choose List or TV Guide layouts in Sports and the TV Guide, with darker, channel-tinted rows and corrected favorites spacing.</li><li><strong>Search by genre:</strong> browse TMDB movies and series by genre with artwork and separate movie and series results.</li>
-            <li><strong>Library artwork:</strong> the hero is centered, with TMDB title logos as a fallback when Fanart.tv has no usable logo.</li><li><strong>Playback engines:</strong> try MPVKit as an additional playback option, and get AetherEngine 7.45.0.</li>
+            <li>The TV Guide and Sports lists have a new look, with row colors drawn from each channel’s logo.</li>
+            <li>Browse movies and shows by genre in Search, with separate movie and series results.</li>
+            <li>Library hero content and title logos are centered, with matching TMDB artwork available when Fanart.tv has no logo.</li>
+            <li>The welcome screen shows official movie and show posters, and its sign-in form is easier to read.</li>
+            <li>Library row panels take up less space while keeping the artwork at its original size.</li>
+            <li>Fixed removing IPTV providers and media servers from Settings.</li>
           </ul>
         </section>
         <section class="release-build" data-release-notes-bundle="com.nulldev85.NullSports" data-notes-build="0.19.0-87">
           <div class="release-build-head"><h3>Apple TV</h3><span class="release-build-version">Version <span data-release-version-for="com.nulldev85.NullSports">0.19.0</span> · Build <span data-release-build-for="com.nulldev85.NullSports">87</span></span></div>
           <p class="release-build-info" data-feed-description-for="com.nulldev85.NullSports">Published from the latest successful main-branch build.</p>
           <ul class="release-list" data-release-notes-list>
-            <li><strong>MPVKit playback trial:</strong> try MPVKit as an additional playback engine alongside VLC and AetherEngine.</li><li><strong>Library title logos:</strong> use matching Fanart.tv or TMDB artwork when a server has no logo.</li>
-            <li><strong>Remote playback controls:</strong> refined the player controls and improved remote seek handling.</li>
-            <li><strong>AetherEngine 7.45.0:</strong> Apple TV now includes the updated playback engine.</li>
+            <li>TV Guide program rows now keep their channel’s logo colors while still showing how far the live program has progressed.</li>
+            <li>The Library hero is centered lower on the screen, with larger text and a rectangular Play button.</li>
+            <li>The Play button now changes between Movie and Series to match the title you are browsing.</li>
+            <li>Added genre browsing to Search and improved how the navigation bar stays visible in the Library.</li>
           </ul>
         </section>
       </div>
@@ -249,9 +254,11 @@
           <div class="release-build-head"><h3>Aether</h3><span class="release-build-version">Version <span data-release-version-for="com.example.IPTVRadio">1.0.0</span> · Build <span data-release-build-for="com.example.IPTVRadio">1</span></span></div>
           <p class="release-build-info" data-feed-description-for="com.example.IPTVRadio">Published from the latest successful main-branch build.</p>
           <ul class="release-list" data-release-notes-list>
-            <li><strong>AetherEngine audio playback:</strong> radio streams use the Aether audio runtime; raw audio streams use FFmpeg decoding, with native HLS handling retained for compatible formats.</li>
-            <li><strong>Clearer playback diagnostics:</strong> stream diagnostics identify the actual audio path in use while preserving provider candidate order.</li>
-            <li><strong>Listening experience polish:</strong> the Now Playing screen, controls, station browsing and Aether visual style were refined for focused radio listening.</li>
+            <li>Radio playback now uses AetherEngine, with improvements to how streams start, stop and recover.</li>
+            <li>Refreshed station browsing and discovery controls to make finding something to listen to feel simpler.</li>
+            <li>Now Playing has a centered vinyl display and controls that stay within easy reach at the bottom.</li>
+            <li>The darker interface and rounded text now feel more consistent throughout the app.</li>
+            <li>Improved playback recovery after phone calls.</li>
           </ul>
         </section>
       </div>
@@ -265,7 +272,10 @@
           <div class="release-build-head"><h3>NullSign</h3><span class="release-build-version">Version <span data-release-version-for="com.elmat.NullSign">1.4.0</span> · Build <span data-release-build-for="com.elmat.NullSign">29</span></span></div>
           <p class="release-build-info" data-feed-description-for="com.elmat.NullSign">Published from the latest successful main-branch build.</p>
           <ul class="release-list" data-release-notes-list>
-            <li>No detailed changelog was attached to this build in AppSource.</li>
+            <li>Fixed signing failures caused by unreadable files inside an imported app.</li>
+            <li>Imported apps now stay clear of the bottom navigation bar.</li>
+            <li>Refreshed the dark interface, with more consistent cards, menus and controls.</li>
+            <li>Improved artwork when importing Apple TV apps and removed repeated installation prompts.</li>
           </ul>
         </section>
       </div>
@@ -275,6 +285,7 @@
   </main>
   <footer class="shell">© Null’s Apps</footer>
 
+  <script src="release-notes.js?v=1"></script>
   <script>
     (() => {
       document.documentElement.classList.add("has-js");
@@ -383,16 +394,25 @@
           const dateLabel = date && !Number.isNaN(date.getTime())
             ? new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date)
             : "Latest build";
-          node.textContent = [dateLabel, release.localizedDescription].filter(Boolean).join(" · ");
+          node.textContent = `${dateLabel} · Sign this IPA before installing.`;
         });
         document.querySelectorAll("[data-release-notes-bundle]").forEach(section => {
-          if (section.dataset.releaseNotesBundle !== bundle || section.dataset.notesBuild === release.version + "-" + release.buildVersion) return;
-          const notes = section.querySelector("[data-release-notes-list]");
-          const message = document.createElement("p");
-          message.className = "notes-pending";
-          message.textContent = "Release notes for this build are being prepared.";
-          if (notes) notes.replaceWith(message);
-          else section.querySelector(".notes-pending")?.replaceWith(message);
+          if (section.dataset.releaseNotesBundle !== bundle) return;
+          const bullets = globalThis.AppReleaseNotes?.items?.(release.localizedDescription) ?? [];
+          const buildKey = release.version + "-" + release.buildVersion;
+          if (!bullets.length && section.dataset.notesBuild === buildKey) return;
+          const previous = section.querySelector("[data-release-notes-list], .notes-pending");
+          const list = document.createElement("ul");
+          list.className = "release-list";
+          list.dataset.releaseNotesList = "";
+          for (const text of bullets.length ? bullets : ["This older release does not have a written changelog."]) {
+            const item = document.createElement("li");
+            item.textContent = text;
+            list.appendChild(item);
+          }
+          if (previous) previous.replaceWith(list);
+          else section.appendChild(list);
+          section.dataset.notesBuild = buildKey;
         });
       };
       fetch(appSourceURL, { cache: "no-store" }).then(response => {
