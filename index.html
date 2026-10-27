@@ -490,8 +490,7 @@
         const fire = [[0, [255, 140, 40]], [.5, [255, 214, 110]], [1, [255, 252, 236]]];
         const warm = [255, 196, 110];
         // The stem and the leaf are drawn once, here. The skin and the face
-        // are drawn over them every frame by the light of the candle, and now
-        // and then a soft shine crosses the skin.
+        // are drawn over them every frame by the light of the candle.
         const base = document.createElement("canvas"), basePen = base.getContext("2d");
         let drawn = "", scene = null;
         const draw = () => {
@@ -515,7 +514,7 @@
             // blazes; at the edge of a cut, the pumpkin's wall in shadow.
             else if ("odrh".includes(key)) {
               const cut = [[0, 1], [0, -1], [1, 0], [-1, 0]].some(([down, across]) => pumpkin[row + down]?.[col + across] === "y");
-              scene.skin.push({ x, y, col: col + .5, row: row + .5, along: col + row * .6,
+              scene.skin.push({ x, y, col: col + .5, row: row + .5,
                                 rgb: rgb(colors[key]).map(value => value * (cut ? .56 : .72)) });
             }
             else {
@@ -523,7 +522,6 @@
               basePen.fillRect(x, y, cell - gap, cell - gap);
             }
           }));
-          scene.width = columns + rows * .6;
           light(performance.now());
         };
         const light = time => {
@@ -546,14 +544,10 @@
           pen.fillStyle = aura;
           pen.fillRect(ax - reach, ay - reach, reach * 2, reach * 2);
           pen.drawImage(base, 0, 0);
-          // The skin glows where it is thin and the flame is close, and a
-          // soft shine crosses it every few seconds.
-          const sweep = (time % 6200) / 1400, band = -3 + sweep * (scene.width + 6);
+          // The skin glows where it is thin and the flame is close.
           for (const spot of scene.skin) {
             const near = Math.exp(-((spot.col - fx) ** 2 + (spot.row - wick + 3) ** 2) / 46);
-            const lit = mix(spot.rgb, warm, near * near * glow * (.12 + .22 * breath));
-            const shine = moving && sweep < 1 ? .3 * Math.exp(-((spot.along - band) ** 2) / 3) : 0;
-            pen.fillStyle = paint(mix(lit, [255, 236, 200], shine));
+            pen.fillStyle = paint(mix(spot.rgb, warm, near * near * glow * (.12 + .22 * breath)));
             pen.fillRect(spot.x, spot.y, size, size);
           }
           // Through the cuts: the inside lit by the flame, brightest round
