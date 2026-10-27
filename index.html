@@ -1547,16 +1547,24 @@
             }
           }
         };
-        // The thunder: the page shaken by a pixel or two, dying away.
+        // The thunder: the whole scene shaken by a pixel or two, dying away.
+        // The page and everything in it or over it, the bats wherever they
+        // are, the ghosts, the pumpkin, the web and its spiders, take the
+        // same steps on the same frames, so nothing comes loose from what it
+        // hangs on; only the sky outside, and its lightning, stays still.
+        // The web and the spiders are already mirrored by a transform, so
+        // they are moved with "translate", which adds to it.
         const rumble = (strength, delay) => {
-          const shake = [], beats = 12;
+          const steps = [], beats = 12;
           for (let i = 0; i <= beats; i++) {
             const size = i === beats ? 0 : Math.round((1 + 1.4 * strength) * (1 - i / beats) * (Math.random() < .5 ? -1 : 1));
-            shake.push({ transform: `translate(${size}px, ${Math.round(size * (Math.random() - .5))}px)` });
+            steps.push([size, Math.round(size * (Math.random() - .5))]);
           }
-          for (const part of document.querySelectorAll(".site-header, main")) {
-            part.animate(shake, { duration: 700 + 500 * strength, delay, easing: "linear" });
-          }
+          const timing = { duration: 700 + 500 * strength, delay, easing: "linear" };
+          const shake = steps.map(([x, y]) => ({ transform: `translate(${x}px, ${y}px)` }));
+          const nudge = steps.map(([x, y]) => ({ translate: `${x}px ${y}px` }));
+          for (const part of document.querySelectorAll(".site-header, main, .float-mark, .bats-page, .bats-screen")) part.animate(shake, timing);
+          for (const part of document.querySelectorAll(".web, .spider")) part.animate(nudge, timing);
         };
         // Each strike is worked out, and its bolt drawn, while the last one's
         // light is still fading, ready to go.
