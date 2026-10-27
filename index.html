@@ -126,10 +126,9 @@
     .site-footer a:hover { color: var(--text); }
 
     /* Floating mark: rests between the header and the headline, and stays
-       there as the page moves under it. Every so often it comes apart into
-       tiny blocks that blink out, then comes back block by block. Each
-       layer owns one transform, so the drift and the scroll and pointer
-       response never fight. */
+       there as the page moves under it, while a wave of tiny blocks rolls
+       through it without end. Each layer owns one transform, so the drift
+       and the scroll and pointer response never fight. */
     .float-mark { --mark-size: 56px; --glass: 0; position: fixed; top: 86px; left: 50%; z-index: 30; display: none; width: var(--mark-size); height: var(--mark-size); margin-left: calc(var(--mark-size) / -2); border-radius: 50%; color: inherit; -webkit-tap-highlight-color: transparent; }
     .has-js .float-mark { display: block; }
     .float-mark:focus-visible { outline: none; }
@@ -138,7 +137,7 @@
     .mark-drift { animation: mark-drift 7s ease-in-out 1.6s infinite; }
     .mark-orb { display: grid; place-items: center; will-change: transform; }
     .mark-glow { position: absolute; inset: -40%; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.09), rgba(255,255,255,.03) 38%, transparent 66%); opacity: calc(1 - var(--glass)); pointer-events: none; animation: mark-glow-in 1.6s ease .3s backwards; }
-    .mark-logo { position: relative; display: block; width: 52%; height: 52%; margin-top: -4%; filter: drop-shadow(0 1px 0 rgba(255,255,255,.18)) drop-shadow(0 4px 10px rgba(0,0,0,.75)) drop-shadow(0 0 3px rgba(0,0,0,.6)); }
+    .mark-logo { position: relative; display: block; width: 52%; height: 52%; margin-top: -4%; animation: mark-glow-in 1s ease .1s backwards; filter: drop-shadow(0 1px 0 rgba(255,255,255,.18)) drop-shadow(0 4px 10px rgba(0,0,0,.75)) drop-shadow(0 0 3px rgba(0,0,0,.6)); }
     @keyframes mark-drift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
     @keyframes mark-glow-in { from { opacity: 0; } }
     @media print { .float-mark { display: none; } }
@@ -389,8 +388,8 @@
 
       // The floating mark, drawn on a canvas so it can come apart. One loop
       // eases the lean, tilt and light toward where they are headed and stops
-      // once they arrive; the other keeps the blocks going out and coming
-      // back, and pauses with the page when it is out of sight.
+      // once they arrive; the other keeps the wave of blocks rolling, and
+      // pauses with the page when it is out of sight.
       const mark = document.querySelector("[data-float-mark]");
       if (mark) {
         const orb = mark.querySelector(".mark-orb");
@@ -406,24 +405,17 @@
         const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
         let lastY = Math.max(0, scrollY), lastScroll = performance.now(), lastFrame = 0, frame = 0;
 
-        // The blocks. Each has its turn to fade out and its turn to come
-        // back: mostly chance, with a sweep down the mark on the way out and
-        // back up it on the way in, dealt afresh each time so no two passes
-        // look alike. Out and back run straight into each other.
-        const timing = { out: 1500, in: 1500 };
-        const spread = .78;
+        // The blocks. A wave rolls down the mark without end: as it reaches a
+        // block, the block fades out, catches the light and comes back, and
+        // by the time it leaves the bottom it is already turning the top
+        // over again, so one pass runs into the next with no seam. Each
+        // block's place in the wave is mostly its height, with a little
+        // chance, so it reads as tiny pixels rather than a line.
+        const period = 2800;
+        const dip = .62;
+        const ramp = .32;
+        const moving = !still.matches;
         let blocks = [], cell = 3, painted = NaN, blockFrame = 0;
-        let phase = still.matches ? "shown" : "in", phaseStart = performance.now() + 120;
-        // Turns are spaced evenly through a pass, so the mark is always on
-        // the move and only eases as it turns around.
-        const deal = next => {
-          const size = canvas.width || 1;
-          const order = blocks.map(block => ({ block, key: Math.random() * .72
-            + (next === "out" ? block.y / size : 1 - block.y / size) * .28 }))
-            .sort((a, b) => a.key - b.key);
-          const last = Math.max(1, order.length - 1);
-          order.forEach(({ block }, rank) => { block[next === "out" ? "out" : "back"] = rank / last; });
-        };
         const shine = () => now.light * 50 - 25 + now.ry;
         const paint = () => {
           const size = art.width, angle = shine() * Math.PI / 180;
@@ -457,11 +449,13 @@
                   if (ink[(row * size + column) * 4 + 3] > 10) { inked = true; break; }
                 }
               }
-              if (inked) blocks.push({ x, y, seen: 1, out: 0, back: 0 });
+              if (inked) blocks.push({ x, y, seen: 1,
+                                       place: y / size * .62 + x / size * .12 + Math.random() * .26 });
             }
           }
-          deal("out");
-          deal("in");
+          // Spread the places evenly round the wave, keeping their order, so
+          // there is always as much turning over as at any other moment.
+          blocks.sort((a, b) => a.place - b.place).forEach((block, rank) => { block.place = rank / blocks.length; });
         };
         const draw = time => {
           const size = canvas.width;
@@ -470,19 +464,21 @@
           pen.globalAlpha = 1;
           pen.clearRect(0, 0, size, size);
           pen.drawImage(art, 0, 0);
-          if (phase === "shown") return;
-          const progress = Math.min(1, (time - phaseStart) / timing[phase]);
-          const span = 1 - spread;
+          if (!moving) return;
+          const wave = time / period;
           // A block catches the light as it turns over.
           pen.globalCompositeOperation = "source-atop";
           pen.fillStyle = "#fff";
           for (const block of blocks) {
-            const turn = (phase === "out" ? block.out : block.back) * spread;
-            const linear = clamp((progress - turn) / span, 0, 1);
-            block.seen = phase === "out" ? 1 - linear : linear;
-            const glint = Math.sin(Math.PI * linear);
-            if (glint > .01) {
-              pen.globalAlpha = glint * glint * .55;
+            const turn = wave - block.place;
+            const into = (turn - Math.floor(turn)) / dip;
+            // Out, a moment gone, and back, each end eased.
+            block.seen = into >= 1 ? 1
+              : into < ramp ? .5 + .5 * Math.cos(Math.PI * into / ramp)
+              : into > 1 - ramp ? .5 - .5 * Math.cos(Math.PI * (into - 1 + ramp) / ramp)
+              : 0;
+            if (block.seen > .005 && block.seen < .995) {
+              pen.globalAlpha = block.seen * (1 - block.seen) * 2.4;
               pen.fillRect(block.x, block.y, cell, cell);
             }
           }
@@ -497,14 +493,6 @@
           pen.globalCompositeOperation = "source-over";
         };
         const blocksStep = time => {
-          const length = timing[phase];
-          if (time - phaseStart >= length) {
-            phase = phase === "out" ? "in" : "out";
-            // Carry on from where the last pass ended, unless the page was
-            // away long enough to start over.
-            phaseStart = time - phaseStart < length * 2 ? phaseStart + length : time;
-            deal(phase);
-          }
           draw(time);
           blockFrame = requestAnimationFrame(blocksStep);
         };
@@ -570,9 +558,8 @@
         follow();
         now.glass = goal.glass; now.light = goal.light; now.tilt = goal.tilt = 0;
         layout();
-        // It arrives the way it leaves, block by block.
-        if (phase === "shown") draw(performance.now());
-        else { deal("in"); blockFrame = requestAnimationFrame(blocksStep); }
+        if (moving) blockFrame = requestAnimationFrame(blocksStep);
+        else draw(performance.now());
         render();
       }
 
