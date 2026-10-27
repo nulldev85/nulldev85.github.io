@@ -812,11 +812,17 @@
         // With nowhere better, the top of the screen.
         const top = () => ({ kind: "word", x: 24 + Math.random() * (innerWidth - 48), y: scrollY + 2 });
 
+        // A bat's way through the air: it drops off its perch, swings out to
+        // one side on a curve and comes up into the next perch from below,
+        // the way bats land, never flying straight and never still. Wings
+        // beat quicker climbing and slower, half gliding, on the way down.
         const fly = time => {
           let flying = false;
           for (const bat of bats) {
             const flight = bat.flight;
             if (!flight) continue;
+            const dt = flight.last ? Math.min(.05, (time - flight.last) / 1000) : 1 / 60;
+            flight.last = time;
             const t = Math.min(1, (time - flight.start) / flight.duration);
             if (t >= 1) {
               bat.flight = null;
@@ -824,29 +830,45 @@
               continue;
             }
             flying = true;
-            // Along a bow to one side, with a flutter that fades in and out;
-            // a loop swings out and back to the same place.
-            const end = onScreen(bat.perch), along = .5 - .5 * Math.cos(Math.PI * t);
-            const dx = end.x - flight.from.x, dy = end.y - flight.from.y, length = Math.hypot(dx, dy) || 1;
-            const bow = flight.arc * Math.sin(Math.PI * t), flutter = 3 * Math.sin(Math.PI * 6 * t) * Math.sin(Math.PI * t);
-            const x = flight.from.x + dx * along - dy / length * bow + flight.loop * Math.sin(2 * Math.PI * t);
-            const y = flight.from.y + dy * along + dx / length * bow + flutter + flight.drop * Math.sin(Math.PI * t);
+            // Easing off the perch and into the next, with small surges between.
+            const u = clamp(.7 * (.5 - .5 * Math.cos(Math.PI * t)) + .3 * t + .03 * Math.sin(Math.PI * 4 * t), 0, 1), v = 1 - u;
+            const a = flight.from, d = onScreen(bat.perch);
+            const b = { x: clamp(a.x + flight.out.x, 12, innerWidth - 12), y: a.y + flight.out.y };
+            const c = { x: clamp(d.x + flight.in.x, 12, innerWidth - 12), y: d.y + flight.in.y };
+            const curve = (p, q, r, s) => v * v * v * p + 3 * v * v * u * q + 3 * v * u * u * r + u * u * u * s;
+            const midway = Math.sin(Math.PI * t), seed = bat.seed;
+            // A long way is taken in a weave from side to side, not a straight drop.
+            const across = Math.hypot(d.x - a.x, d.y - a.y) || 1, weave = flight.weave * Math.sin(Math.PI * flight.turns * u) * midway;
+            const x = curve(a.x, b.x, c.x, d.x) - (d.y - a.y) / across * weave
+              + midway * (2.4 * Math.sin(time / 83 + seed * 9) + 1.4 * Math.sin(time / 47 + seed * 3));
+            const y = curve(a.y, b.y, c.y, d.y) + (d.x - a.x) / across * weave
+              + midway * (2.8 * Math.sin(time / 71 + seed * 5) + 1.2 * Math.sin(time / 39 + seed * 11));
+            const rising = flight.now ? flight.now.y - y : 0;
+            flight.beat += dt * (rising > .5 ? 14 : rising < -.5 ? 6.5 : 10.5);
             flight.now = { x, y };
-            paint(bat, Math.floor((time - flight.start) / 90 + bat.seed * 7) % 2 ? wingsDown : wingsUp);
+            paint(bat, Math.floor(flight.beat) % 2 ? wingsDown : wingsUp);
             place(bat, x, y);
           }
           frame = flying ? requestAnimationFrame(fly) : 0;
         };
+        // `loop` sends it out and back to the same perch, swinging to the side
+        // its sign gives.
         const takeOff = (bat, to, from, loop = 0) => {
-          from = from || (bat.flight ? bat.flight.now : onScreen(bat.perch));
+          from = from || (bat.flight ? bat.flight.now || bat.flight.from : onScreen(bat.perch));
           if (!from) return;
           bat.perch = to;
           if (still.matches) { bat.flight = null; settle(bat); return; }
           if (bat.el.parentNode !== screen) screen.appendChild(bat.el);
-          const end = onScreen(to), distance = Math.hypot(end.x - from.x, end.y - from.y);
-          bat.flight = { from, now: from, loop, start: performance.now(),
-                         arc: (Math.random() < .5 ? -1 : 1) * (12 + Math.random() * 36), drop: loop ? 18 + Math.random() * 20 : 0,
-                         duration: loop ? 900 + Math.random() * 400 : clamp(distance / .45, 700, 2200) };
+          const end = onScreen(to), dx = end.x - from.x, distance = Math.hypot(dx, end.y - from.y);
+          const side = loop ? Math.sign(loop) : Math.random() < .5 ? -1 : 1;
+          const swing = loop ? Math.abs(loop) * 3 : clamp(distance * .35, 40, 150) * (.6 + Math.random() * .6);
+          bat.flight = {
+            from, now: null, beat: Math.random() * 2, start: performance.now(),
+            out: { x: side * swing + dx * .2, y: 26 + Math.random() * 30 },
+            in: { x: -side * swing * .5 - dx * .1, y: 40 + Math.random() * 40 },
+            turns: 1 + Math.floor(distance / 200), weave: (Math.random() < .5 ? -1 : 1) * clamp(distance * .12, 12, 48),
+            duration: loop ? 1300 + Math.random() * 700 : clamp((distance + swing) / .14, 1500, 4800)
+          };
           place(bat, from.x, from.y);
           if (!frame) frame = requestAnimationFrame(fly);
         };
