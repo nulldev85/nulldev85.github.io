@@ -1223,7 +1223,7 @@
           settle = setTimeout(regather, 200);
         }, { passive: true });
 
-        const count = innerWidth <= 600 ? 3 : 4, now = performance.now();
+        const count = innerWidth <= 600 ? 1 : 2, now = performance.now();
         for (let i = 0; i < count; i++) {
           const el = document.createElement("canvas");
           el.className = "spirit";
@@ -1289,7 +1289,7 @@
                                                             drop: .1 + random() * .16, curl: (random() - .5) * .1 }));
           return { el, spokes, passes, tear, missing, dew, loose, size: 0, ratio: 1, fall: 1, phase: random() * 6 };
         });
-        let sway = 0, last = 0, lastScroll = scrollY, swaying = false;
+        let sway = 0, last = 0, lastScroll = scrollY, swaying = false, tremor = 0, quake = 0;
         const torn = (web, along, reach) => along > web.tear.from && along < web.tear.to
           && reach > web.tear.inner && reach < web.tear.outer;
         const spin = (web, time) => {
@@ -1299,7 +1299,9 @@
           // Every point is pushed sideways a little by the sway, more the
           // further it is from the corner.
           const point = (angle, reach) => {
-            const r = reach * s, push = sway * 4 * px * reach * Math.sin(t * 5.5 + web.phase + reach * 3);
+            // Thunder sets it trembling from the corner out along its threads.
+            const r = reach * s, push = sway * 4 * px * reach * Math.sin(t * 5.5 + web.phase + reach * 3)
+              + tremor * 6 * px * reach * Math.sin(Math.max(0, quake - reach * 4));
             return [Math.cos(angle) * r - Math.sin(angle) * push, Math.sin(angle) * r + Math.cos(angle) * push];
           };
           // Light from above and to one side catches some threads more than others.
@@ -1488,10 +1490,13 @@
         const tick = time => {
           const dt = last ? Math.min(.05, (time - last) / 1000) : 1 / 60;
           last = time;
-          // The webs are only drawn again while they sway.
-          if (sway || swaying) {
+          // The web is only drawn again while it sways or trembles.
+          if (sway || swaying || tremor) {
             sway *= Math.exp(-dt * 1.8);
             if (sway < .01) sway = 0;
+            tremor *= Math.exp(-dt * 2.6);
+            if (tremor < .01) tremor = 0;
+            quake += dt * 2 * Math.PI * 3.4;
             for (const web of webs) spin(web, time);
             swaying = sway > 0;
           }
@@ -1510,12 +1515,14 @@
           lastScroll = scrollY;
           if (!calm.matches) { sway = Math.min(1, sway + delta / 400); swaying = true; }
         }, { passive: true });
-        // Thunder shakes the web harder than any scroll, and knocks each
-        // spider swinging on its thread.
+        // Thunder sets the web trembling the moment it arrives, harder than
+        // any scroll moves it, and knocks each spider swinging on its thread.
         addEventListener("thunder", event => {
           if (calm.matches) return;
           const strength = event.detail?.strength ?? .5;
-          sway = Math.min(1.3, sway + .5 + .7 * strength);
+          if (tremor < .05) quake = 0;
+          tremor = Math.min(1.4, tremor + .6 + .8 * strength);
+          sway = Math.min(1, sway + .3 * strength);
           swaying = true;
           for (const spider of spiders) {
             spider.speed += (5 + 6 * strength) * (spider.size / 150) * (spider.rate || 6) * (Math.random() < .5 ? -1 : 1);
@@ -1604,10 +1611,11 @@
           const timing = { duration: 700 + 500 * strength, delay, easing: "linear" };
           const shake = steps.map(([x, y]) => ({ transform: `translate(${x}px, ${y}px)` }));
           const nudge = steps.map(([x, y]) => ({ translate: `${x}px ${y}px` }));
-          for (const part of document.querySelectorAll(".top-shade, .site-header, main, .float-mark, .bats-page, .bats-screen")) part.animate(shake, timing);
+          const started = [...document.querySelectorAll(".top-shade, .site-header, main, .float-mark, .bats-page, .bats-screen")].map(part => part.animate(shake, timing));
           for (const part of document.querySelectorAll(".web, .spider")) part.animate(nudge, timing);
-          // The web and its spiders feel it as it arrives.
-          setTimeout(() => dispatchEvent(new CustomEvent("thunder", { detail: { strength } })), delay);
+          // The web and its spiders feel it on the same frame the shaking
+          // starts, timed from when the shaking itself began.
+          started[0].ready.then(() => setTimeout(() => dispatchEvent(new CustomEvent("thunder", { detail: { strength } })), delay));
         };
         // Each strike is worked out, and its bolt drawn, while the last one's
         // light is still fading, ready to go.
@@ -1620,16 +1628,17 @@
           let at = 0;
           if (Math.random() < .7) beats.push([at += .04, .3], [at += .04, .05]);
           beats.push([at += .05, 1], [at += .09, .32]);
+          const flashAt = at - .09;
           for (let again = Math.floor(Math.random() * 3), level = .75; again > 0; again--, level *= .7) {
             beats.push([at += .05, level], [at += .08, level * .35]);
           }
           beats.push([Math.min(.8, at + .22), .1], [1, 0]);
           if (near > .45) drawBolt(across);
-          coming = { near, strength, across, beats, duration: 1000 + 400 * near };
+          coming = { near, strength, across, beats, flashAt, duration: 1000 + 400 * near };
         };
         const strike = () => {
           if (!coming) prepare();
-          const { near, strength, across, beats, duration } = coming;
+          const { near, strength, across, beats, flashAt, duration } = coming;
           coming = null;
           // Light from the sky above where it struck, washing down the page:
           // a cold white, kept within a safe change of brightness.
@@ -1643,8 +1652,10 @@
           if (near > .45) {
             bolt.animate(beats.map(([offset, light]) => ({ offset, opacity: light > .5 ? Math.min(1, light * 1.1) : light * .3 })), { duration, easing: "linear" });
           }
-          // The thunder after it, sooner and harder the nearer it was.
-          if (near > .25) rumble(near, 250 + (1 - near) * 1700);
+          // The thunder right behind its flash: at once when it struck close,
+          // a moment later and softer further off, but always before the
+          // next strike can come.
+          if (near > .25) rumble(near, duration * flashAt + (1 - near) * 350);
           setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(prepare, { timeout: 500 }) : prepare()), duration + 200);
         };
         const weather = () => setTimeout(() => {
