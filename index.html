@@ -146,7 +146,16 @@
     .bats-screen { position: fixed; z-index: 31; }
     .bat, .spirit { position: absolute; top: 0; left: 0; display: block; pointer-events: none; will-change: transform; }
     .spirit { opacity: 0; filter: drop-shadow(0 0 6px rgba(205, 220, 255, .45)); }
-    @media print { .float-mark, .bats { display: none; } }
+    /* Cobwebs in the corners of the screen, under the bats and ghosts. */
+    .webs { display: none; }
+    .has-js .webs { display: block; }
+    .web, .spider { position: fixed; z-index: 24; display: block; pointer-events: none; }
+    .web.top-left { top: 0; left: 0; }
+    .web.top-right { top: 0; right: 0; transform: scaleX(-1); }
+    .web.bottom-left { bottom: 0; left: 0; transform: scaleY(-1); }
+    .web.bottom-right { bottom: 0; right: 0; transform: scale(-1, -1); }
+    .spider { top: 0; right: 0; }
+    @media print { .float-mark, .bats, .webs { display: none; } }
 
     /* Motion */
     .has-js [data-project-card] { opacity: 0; transform: translateY(10px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
@@ -189,6 +198,7 @@
   </style>
 </head>
 <body>
+  <div class="webs" aria-hidden="true" data-webs></div>
   <div class="bats" aria-hidden="true" data-bats><div class="bats-page"></div><div class="bats-screen"></div></div>
   <header class="site-header wrap">
     <a class="wordmark" href="#top">Null’s Apps</a>
@@ -1088,6 +1098,167 @@
             place(ghost, ghost.x, ghost.y);
           }
         } else requestAnimationFrame(float);
+      }
+
+      // Cobwebs in the four corners of the screen, staying there however far
+      // the page scrolls. Each is spun once from its own seed, so it keeps
+      // its shape: threads fanning out from the corner, sagging rings
+      // between them, a few broken and a few hanging loose. A scroll sets
+      // them swaying, as if in a draught, and they settle. A small spider
+      // lets itself down from the top right one and climbs back up.
+      const corners = document.querySelector("[data-webs]");
+      if (corners) {
+        const calm = matchMedia("(prefers-reduced-motion: reduce)");
+        const seeded = seed => () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+        const webs = ["top-left", "top-right", "bottom-left", "bottom-right"].map((corner, index) => {
+          const el = document.createElement("canvas");
+          el.className = "web " + corner;
+          corners.appendChild(el);
+          // Spun in the top left; the others are mirrored copies.
+          const random = seeded(4049 + index * 7919), spokes = [];
+          const count = 7 + Math.floor(random() * 3);
+          for (let i = 0; i < count; i++) {
+            const along = i / (count - 1);
+            spokes.push({ angle: (along * 90 + (i && i < count - 1 ? (random() - .5) * 8 : 0)) * Math.PI / 180,
+                          length: i && i < count - 1 ? .78 + random() * .3 : 1.02 });
+          }
+          const rings = [];
+          for (let k = 0; k < 6; k++) {
+            const radius = .15 + k * .145 + (random() - .5) * .03;
+            const gaps = spokes.slice(1).map(() => random() < (k > 3 ? .16 : .07));
+            rings.push({ radius, gaps, sag: .1 + random() * .08 });
+          }
+          const loose = Array.from({ length: 2 }, () => ({ spoke: 1 + Math.floor(random() * (count - 2)), at: .4 + random() * .4,
+                                                            drop: .12 + random() * .14 }));
+          return { el, spokes, rings, loose, size: 0, ratio: 1, phase: random() * 6 };
+        });
+        let sway = 0, last = 0, frame = 0, lastScroll = scrollY;
+        const measure = () => {
+          const size = innerWidth <= 600 ? 96 : 150, ratio = Math.min(3, devicePixelRatio || 1);
+          for (const web of webs) {
+            web.size = size;
+            web.ratio = ratio;
+            web.el.width = web.el.height = Math.round(size * ratio);
+            web.el.style.width = web.el.style.height = size + "px";
+          }
+          spider.size = size;
+          spider.el.width = Math.round(size * ratio);
+          spider.el.height = Math.round(size * 2.2 * ratio);
+          spider.el.style.width = size + "px";
+          spider.el.style.height = size * 2.2 + "px";
+        };
+        // One web, with every point nudged sideways a little by the sway,
+        // more the further it is from the corner.
+        const spin = (web, time) => {
+          const pen = web.el.getContext("2d"), s = web.size * web.ratio, t = time / 1000;
+          pen.setTransform(1, 0, 0, 1, 0, 0);
+          pen.clearRect(0, 0, s, s);
+          const point = (angle, reach) => {
+            const r = reach * s, push = sway * 4 * web.ratio * reach * Math.sin(t * 5.5 + web.phase + reach * 3);
+            return [Math.cos(angle) * r - Math.sin(angle) * push, Math.sin(angle) * r + Math.cos(angle) * push];
+          };
+          pen.lineCap = "round";
+          pen.shadowColor = "rgba(255, 255, 255, .25)";
+          pen.shadowBlur = 2 * web.ratio;
+          // Spokes, fading as they reach out.
+          for (const spoke of web.spokes) {
+            const [x, y] = point(spoke.angle, spoke.length);
+            const fade = pen.createLinearGradient(0, 0, x, y);
+            fade.addColorStop(0, "rgba(226, 230, 240, .5)");
+            fade.addColorStop(1, "rgba(226, 230, 240, .08)");
+            pen.strokeStyle = fade;
+            pen.lineWidth = .9 * web.ratio;
+            pen.beginPath();
+            pen.moveTo(0, 0);
+            pen.lineTo(x, y);
+            pen.stroke();
+          }
+          // Rings, each strand sagging toward the corner.
+          web.rings.forEach(ring => {
+            pen.strokeStyle = `rgba(226, 230, 240, ${(.46 - ring.radius * .32).toFixed(3)})`;
+            pen.lineWidth = .7 * web.ratio;
+            for (let i = 0; i < web.spokes.length - 1; i++) {
+              if (ring.gaps[i]) continue;
+              const a = web.spokes[i], b = web.spokes[i + 1];
+              const reachA = ring.radius * Math.min(1, a.length / .9), reachB = ring.radius * Math.min(1, b.length / .9);
+              const [x1, y1] = point(a.angle, reachA), [x2, y2] = point(b.angle, reachB);
+              const [cx, cy] = point((a.angle + b.angle) / 2, (reachA + reachB) / 2 * (1 - ring.sag));
+              pen.beginPath();
+              pen.moveTo(x1, y1);
+              pen.quadraticCurveTo(cx, cy, x2, y2);
+              pen.stroke();
+            }
+          });
+          // A few broken threads hanging down.
+          pen.strokeStyle = "rgba(226, 230, 240, .22)";
+          for (const thread of web.loose) {
+            const spoke = web.spokes[thread.spoke], [x, y] = point(spoke.angle, thread.at);
+            pen.beginPath();
+            pen.moveTo(x, y);
+            pen.quadraticCurveTo(x + 3 * web.ratio, y + thread.drop * s * .6, x + sway * 3 * web.ratio, y + thread.drop * s);
+            pen.stroke();
+          }
+        };
+
+        // The spider: pixels like the bats, on a thread of silk.
+        const legs = [
+          "..x...x..",
+          ".x.bbb.x.",
+          "x.bbbbb.x",
+          ".xbebebx.",
+          "x.bbbbb.x",
+          ".x.....x."
+        ];
+        const spider = { el: document.createElement("canvas"), size: 0 };
+        spider.el.className = "spider";
+        corners.appendChild(spider.el);
+        const crawl = time => {
+          const pen = spider.el.getContext("2d"), ratio = webs[0].ratio, size = spider.size, t = time / 1000;
+          pen.setTransform(1, 0, 0, 1, 0, 0);
+          pen.clearRect(0, 0, spider.el.width, spider.el.height);
+          // Down slowly, a pause, back up; never all the way off its web.
+          const swing = calm.matches ? .5 : .5 - .5 * Math.cos(t * .55);
+          const hang = size * (.42 + swing * 1.35), x = size * .46 + (calm.matches ? 0 : Math.sin(t * .9) * 2.5 + sway * 3);
+          pen.strokeStyle = "rgba(226, 230, 240, .45)";
+          pen.lineWidth = .8 * ratio;
+          pen.beginPath();
+          pen.moveTo(size * .46 * ratio, size * .3 * ratio);
+          pen.lineTo(x * ratio, hang * ratio);
+          pen.stroke();
+          const cell = Math.max(2, Math.round(1.8 * ratio)), gap = cell >= 4 ? 1 : 0;
+          const left = Math.round(x * ratio - legs[0].length * cell / 2), top = Math.round(hang * ratio);
+          const wiggle = !calm.matches && Math.floor(t * 3) % 2;
+          legs.forEach((line, row) => {
+            for (let col = 0; col < line.length; col++) {
+              const key = line[col];
+              if (key === ".") continue;
+              const eye = key === "e";
+              pen.shadowColor = eye ? "rgba(255, 90, 70, .9)" : "transparent";
+              pen.shadowBlur = eye ? cell * 1.4 : 0;
+              pen.fillStyle = key === "x" ? "#6b6080" : eye ? "#ff6a57" : "#554b68";
+              pen.fillRect(left + col * cell, top + (key === "x" && wiggle && row % 2 ? cell * .5 : row * cell), cell - gap, cell - gap);
+            }
+          });
+        };
+
+        const tick = time => {
+          const dt = last ? Math.min(.05, (time - last) / 1000) : 1 / 60;
+          last = time;
+          sway *= Math.exp(-dt * 1.8);
+          if (sway < .01) sway = 0;
+          for (const web of webs) spin(web, time);
+          crawl(time);
+          frame = calm.matches ? 0 : requestAnimationFrame(tick);
+        };
+        addEventListener("scroll", () => {
+          const delta = Math.abs(scrollY - lastScroll);
+          lastScroll = scrollY;
+          if (!calm.matches) sway = Math.min(1, sway + delta / 400);
+        }, { passive: true });
+        addEventListener("resize", () => { measure(); if (calm.matches) tick(performance.now()); }, { passive: true });
+        measure();
+        if (calm.matches) tick(performance.now());
+        else frame = requestAnimationFrame(tick);
       }
 
       const appSourceURL = "https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json";
