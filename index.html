@@ -594,7 +594,7 @@
         const colors = { w: "#51476a", b: "#64587c", f: "#786c90", e: "#ff6a57" };
         const bats = [];
         let width = 0, ratio = 1, cell = 3, frame = 0, lastFrame = 0, nextFlight = 0, nextStretch = 0;
-        let underMark = [], lastScroll = Math.max(0, scrollY);
+        let underMark = [], lastScroll = Math.max(0, scrollY), settled = 0;
         const pick = list => list[Math.floor(Math.random() * list.length)];
         const measure = () => {
           ratio = Math.min(3, devicePixelRatio || 1);
@@ -637,7 +637,7 @@
             // Catching up after a scroll: quick at first, never faster than
             // a bat can fly, settling as it arrives.
             if (bat.drag) {
-              const step = bat.drag * (1 - Math.exp(-dt * 3.2)), limit = 760 * dt;
+              const step = bat.drag * (1 - Math.exp(-dt * 7)), limit = 1500 * dt;
               bat.drag -= Math.max(-limit, Math.min(limit, step));
               if (Math.abs(bat.drag) < .4) bat.drag = 0;
               else moving = true;
@@ -648,8 +648,9 @@
               if (t < 1) {
                 moving = true;
                 // Across in a swoop, with a flutter that fades in and out.
+                // A loop goes out to one side and back the other way.
                 const along = .5 - .5 * Math.cos(Math.PI * t), end = point(bat.perch);
-                const x = flight.from.x + (end.x - flight.from.x) * along;
+                const x = flight.from.x + (end.x - flight.from.x) * along + flight.loop * Math.sin(2 * Math.PI * t);
                 const y = flight.from.y + (end.y - flight.from.y) * along + 6 + flight.dip * Math.sin(Math.PI * t)
                   + 4 * Math.sin(Math.PI * 5 * t) * Math.sin(Math.PI * t);
                 sprite(flapping(time - flight.start, bat), x * ratio, y * ratio);
@@ -674,16 +675,20 @@
           if (!frame) lastFrame = 0;
         };
         const wake = () => { if (!frame) frame = requestAnimationFrame(tick); };
-        const launch = () => {
-          schedule();
-          const resting = bats.filter(bat => !bat.flight && !bat.drag);
+        const takeOff = () => {
+          const resting = bats.filter(bat => !bat.flight);
           if (document.hidden || !resting.length) return;
           const bat = pick(resting);
-          // To a free spot under the mark now and then; otherwise somewhere
-          // along the top on the other side, clear of the others.
+          // A quick loop off its perch and back; or to a free spot under the
+          // mark; or somewhere along the top on the other side, clear of the
+          // others.
           const free = underMark.map((_, index) => ({ kind: "mark", index })).filter(perch => !taken(perch, bat));
-          let to = null;
-          if (bat.perch.kind === "edge" && free.length && Math.random() < .45) to = pick(free);
+          let to = null, loop = 0;
+          const roll = Math.random();
+          if (roll < .28) {
+            to = bat.perch;
+            loop = (Math.random() < .5 ? -1 : 1) * (16 + Math.random() * 26);
+          } else if (bat.perch.kind === "edge" && free.length && roll < .6) to = pick(free);
           else {
             const [low, high] = point(bat.perch).x / width < .5 ? [.55, .95] : [.05, .45];
             for (let tries = 0; tries < 12 && !to; tries++) {
@@ -692,16 +697,25 @@
             }
           }
           if (!to) return;
-          const from = point(bat.perch), end = point(to);
+          // From wherever it is, even still catching up after a scroll.
+          const at = point(bat.perch), from = { x: at.x, y: at.y + bat.drag }, end = point(to);
           const distance = Math.hypot(end.x - from.x, end.y - from.y);
           bat.perch = to;
-          bat.flight = { from, start: performance.now(), dip: 30 + Math.random() * 40,
-                         duration: Math.min(3400, Math.max(1300, distance / .28)) };
+          bat.drag = 0;
+          bat.flight = { from, loop, start: performance.now(), dip: (loop ? 22 : 30) + Math.random() * 36,
+                         duration: loop ? 900 + Math.random() * 400 : Math.min(2400, Math.max(900, distance / .42)) };
           wake();
+        };
+        // Something is always about to happen: a flight every second or two,
+        // and sometimes a second bat goes with it.
+        const launch = () => {
+          schedule();
+          takeOff();
+          if (Math.random() < .35) setTimeout(takeOff, 250 + Math.random() * 400);
         };
         const schedule = () => {
           clearTimeout(nextFlight);
-          if (!still.matches) nextFlight = setTimeout(launch, 2200 + Math.random() * 3800);
+          if (!still.matches) nextFlight = setTimeout(launch, 900 + Math.random() * 1500);
         };
         // Now and then one stretches its wings where it hangs.
         const stretch = () => {
@@ -717,7 +731,7 @@
               }
             }
             stretch();
-          }, 1600 + Math.random() * 3400);
+          }, 700 + Math.random() * 1100);
         };
         addEventListener("scroll", () => {
           const y = Math.min(Math.max(0, scrollY), document.documentElement.scrollHeight - innerHeight);
@@ -729,6 +743,13 @@
             if (!bat.flight && bat.perch.kind === "edge") bat.drag = Math.max(-170, Math.min(240, bat.drag - delta));
           }
           wake();
+          // Once the page comes to rest, a couple of them take off at once.
+          clearTimeout(settled);
+          settled = setTimeout(() => {
+            takeOff();
+            setTimeout(takeOff, 180);
+            schedule();
+          }, 260);
         }, { passive: true });
         addEventListener("resize", () => { measure(); if (!frame) draw(performance.now(), 0); }, { passive: true });
 
