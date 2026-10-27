@@ -388,9 +388,9 @@
       } else cards.forEach(card => card.classList.add("is-visible"));
 
       // The floating mark, drawn on a canvas so it can come apart. One loop
-      // eases the lean, tilt and light toward where they are headed; another
-      // runs only while the blocks are on the move. Both stop once
-      // everything has arrived, so a still page costs nothing.
+      // eases the lean, tilt and light toward where they are headed and stops
+      // once they arrive; the other keeps the blocks going out and coming
+      // back, and pauses with the page when it is out of sight.
       const mark = document.querySelector("[data-float-mark]");
       if (mark) {
         const orb = mark.querySelector(".mark-orb");
@@ -406,13 +406,24 @@
         const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
         let lastY = Math.max(0, scrollY), lastScroll = performance.now(), lastFrame = 0, frame = 0;
 
-        // The blocks. Each has its turn to blink out and its turn to come
+        // The blocks. Each has its turn to fade out and its turn to come
         // back: mostly chance, with a sweep down the mark on the way out and
-        // back up it on the way in.
-        const timing = { out: 1000, gone: 420, in: 1250, shown: 7000 };
-        const spread = .82;
-        let blocks = [], cell = 3, painted = NaN, blockFrame = 0, cycle = 0;
-        let phase = still.matches ? "shown" : "gone", phaseStart = performance.now() + 200;
+        // back up it on the way in, dealt afresh each time so no two passes
+        // look alike. Out and back run straight into each other.
+        const timing = { out: 1500, in: 1500 };
+        const spread = .78;
+        let blocks = [], cell = 3, painted = NaN, blockFrame = 0;
+        let phase = still.matches ? "shown" : "in", phaseStart = performance.now() + 120;
+        // Turns are spaced evenly through a pass, so the mark is always on
+        // the move and only eases as it turns around.
+        const deal = next => {
+          const size = canvas.width || 1;
+          const order = blocks.map(block => ({ block, key: Math.random() * .72
+            + (next === "out" ? block.y / size : 1 - block.y / size) * .28 }))
+            .sort((a, b) => a.key - b.key);
+          const last = Math.max(1, order.length - 1);
+          order.forEach(({ block }, rank) => { block[next === "out" ? "out" : "back"] = rank / last; });
+        };
         const shine = () => now.light * 50 - 25 + now.ry;
         const paint = () => {
           const size = art.width, angle = shine() * Math.PI / 180;
@@ -446,10 +457,11 @@
                   if (ink[(row * size + column) * 4 + 3] > 10) { inked = true; break; }
                 }
               }
-              if (inked) blocks.push({ x, y, seen: 1, out: Math.random() * .72 + y / size * .28,
-                                       back: Math.random() * .72 + (1 - y / size) * .28 });
+              if (inked) blocks.push({ x, y, seen: 1, out: 0, back: 0 });
             }
           }
+          deal("out");
+          deal("in");
         };
         const draw = time => {
           const size = canvas.width;
@@ -457,22 +469,20 @@
           pen.globalCompositeOperation = "source-over";
           pen.globalAlpha = 1;
           pen.clearRect(0, 0, size, size);
-          if (phase === "gone") return;
           pen.drawImage(art, 0, 0);
           if (phase === "shown") return;
           const progress = Math.min(1, (time - phaseStart) / timing[phase]);
           const span = 1 - spread;
-          // A block lights up as it turns over, and steps rather than fades,
-          // like a screen redrawing.
+          // A block catches the light as it turns over.
           pen.globalCompositeOperation = "source-atop";
           pen.fillStyle = "#fff";
           for (const block of blocks) {
             const turn = (phase === "out" ? block.out : block.back) * spread;
-            const step = clamp((progress - turn) / span, 0, 1);
-            block.seen = Math.round((phase === "out" ? 1 - step : step) * 3) / 3;
-            const glint = step > 0 && step < 1 ? 1 - Math.abs(2 * step - 1) : 0;
-            if (glint > 0) {
-              pen.globalAlpha = glint * .9;
+            const linear = clamp((progress - turn) / span, 0, 1);
+            block.seen = phase === "out" ? 1 - linear : linear;
+            const glint = Math.sin(Math.PI * linear);
+            if (glint > .01) {
+              pen.globalAlpha = glint * glint * .55;
               pen.fillRect(block.x, block.y, cell, cell);
             }
           }
@@ -486,24 +496,17 @@
           pen.globalAlpha = 1;
           pen.globalCompositeOperation = "source-over";
         };
-        const schedule = () => {
-          clearTimeout(cycle);
-          if (still.matches) return;
-          cycle = setTimeout(() => {
-            if (document.hidden) return schedule();
-            phase = "out";
-            phaseStart = performance.now();
-            if (!blockFrame) blockFrame = requestAnimationFrame(blocksStep);
-          }, timing.shown);
-        };
         const blocksStep = time => {
-          if (phase !== "shown" && time - phaseStart >= timing[phase]) {
-            phase = phase === "out" ? "gone" : phase === "gone" ? "in" : "shown";
-            phaseStart = time;
+          const length = timing[phase];
+          if (time - phaseStart >= length) {
+            phase = phase === "out" ? "in" : "out";
+            // Carry on from where the last pass ended, unless the page was
+            // away long enough to start over.
+            phaseStart = time - phaseStart < length * 2 ? phaseStart + length : time;
+            deal(phase);
           }
           draw(time);
-          if (phase === "shown") { blockFrame = 0; schedule(); }
-          else blockFrame = requestAnimationFrame(blocksStep);
+          blockFrame = requestAnimationFrame(blocksStep);
         };
 
         const render = () => {
@@ -569,7 +572,7 @@
         layout();
         // It arrives the way it leaves, block by block.
         if (phase === "shown") draw(performance.now());
-        else blockFrame = requestAnimationFrame(blocksStep);
+        else { deal("in"); blockFrame = requestAnimationFrame(blocksStep); }
         render();
       }
 
