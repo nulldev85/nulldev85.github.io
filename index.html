@@ -35,6 +35,9 @@
       --thick: "Null Dots Thick", "Null Dots", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     }
     * { box-sizing: border-box; }
+    /* The top of the site, the header with the pumpkin under it, stays put
+       like an app's; the page slips under it as it scrolls. */
+    :root { --top: 168px; }
     html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
@@ -55,14 +58,17 @@
     .wrap { width: min(960px, 100% - 48px); margin: 0 auto; }
 
     /* Header */
-    .site-header { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .site-header { position: fixed; top: 0; right: 0; left: 0; z-index: 22; display: flex; align-items: center; justify-content: space-between; height: 64px; margin: 0 auto; }
+    /* Behind it, a band of the page's own dark, fading at its lower edge, for
+       the page to disappear under. */
+    .top-shade { position: fixed; top: 0; right: 0; left: 0; z-index: 22; height: var(--top); background: linear-gradient(var(--bg) calc(100% - 30px), rgba(10, 10, 11, 0)); pointer-events: none; }
     .wordmark { font-size: 15px; font-weight: 600; text-decoration: none; }
     .site-nav { display: flex; gap: 24px; font-size: 14px; }
     .site-nav a { color: var(--text-2); text-decoration: none; transition: color .15s ease; }
     .site-nav a:hover { color: var(--text); }
 
     /* Intro */
-    .intro { padding: 116px 0 64px; }
+    .intro { padding: 180px 0 64px; }
     .intro h1 { max-width: 760px; margin: 0; font-family: var(--thick); font-size: clamp(30px, 5.2vw, 46px); font-weight: 600; line-height: 1.18; }
     .lede { max-width: 580px; margin: 18px 0 0; color: var(--text-2); font-size: 17px; line-height: 1.6; }
     .source { display: flex; align-items: stretch; max-width: 700px; height: 44px; margin-top: 36px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); }
@@ -79,8 +85,8 @@
     .feed-status:not(:empty)::before { content: " "; }
 
     /* Apps */
-    .app { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 0 56px; padding: 56px 0 64px; border-top: 1px solid var(--line); scroll-margin-top: 8px; }
-    .app-side { position: sticky; top: 40px; align-self: start; display: flex; flex-direction: column; align-items: flex-start; }
+    .app { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 0 56px; padding: 56px 0 64px; border-top: 1px solid var(--line); scroll-margin-top: var(--top); }
+    .app-side { position: sticky; top: calc(var(--top) + 16px); align-self: start; display: flex; flex-direction: column; align-items: flex-start; }
     .app-icon { position: relative; display: block; width: 56px; height: 56px; overflow: hidden; border-radius: 13px; background: var(--raised); }
     .app-icon::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255,255,255,.09); }
     .app-icon img { display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -151,7 +157,7 @@
     .bats { display: none; }
     .has-js .bats { display: block; }
     .bats-page, .bats-screen { top: 0; left: 0; width: 0; height: 0; pointer-events: none; }
-    .bats-page { position: absolute; z-index: 25; }
+    .bats-page { position: absolute; z-index: 21; }
     .bats-screen { position: fixed; z-index: 31; }
     .bat, .spirit { position: absolute; top: 0; left: 0; display: block; pointer-events: none; will-change: transform; }
     .spirit { opacity: 0; }
@@ -173,7 +179,7 @@
     @media (prefers-reduced-motion: reduce) { .storm { display: none !important; } }
     /* The page and its header are shaken by the thunder; kept on their own
        layers, the shaking moves them without painting them again. */
-    @media (prefers-reduced-motion: no-preference) { .has-js main, .has-js .site-header { will-change: transform; } }
+    @media (prefers-reduced-motion: no-preference) { .has-js main, .has-js .site-header, .has-js .top-shade { will-change: transform; } }
     @media print { .float-mark, .bats, .webs, .storm { display: none; } }
 
     /* Motion */
@@ -193,7 +199,8 @@
     @media (max-width: 600px) {
       .wrap { width: calc(100% - 32px); }
       .site-nav { gap: 18px; }
-      .intro { padding: 84px 0 44px; }
+      :root { --top: 140px; }
+      .intro { padding: 148px 0 44px; }
       .float-mark { --mark-size: 48px; --pixel: 2.1px; top: 74px; }
       .lede { font-size: 16px; }
       .source-label { display: none; }
@@ -220,6 +227,7 @@
   <div class="storm" aria-hidden="true" data-storm><canvas class="storm-bolt"></canvas><div class="storm-flash"></div></div>
   <div class="webs" aria-hidden="true" data-webs></div>
   <div class="bats" aria-hidden="true" data-bats><div class="bats-page"></div><div class="bats-screen"></div></div>
+  <div class="top-shade" aria-hidden="true"></div>
   <header class="site-header wrap">
     <a class="wordmark" href="#top">Null’s Apps</a>
     <nav class="site-nav" aria-label="Apps">
@@ -713,23 +721,28 @@
         const place = (bat, x, y) => {
           bat.el.style.transform = `translate3d(${(x - 8.5 * unit).toFixed(1)}px, ${(y - unit).toFixed(1)}px, 0)`;
         };
+        // How far down the top of the site reaches; the page goes under it.
+        let bar = 0;
         const measure = () => {
           ratio = Math.min(3, devicePixelRatio || 1);
           cell = Math.max(2, Math.round((innerWidth <= 600 ? 2 : 2.2) * ratio));
           unit = cell / ratio;
+          bar = document.querySelector(".top-shade")?.offsetHeight || 0;
           underMark = markPerches();
           bats.forEach(size);
         };
 
-        // Where a perch is on the screen right now. Words are kept in page
-        // coordinates, the mark's three in screen coordinates.
+        // Where a perch is on the screen right now. Words in the page are kept
+        // in page coordinates; the mark's and the header's, which stay put,
+        // in screen coordinates.
         const onScreen = perch => perch.kind === "mark"
           ? underMark[perch.index] || { x: innerWidth / 2, y: -40 }
-          : { x: perch.x, y: perch.y - scrollY };
+          : perch.kind === "bar" ? perch : { x: perch.x, y: perch.y - scrollY };
+        // A word that has gone under the top of the site is out of sight too.
         const offScreen = perch => {
-          if (perch.kind === "mark") return false;
+          if (perch.kind !== "word") return false;
           const y = perch.y - scrollY;
-          return y < 10 || y > innerHeight - 26;
+          return y < bar + 4 || y > innerHeight - 26;
         };
         const settle = bat => {
           paint(bat, hanging);
@@ -753,15 +766,18 @@
           if (found && found.scroll === scrollY && now - found.time < 600) return found.spots;
           const spots = [], view = innerHeight, bottom = document.documentElement.scrollHeight - 40;
           const markBox = document.querySelector(".mark-scene")?.getBoundingClientRect();
-          const clear = (x, y) => x > 22 && x < innerWidth - 22 && y > 24 && y < view - 36 && y + scrollY < bottom
-            && !(markBox && x > markBox.left - 26 && x < markBox.right + 26 && y > markBox.top - 26 && y < markBox.bottom + 34);
           for (const element of document.querySelectorAll(perchable)) {
             if (element.closest("dialog")) continue;
+            // In the header, a perch stays put with it; in the page, it has
+            // to be clear of the top of the site.
+            const fixed = !!element.closest(".site-header"), above = fixed ? 24 : bar + 6;
+            const clear = (x, y) => x > 22 && x < innerWidth - 22 && y > above && y < view - 36 && y + scrollY < bottom
+              && !(markBox && x > markBox.left - 26 && x < markBox.right + 26 && y > markBox.top - 26 && y < markBox.bottom + 34);
             const box = element.getBoundingClientRect();
-            if (!box.width || box.bottom < 24 || box.top > view - 36) continue;
+            if (!box.width || box.bottom < above || box.top > view - 36) continue;
             if (element.matches(".download, .notes-button, .copy-repo")) {
               const x = box.left + box.width * (.25 + Math.random() * .5), y = box.bottom - 1;
-              if (clear(x, y)) spots.push({ x, y: y + scrollY, weight: 3 });
+              if (clear(x, y)) spots.push({ x, y: y + scrollY, weight: 3, fixed });
               continue;
             }
             // Headings, and the last line of anything else, where a bat
@@ -776,7 +792,7 @@
                 const word = range.getBoundingClientRect();
                 const x = word.left + word.width / 2, y = word.bottom - 2;
                 const weight = heading || word.bottom > box.bottom - 4 ? 3 : .6;
-                if (word.width >= 14 && clear(x, y)) spots.push({ x, y: y + scrollY, weight });
+                if (word.width >= 14 && clear(x, y)) spots.push({ x, y: y + scrollY, weight, fixed });
               }
             }
           }
@@ -785,7 +801,7 @@
         };
         const pageSpot = perch => perch.kind === "mark"
           ? underMark[perch.index] && { x: underMark[perch.index].x, y: underMark[perch.index].y + scrollY }
-          : perch;
+          : perch.kind === "bar" ? { x: perch.x, y: perch.y + scrollY } : perch;
         const roomAt = (spot, except) => bats.every(bat => {
           if (bat === except || !bat.perch) return true;
           const other = pageSpot(bat.perch);
@@ -796,15 +812,15 @@
           if (!options.length) return null;
           let roll = Math.random() * options.reduce((sum, spot) => sum + spot.weight, 0);
           const spot = options.find(option => (roll -= option.weight) <= 0) || options[options.length - 1];
-          return { kind: "word", x: spot.x, y: spot.y };
+          return spot.fixed ? { kind: "bar", x: spot.x, y: spot.y - scrollY } : { kind: "word", x: spot.x, y: spot.y };
         };
         const freeMark = except => {
           const free = underMark.map((_, index) => ({ kind: "mark", index }))
             .filter(perch => bats.every(bat => bat === except || bat.perch?.kind !== "mark" || bat.perch.index !== perch.index));
           return free.length ? pick(free) : null;
         };
-        // With nowhere better, the top of the screen.
-        const top = () => ({ kind: "word", x: 24 + Math.random() * (innerWidth - 48), y: scrollY + 2 });
+        // With nowhere better, the top edge of the screen.
+        const top = () => ({ kind: "bar", x: 24 + Math.random() * (innerWidth - 48), y: 2 });
 
         // A bat's way through the air: it drops off its perch, swings out to
         // one side on a curve and comes up into the next perch from below,
@@ -938,12 +954,13 @@
         const lost = bat => {
           if (!bat.flight) return offScreen(bat.perch);
           const y = seen(bat).y;
-          return bat.flight.inPage && (y < -20 || y > innerHeight + 20);
+          return bat.flight.inPage && (y < bar - 20 || y > innerHeight + 20);
         };
         // Once the page comes to rest, the bats left out of sight come after
-        // you: each sets off from just past the edge of the screen it was
-        // left beyond, a little after the one before, so they trickle in
-        // rather than pour. A couple more take off for the fun of it.
+        // you: each sets off from just past the edge it was left beyond, out
+        // from under the top of the site or up from below the screen, a
+        // little after the one before, so they trickle in rather than pour.
+        // A couple more take off for the fun of it.
         const regroup = () => {
           found = null;
           bats.filter(lost).forEach((bat, index) => {
@@ -951,7 +968,7 @@
               if (!lost(bat)) return;
               const at = seen(bat);
               takeOff(bat, freeWord(bat) || freeMark(bat) || top(),
-                      { x: clamp(at.x, 24, innerWidth - 24), y: at.y < innerHeight / 2 ? -24 : innerHeight + 24 });
+                      { x: clamp(at.x, 24, innerWidth - 24), y: at.y < innerHeight / 2 ? bar - 16 : innerHeight + 24 });
             }, index * 260 + Math.random() * 500);
           });
           setTimeout(launchOne, 120);
@@ -1017,7 +1034,7 @@
         const calm = matchMedia("(prefers-reduced-motion: reduce)");
         const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
         const ghosts = [], cols = 22, rows = 30;
-        let ratio = 1, cell = 3, unit = 1.5, last = 0, sizedFor = "", settle = 0;
+        let ratio = 1, cell = 3, unit = 1.5, last = 0, sizedFor = "", settle = 0, bar = 0;
         // The pale light around a ghost, drawn once for each size and laid
         // under it every frame.
         const aura = document.createElement("canvas");
@@ -1025,6 +1042,7 @@
           ratio = Math.min(3, devicePixelRatio || 1);
           cell = Math.max(2, Math.round((innerWidth <= 600 ? 1.6 : 2) * ratio));
           unit = cell / ratio;
+          bar = document.querySelector(".top-shade")?.offsetHeight || 0;
           aura.width = cols * cell;
           aura.height = rows * cell;
           const light = aura.getContext("2d"), glow = light.createRadialGradient(cols / 2 * cell, 10.5 * cell, 0, cols / 2 * cell, 10.5 * cell, 10.5 * cell);
@@ -1040,8 +1058,10 @@
             ghost.el.style.height = rows * unit + "px";
           }
         };
-        // Somewhere in the part of the page on screen.
-        const somewhere = () => ({ x: 40 + Math.random() * (innerWidth - 80), y: scrollY + 40 + Math.random() * Math.max(40, innerHeight - 120) });
+        // Somewhere in the part of the page on screen, below the top of the
+        // site, which the page and its ghosts go under.
+        const somewhere = () => ({ x: 40 + Math.random() * (innerWidth - 80),
+                                   y: scrollY + bar + 30 + Math.random() * Math.max(40, innerHeight - bar - 110) });
         // The same number for a pixel every frame, so a ghost comes apart and
         // builds back in a fixed order.
         const grain = (col, row, seed) => {
@@ -1112,7 +1132,7 @@
             const dx = ghost.target.x - ghost.x, dy = ghost.target.y - ghost.y, far = Math.hypot(dx, dy);
             if (far < 24) ghost.target = somewhere();
             // One coming after you hurries, until it is back in view.
-            const inView = ghost.y > scrollY && ghost.y < scrollY + innerHeight;
+            const inView = ghost.y > scrollY + bar && ghost.y < scrollY + innerHeight;
             if (inView) ghost.hurry *= Math.exp(-dt * .9);
             const speed = ghost.speed * Math.min(1, far / 120) * (1 + 1.8 * ghost.hurry);
             const ease = 1 - Math.exp(-dt * .7);
@@ -1160,7 +1180,7 @@
         // you. Half swoop in from the edge you left them past, if the page
         // has room there; the rest build themselves back in view.
         const regather = () => {
-          const top = scrollY, bottom = scrollY + innerHeight, now = performance.now();
+          const top = scrollY + bar, bottom = scrollY + innerHeight, now = performance.now();
           const room = document.documentElement.scrollHeight - (bottom + 80);
           for (const ghost of ghosts) {
             if (ghost.target.y < top + 40 || ghost.target.y > bottom - 80) ghost.target = somewhere();
@@ -1584,7 +1604,7 @@
           const timing = { duration: 700 + 500 * strength, delay, easing: "linear" };
           const shake = steps.map(([x, y]) => ({ transform: `translate(${x}px, ${y}px)` }));
           const nudge = steps.map(([x, y]) => ({ translate: `${x}px ${y}px` }));
-          for (const part of document.querySelectorAll(".site-header, main, .float-mark, .bats-page, .bats-screen")) part.animate(shake, timing);
+          for (const part of document.querySelectorAll(".top-shade, .site-header, main, .float-mark, .bats-page, .bats-screen")) part.animate(shake, timing);
           for (const part of document.querySelectorAll(".web, .spider")) part.animate(nudge, timing);
           // The web and its spiders feel it as it arrives.
           setTimeout(() => dispatchEvent(new CustomEvent("thunder", { detail: { strength } })), delay);
