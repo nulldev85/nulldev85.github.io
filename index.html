@@ -507,6 +507,9 @@
           const gutter = Math.max(0, Math.sin(t * .9 + 2) - .9) * 3;
           return Math.min(1, Math.max(.28, .72 + sway + flutter - gutter));
         };
+        // A blow struck at the pumpkin makes the flame gutter for a moment.
+        let frightAt = -1e9;
+        addEventListener("fright", () => { frightAt = performance.now(); });
         // How far the flame leans, in pixels of the pumpkin.
         const lean = time => {
           const t = time / 1000;
@@ -564,7 +567,7 @@
         const light = time => {
           if (!scene) return;
           const { cell, gap, pad } = scene, size = cell - gap, moving = !calm.matches;
-          const glow = moving ? flame(time) : .8;
+          const glow = moving ? flame(time) * (1 - .7 * Math.exp(-Math.max(0, time - frightAt) / 260)) : .8;
           // The light inside swells and settles, slower than the flicker.
           const t = time / 1000;
           const breath = moving ? .35 + .65 * (.5 + .5 * (.6 * Math.sin(t * 1.9) + .4 * Math.sin(t * .83 + 1.2))) : .85;
@@ -1685,96 +1688,451 @@
 
       // Along the bottom of the top of the site, on the line the pumpkin
       // stands on, the villains of Halloween take turns: one walks in from
-      // the edge of the screen to the pumpkin, shows what it came to show,
-      // turns and walks off again, and a little later the next comes in,
-      // mostly from the other side. All five come before any comes again,
-      // each at its own pace, Michael slow and steady, Chucky on quick little
-      // legs. They are drawn facing right and mirrored to face left. The
-      // lightning catches them as dark shapes and the thunder shakes them
-      // with everything else; with reduced motion, Michael just stands by
-      // the pumpkin.
+      // the edge of the screen to the pumpkin, does what it came to do, turns
+      // and walks off again, and a little later the next comes in, mostly
+      // from the other side. All five come before any comes again, each
+      // walking its own way: Michael stiff and slow, Jason lumbering, Freddy
+      // with a swagger, Chucky on quick little legs. At the pumpkin Jason
+      // raises his machete and slashes, Freddy snicks his claws, scrapes
+      // sparks and tips his hat, Michael tilts his head and stabs, Ghostface
+      // tilts his, wipes his knife and lunges, and Chucky stabs twice and
+      // throws his head back laughing; the candle gutters at every blow.
+      //
+      // Each is rigged rather than drawn frame by frame: a head and a body
+      // drawn in pixels, and arms and legs posed by angle and drawn into the
+      // same pixels every frame, so they walk and move smoothly. They face
+      // right and are mirrored, about the hips, to face left. The lightning
+      // catches them as dark shapes and the thunder shakes them with
+      // everything else; with reduced motion, Michael just stands by the
+      // pumpkin.
       const stage = document.querySelector("[data-villains]");
       if (stage) {
         const calm = matchMedia("(prefers-reduced-motion: reduce)");
-        const cast = {
-          jason: {
-            colors: { w: "#e6dfcc", k: "#2b2522", r: "#c8322e", j: "#56634b", J: "#3f4a37", h: "#b88b6c", p: "#3b3c44", b: "#2c2826", s: "#b9c0ca", S: "#eef2f7", n: "#5d4029" },
-            walk: [
-              ["....wwwww....", "...wrwwwrw...", "...wkwwwkw...", "...wwwwwww...", "...wrwkwrw...", "....wkwkw....", ".....www.....", "....JjjjJ....", "..jjjjjjjjj..", ".jjjjjjjjjjj.", ".jjjjJjJjjjj.", ".jj.jjjjj.jj.", ".jj.jjjjj.jj.", ".jj.jjjjj.jj.", ".hh.jjjjj.hhn", "....JJJJJ...s", "....ppppp...s", "...ppp.ppp..s", "..ppp...ppp.S", ".ppp.....pppS", ".bb.......bbb"],
-              ["....wwwww....", "...wrwwwrw...", "...wkwwwkw...", "...wwwwwww...", "...wrwkwrw...", "....wkwkw....", ".....www.....", "....JjjjJ....", "..jjjjjjjjj..", ".jjjjjjjjjjj.", ".jjjjJjJjjjj.", ".jj.jjjjj.jj.", ".jj.jjjjj.jj.", ".jj.jjjjj.jj.", ".hh.jjjjj.hhn", "....JJJJJ...s", "....ppppp...s", "....pp.pp...s", "....pp.pp...S", "....pp.pp...S", "....bb.bbb..."]
-            ],
-            pose: ["....wwwww...S", "...wrwwwrw..S", "...wkwwwkw.sS", "...wwwwwww.s.", "...wrwkwrwn..", "....wkwkwhh..", ".....www.jj..", "....Jjjjjj...", "..jjjjjjjjj..", ".jjjjjjjjjjj.", ".jjjjJjJjjjj.", ".jj.jjjjj....", ".jj.jjjjj....", ".jj.jjjjj....", ".hh.jjjjj....", "....JJJJJ....", "....ppppp....", "....pp.pp....", "....pp.pp....", "....pp.pp....", "....bb.bbb..."],
-            speed: 38, step: 240, hold: 1500
-          },
-          freddy: {
-            colors: { f: "#6e4c30", F: "#4a3220", c: "#b65a4b", C: "#8c3a32", e: "#e8c860", k: "#3a1c18", r: "#b8282e", g: "#2f6e3c", l: "#6e4c30", s: "#d4dae2", p: "#5b4a3a", b: "#2b2420" },
-            walk: [
-              ["...ffffff....", "...ffffff....", ".FFFFFFFFFF..", "...cCcccc....", "...cecceC....", "...ccCccc....", "...cckkcc....", "....cccc.....", "...rrrrrr....", "..gggggggg...", ".rrrrrrrrrr..", ".gg.gggg.gg..", ".rr.rrrr.rr..", ".gg.gggg.ggs.", ".cc.rrrr.llss", "....gggg..s.s", "....ppppp....", "...ppp.ppp...", "..ppp...ppp..", ".ppp.....ppp.", ".bb.......bbb"],
-              ["...ffffff....", "...ffffff....", ".FFFFFFFFFF..", "...cCcccc....", "...cecceC....", "...ccCccc....", "...cckkcc....", "....cccc.....", "...rrrrrr....", "..gggggggg...", ".rrrrrrrrrr..", ".gg.gggg.gg..", ".rr.rrrr.rr..", ".gg.gggg.ggs.", ".cc.rrrr.llss", "....gggg..s.s", "....ppppp....", "....pp.pp....", "....pp.pp....", "....pp.pp....", "....bb.bbb..."]
-            ],
-            pose: ["...ffffff....", "...ffffff....", ".FFFFFFFFFF..", "...cCcccc....", "...cecceC....", "...ccCccc....", "...cckkcc....", "....cccc.....", "...rrrrrr....", "..gggggggg.s.", ".rrrrrrrrrr..", ".gg.gggg.....", ".rr.rrrr..s.s", ".gg.gggg.ssss", ".cc.rrrr.lls.", "....gggg.ll..", "....ppppp....", "....pp.pp....", "....pp.pp....", "....pp.pp....", "....bb.bbb..."],
-            speed: 44, step: 200, hold: 1600
-          },
-          michael: {
-            colors: { a: "#3c2b1f", w: "#e8e5dd", k: "#2b2725", v: "#2f3a54", V: "#45526e", h: "#d9cdbf", p: "#2f3a54", b: "#222226", s: "#d6dbe2", S: "#f2f5f8", n: "#3a2a20" },
-            walk: [
-              ["....aaaaa....", "...aawwwaa...", "...awwwwwa...", "...wkwwwkw...", "...wwwwwww...", "...wwwkwww...", "....wwwww....", ".....www.....", "...vvvvvvv...", "..vvvvvvvvv..", ".vvvVvvvVvvv.", ".vv.vvvvv.vv.", ".vv.vvvvv.vv.", ".vv.vVvVv.vv.", ".hh.vvvvv.hhn", "....vvvvv...s", "....ppppp...S", "...ppp.ppp...", "..ppp...ppp..", ".ppp.....ppp.", ".bb.......bbb"],
-              ["....aaaaa....", "...aawwwaa...", "...awwwwwa...", "...wkwwwkw...", "...wwwwwww...", "...wwwkwww...", "....wwwww....", ".....www.....", "...vvvvvvv...", "..vvvvvvvvv..", ".vvvVvvvVvvv.", ".vv.vvvvv.vv.", ".vv.vvvvv.vv.", ".vv.vVvVv.vv.", ".hh.vvvvv.hhn", "....vvvvv...s", "....ppppp...S", "....pp.pp....", "....pp.pp....", "....pp.pp....", "....bb.bbb..."]
-            ],
-            pose: ["....aaaaa....", "....aawwwaa..", "....awwwwwa..", "....wkwwwkw..", "....wwwwwww..", "....wwwkwww..", ".....wwwww...", ".....www.....", "...vvvvvvv...", "..vvvvvvvvv..", ".vvvVvvvVvvv.", ".vv.vvvvv.vv.", ".vv.vvvvv.vv.", ".vv.vVvVv.vv.", ".hh.vvvvv.hhn", "....vvvvv...s", "....ppppp...S", "....pp.pp....", "....pp.pp....", "....pp.pp....", "....bb.bbb..."],
-            speed: 30, step: 300, hold: 2400
-          },
-          ghostface: {
-            colors: { o: "#2a2a31", O: "#45454f", w: "#f2f2ef", k: "#121215", s: "#d6dbe2", S: "#f2f5f8", p: "#2a2a31", b: "#18181c" },
-            walk: [
-              ["....ooooo....", "...ooOOOoo...", "..ooowwwooo..", "..oowwwwwoo..", "..oowkwkwoo..", "..oowkwkwoo..", "..oowwwwwoo..", "..ooowkwooo..", "..ooowkwooo..", ".ooooowoooooo", "ooooOoooOoooo", "oo.ooooooo.oo", "oo.ooooooo.oo", "oo.oooOooo.oo", "oo.ooooooo.os", "...ooooooo..s", "...oooooooo..", "..o.oo.oo.o..", "...pp...pp...", "..pp.....pp..", ".bb.......bbb"],
-              ["....ooooo....", "...ooOOOoo...", "..ooowwwooo..", "..oowwwwwoo..", "..oowkwkwoo..", "..oowkwkwoo..", "..oowwwwwoo..", "..ooowkwooo..", "..ooowkwooo..", ".ooooowoooooo", "ooooOoooOoooo", "oo.ooooooo.oo", "oo.ooooooo.oo", "oo.oooOooo.oo", "oo.ooooooo.os", "...ooooooo..s", "...oooooooo..", "..o.oo.oo.o..", "....pp.pp....", "....pp.pp....", "....bb.bbb..."]
-            ],
-            pose: ["....ooooo....", "...ooOOOoo...", "..ooowwwooo..", "..oowwwwwoo..", "..oowkwkwoo..", "..oowkwkwoo..", "..oowwwwwoo..", "..ooowkwooo.S", "..ooowkwooo.s", ".ooooowooooos", "ooooOoooOoooo", "oo.ooooooo.oo", "oo.ooooooo.oo", "oo.oooOooo.oo", "oo.ooooooo.oo", "...ooooooo..s", "...oooooooo..", "..o.oo.oo.o..", "....pp.pp....", "....pp.pp....", "....bb.bbb..."],
-            speed: 48, step: 180, hold: 1500
-          },
-          chucky: {
-            colors: { r: "#d4471f", c: "#f0c8a0", e: "#3d6fe0", f: "#c98a62", C: "#a2503a", k: "#7a2a22", w: "#e8e8e8", R: "#c33030", b: "#3a5ab0", d: "#5274b0", s: "#d6dbe2", S: "#f2f5f8", p: "#5274b0", q: "#ece8e0" },
-            walk: [
-              ["...rrrrr...", "..rrrrrrr..", "..rcccccr..", "..cecccec..", "..cfcccfc..", "..ccCkCcc..", "...ccccc...", "..wRbRbRw..", ".wddddddw..", ".bdddddd.b.", ".cdddddd.cs", "..dddddd..S", "..dd..dd...", ".dd....dd..", ".qq....qqq."],
-              ["...rrrrr...", "..rrrrrrr..", "..rcccccr..", "..cecccec..", "..cfcccfc..", "..ccCkCcc..", "...ccccc...", "..wRbRbRw..", ".wddddddw..", ".bdddddd.b.", ".cdddddd.cs", "..dddddd..S", "..dd.dd....", "..dd.dd....", "..qq.qqq..."]
-            ],
-            pose: ["...rrrrr...", "..rrrrrrr..", "..rcccccr..", "..cecccec..", "..cfcccfc..", "..ccCkCcc..", "...ccccc...", "..wRbRbRwS.", ".wddddddcs.", ".bdddddd....", ".cdddddd....", "..dddddd....", "..dd.dd....", "..dd.dd....", "..qq.qqq..."],
-            speed: 56, step: 120, hold: 1800
+        // Angles are in degrees: 0 straight down, 90 forward, 180 straight up.
+        const W = 36, H = 46, HIP_X = 12;
+        const rad = d => d * Math.PI / 180;
+        const smooth = t => t * t * (3 - 2 * t);
+        const dir = (angle, length) => [Math.sin(rad(angle)) * length, Math.cos(rad(angle)) * length];
+        const shade = (hex, by) => "#" + [1, 3, 5].map(i => Math.round(parseInt(hex.slice(i, i + 2), 16) * by).toString(16).padStart(2, "0")).join("");
+
+        const frame = () => new Map();
+        const dot = (cells, x, y, color) => {
+          x = Math.floor(x); y = Math.floor(y);
+          if (x >= 0 && y >= 0 && x < W && y < H) cells.set(y * W + x, color);
+        };
+        // A limb or a blade: every cell whose middle is within half the width of the line.
+        const line = (cells, [x1, y1], [x2, y2], width, color) => {
+          const r = width / 2, dx = x2 - x1, dy = y2 - y1, span = dx * dx + dy * dy || 1;
+          for (let y = Math.floor(Math.min(y1, y2) - r); y <= Math.max(y1, y2) + r; y++) {
+            for (let x = Math.floor(Math.min(x1, x2) - r); x <= Math.max(x1, x2) + r; x++) {
+              const px = x + .5, py = y + .5, t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / span));
+              if (Math.hypot(px - x1 - dx * t, py - y1 - dy * t) <= r) dot(cells, x, y, color);
+            }
           }
         };
+        // A drawn part, placed so its anchor lands on (ax, ay), turned by `turn`
+        // about that anchor (looked up backwards, so turning leaves no holes).
+        const stamp = (cells, art, colors, [cx, cy], [ax, ay], turn = 0) => {
+          const c = Math.cos(rad(turn)), s = Math.sin(rad(turn)), wide = Math.max(...art.map(r => r.length)), reach = Math.hypot(wide, art.length) + 1;
+          for (let y = Math.floor(ay - reach); y <= ay + reach; y++) {
+            for (let x = Math.floor(ax - reach); x <= ax + reach; x++) {
+              // From this cell back into the art.
+              const dx = x + .5 - ax, dy = y + .5 - ay;
+              const u = Math.floor(cx + dx * c + dy * s), v = Math.floor(cy - dx * s + dy * c);
+              const key = art[v]?.[u];
+              if (key && key !== ".") dot(cells, x, y, colors[key]);
+            }
+          }
+        };
+        // Where a point of the body ends up when the body leans about the hips.
+        const lean = ([x, y], [hx, hy], angle) => {
+          const c = Math.cos(rad(angle)), s = Math.sin(rad(angle)), dx = x - hx, dy = y - hy;
+          return [hx + dx * c - dy * s, hy + dx * s + dy * c];
+        };
+
+        // One villain in one pose.
+        const draw = (who, pose) => {
+          const cells = frame(), L = who.limbs, k = who.colors;
+          // Legs from the hips: thigh, knee, shin, and a foot pointing forward.
+          const leg = ([thigh, knee]) => {
+            const [tx, ty] = dir(thigh, L.thigh), [sx, sy] = dir(thigh - knee, L.shin);
+            return { knee: [tx, ty], ankle: [tx + sx, ty + sy] };
+          };
+          const near = leg(pose.nearLeg), far = leg(pose.farLeg);
+          // The hips sit where the lower foot just touches the ground.
+          const hy = H - L.foot[1] - Math.max(near.ankle[1], far.ankle[1]) - (pose.crouch || 0) - (pose.hop || 0);
+          const hip = [HIP_X + (pose.shift || 0), hy];
+          const at = ([x, y]) => [hip[0] + x, hip[1] + y];
+          const drawLeg = (l, angle, color, shoe) => {
+            line(cells, hip, at(l.knee), L.legWidth, color);
+            line(cells, at(l.knee), at(l.ankle), L.legWidth * .9, color);
+            const [ax, ay] = at(l.ankle), toe = Math.max(-25, Math.min(25, (angle[0] - angle[1]) * .4));
+            line(cells, [ax - .4, ay + .2], [ax + Math.cos(rad(toe)) * L.foot[0], ay + .2 + Math.sin(rad(toe)) * .3], L.foot[1], shoe);
+          };
+          // Arms from the shoulders: upper arm, elbow, forearm, hand.
+          const torsoAt = p => lean(at([p[0] - who.torso.hips[0], p[1] - who.torso.hips[1]]), hip, pose.lean || 0);
+          const arm = (shoulder, [upper, elbow]) => {
+            const s = torsoAt(shoulder), [ex, ey] = dir(upper + (pose.lean || 0), L.upper), e = [s[0] + ex, s[1] + ey];
+            const [wx, wy] = dir(upper + elbow + (pose.lean || 0), L.fore), w = [e[0] + wx, e[1] + wy];
+            return { s, e, w, fore: upper + elbow + (pose.lean || 0) };
+          };
+          const farArm = arm(who.torso.far, pose.farArm), nearArm = arm(who.torso.near, pose.nearArm);
+          // A sleeve of one colour, or of stripes running round the arm.
+          const sleeveLine = (from, to, width, sleeve) => {
+            if (!Array.isArray(sleeve)) return line(cells, from, to, width, sleeve);
+            const length = Math.hypot(to[0] - from[0], to[1] - from[1]), bands = Math.max(1, Math.round(length / (L.band || 1.3)));
+            for (let i = 0; i < bands; i++) {
+              const p = t => [from[0] + (to[0] - from[0]) * t, from[1] + (to[1] - from[1]) * t];
+              line(cells, p(i / bands), p((i + 1) / bands), width, sleeve[i % sleeve.length]);
+            }
+          };
+          const drawArm = (a, sleeve, hand, offset = 0) => {
+            sleeveLine(a.s, a.e, L.armWidth, Array.isArray(sleeve) ? [...sleeve.slice(offset), ...sleeve.slice(0, offset)] : sleeve);
+            sleeveLine(a.e, a.w, L.armWidth * .9, Array.isArray(sleeve) ? [...sleeve.slice(offset + 1), ...sleeve.slice(0, offset + 1)] : sleeve);
+            line(cells, a.w, a.w, L.hand, hand);
+          };
+          const dark = by => Object.fromEntries(Object.entries(k).map(([key, hex]) => [key, Array.isArray(hex) ? hex.map(h => shade(h, by)) : shade(hex, by)]));
+          const farColors = dark(.76);
+          // Behind: the far arm and its hand, the far leg.
+          drawArm(farArm, farColors.sleeve, farColors.hand);
+          if (who.farProp) who.farProp(cells, farArm, pose, farColors);
+          drawLeg(far, pose.farLeg, farColors.pants, farColors.shoe);
+          drawLeg(near, pose.nearLeg, k.pants, k.shoe);
+          // The body, leaning about the hips, and the head on it.
+          stamp(cells, who.torso.art, k, who.torso.hips, hip, pose.lean || 0);
+          const neck = torsoAt(who.torso.neck);
+          stamp(cells, who.head.art, k, who.head.neck, neck, (pose.lean || 0) + (pose.tilt || 0));
+          if (who.hat) {
+            const [hx, hy] = dir((pose.lean || 0) + (pose.tilt || 0) + 180, pose.hat || 0);
+            stamp(cells, who.hat.art, k, who.hat.neck, [neck[0] + hx, neck[1] + hy], (pose.lean || 0) + (pose.tilt || 0) + (pose.hatTip || 0));
+          }
+          // In front: the near arm, and what it holds.
+          drawArm(nearArm, k.sleeve, k.nearHand || k.hand);
+          if (who.prop) who.prop(cells, nearArm, pose, k);
+          return cells;
+        };
+
+        // What they hold.
+        const blade = (length, width, handle) => (cells, hand, pose, k) => {
+          const angle = pose.prop ?? hand.fore + (pose.grip ?? 0);
+          const [dx, dy] = dir(angle, 1), w = hand.w;
+          const grip = [w[0] - dx * handle * .5, w[1] - dy * handle * .5], hilt = [w[0] + dx * handle * .5, w[1] + dy * handle * .5];
+          line(cells, grip, hilt, 1.2, k.handle);
+          const tip = [hilt[0] + dx * length, hilt[1] + dy * length];
+          line(cells, hilt, tip, width, k.steel);
+          // The edge catches the light along its length.
+          line(cells, [hilt[0] + dx, hilt[1] + dy], tip, .9, k.edge);
+          if (pose.glint) dot(cells, hilt[0] + dx * length * pose.glint, hilt[1] + dy * length * pose.glint, "#ffffff");
+        };
+        const claws = (cells, hand, pose, k) => {
+          const angle = pose.prop ?? hand.fore, spread = pose.spread ?? .4, w = hand.w;
+          for (const fan of [-1.5, -.5, .5, 1.5]) {
+            const [dx, dy] = dir(angle + fan * 9 * spread, 1);
+            line(cells, [w[0] + dx * .8, w[1] + dy * .8], [w[0] + dx * 5.4, w[1] + dy * 5.4], .9, k.steel);
+            if (pose.sparks) dot(cells, w[0] + dx * 5.4 + (Math.random() - .5) * 2, w[1] + dy * 5.4 + (Math.random() - .5) * 2, Math.random() < .5 ? "#ffe9a0" : "#ffffff");
+          }
+        };
+
+        const rest = { nearLeg: [5, 4], farLeg: [-5, 4], nearArm: [6, 12], farArm: [3, 10], lean: 0, tilt: 0 };
+        const cast = {   // Jason: the hockey mask, the bald scarred head behind it, an olive work
+        // jacket, a machete.
+        jason: {
+          colors: { w: "#e7e0cd", W: "#c9c1ab", m: "#8a7a6c", r: "#cc3530", k: "#2b2522", J: "#46523d", j: "#5d6b51", h: "#71806a", z: "#3a4332", b: "#2e2924",
+                    sleeve: "#5d6b51", hand: "#b88b6c", pants: "#4a4c57", shoe: "#3a2e26", handle: "#6a4a2e", steel: "#9fa8b4", edge: "#f0f4f8" },
+          head: { neck: [5.5, 9.6], art: [
+            "...mmmm...",
+            "..mmwwww..",
+            ".mmwwwwwww",
+            ".mmwrwwwrw",
+            ".mwkkwwwkk",
+            ".mwwWwwwWw",
+            ".mwwrwkwrw",
+            "..mwwkwkww",
+            "...wwwwwW.",
+            "....wwww..",
+          ] },
+          torso: { hips: [6.5, 10.5], neck: [6.8, .3], near: [10.6, 1.8], far: [2.6, 1.8], art: [
+            "...JJjjjjJ...",
+            "..JJjjjjjjjj.",
+            ".JJjjjjhjjjjj",
+            ".JJjjjzjhjjjj",
+            ".JJjjjzjjhjjj",
+            ".JJjjjzjjjjj.",
+            ".JJjjjzjjjjj.",
+            "..JJjjzjjjjj.",
+            "..JJjjzjjjjJ.",
+            "..JJjjjjjjjJ.",
+            "..bbbbbbbbbb.",
+          ] },
+          limbs: { thigh: 7, shin: 6.6, upper: 4.8, fore: 4.4, legWidth: 3, armWidth: 2.5, hand: 2, foot: [3.4, 1.6] },
+          prop: blade(8, 2, 2), grip: 8,
+          speed: 36, walk: { stride: 23, knee: 38, swing: 14, armRest: 6, elbow: 12, elbowSwing: 10, lean: 4 },
+          act: [
+            { at: 0, pose: {} },
+            { at: 750, pose: { nearArm: [168, 35], prop: 205, lean: -5, farArm: [25, 30] } },
+            { at: 1250, pose: { glint: .2 } },
+            { at: 1500, pose: { glint: 1 } },
+            { at: 1620, pose: { nearArm: [62, 6], prop: 80, lean: 10, farArm: [-12, 20], glint: 0 }, hit: true },
+            { at: 2400, pose: {} },
+            { at: 3200, pose: { nearArm: rest.nearArm, prop: undefined, lean: 0, farArm: rest.farArm } },
+          ],
+        },
+        // Freddy: the brown fedora, the burned face, the red and green sweater,
+        // the glove of four blades.
+        freddy: {
+          colors: { f: "#b85b49", F: "#8a3a30", e: "#f0d060", k: "#3a1a16", t: "#e8dcc0", h: "#6e4c30", H: "#3e2a1a",
+                    r: "#bd2a30", R: "#8e1f24", g: "#2f7a40", G: "#235c30", P: "#5b4a3a",
+                    sleeve: ["#bd2a30", "#2f7a40"], hand: "#b85b49", nearHand: "#6e4c30", pants: "#5e4c3a", shoe: "#2e2520", steel: "#d4dae2" },
+          head: { neck: [4.5, 8.4], art: [
+            "..ffff...",
+            ".fFffff..",
+            ".ffFffFf.",
+            ".fffefffe",
+            ".fFffFfff",
+            ".fffkkkkf",
+            ".fffktktf",
+            "..fffkkf.",
+          ] },
+          hat: { neck: [6, 10.4], art: [
+            "....hhhh....",
+            "...hhhhhh...",
+            "...hhhhhhh..",
+            "...HHHHHHH..",
+            "hhhhhhhhhhhh",
+          ] },
+          torso: { hips: [6.5, 10.5], neck: [6.5, .3], near: [10.4, 1.8], far: [2.6, 1.8], art: [
+            "...RRrrrrr...",
+            "..GGgggggggg.",
+            ".RRrrrrrrrrrr",
+            ".GGgggggggggg",
+            ".RRrrrrrrrrr.",
+            ".GGggggggggg.",
+            "..RRrrrrrrrr.",
+            "..GGgggggggg.",
+            "..RRrrrrrrrr.",
+            "..GGgggggggg.",
+            "..PPPPPPPPPP.",
+          ] },
+          limbs: { thigh: 7, shin: 6.6, upper: 4.6, fore: 4.2, legWidth: 2.8, armWidth: 2.3, hand: 1.9, foot: [3.2, 1.5] },
+          prop: claws,
+          speed: 42, walk: { stride: 26, knee: 44, swing: 20, armRest: 8, elbow: 20, elbowSwing: 14, lean: 2 },
+          act: [
+            { at: 0, pose: {} },
+            { at: 500, pose: { nearArm: [60, 85], prop: 150, spread: .3 } },
+            { at: 700, pose: { spread: 1.4 } },
+            { at: 880, pose: { spread: .2 } },
+            { at: 1060, pose: { spread: 1.4 } },
+            { at: 1240, pose: { spread: .2 } },
+            { at: 1600, pose: { nearArm: [150, 30], prop: 175, spread: .9, lean: -3 } },
+            { at: 1800, pose: { nearArm: [70, 5], prop: 80, lean: 8, sparks: 1 }, hit: true },
+            { at: 2050, pose: { nearArm: [30, 10], prop: 40, sparks: 0 } },
+            { at: 2400, pose: { farArm: [168, 95], lean: 0 } },
+            { at: 2650, pose: { hat: 2.6, hatTip: -14 } },
+            { at: 2950, pose: { hat: 0, hatTip: 0 } },
+            { at: 3300, pose: { farArm: rest.farArm, nearArm: rest.nearArm, prop: undefined, spread: .4 } },
+          ],
+        },
+        // Michael: the pale blank mask and dark hair, navy coveralls, a kitchen knife.
+        michael: {
+          colors: { a: "#3e2c1f", A: "#5a4030", w: "#ece9e2", g: "#bdb8ae", k: "#26221f", v: "#33405c", V: "#252f45", z: "#5d6a86",
+                    sleeve: "#33405c", hand: "#dcd0c2", pants: "#33405c", shoe: "#1f1f24", handle: "#2a2420", steel: "#c3c9d2", edge: "#f4f6f9" },
+          head: { neck: [5, 9.6], art: [
+            "..aaAaa...",
+            ".aaaaAaaa.",
+            "aaaaawwwa.",
+            "aaagwwwwww",
+            "aagkkwwkkw",
+            "aagkkwwkkw",
+            ".agwwwwgww",
+            ".aagwwwwww",
+            "..agwkkww.",
+            "...gwwww..",
+          ] },
+          torso: { hips: [6.5, 10.5], neck: [6.5, .3], near: [10.4, 1.8], far: [2.6, 1.8], art: [
+            "...VVvvvvV...",
+            "..VVvvvvvvvv.",
+            ".VVvvvvvvvvvv",
+            ".VVvvvvzvvvvv",
+            ".VVvvvvzvvvvv",
+            ".VVvvvvzvvvv.",
+            ".VVvvvvzvvvv.",
+            "..VVvvvzvvvv.",
+            "..VVvvvzvvvv.",
+            "..VVvvvvvvvv.",
+            "..VVvvvvvvvv.",
+          ] },
+          limbs: { thigh: 7.2, shin: 6.8, upper: 4.8, fore: 4.4, legWidth: 2.8, armWidth: 2.3, hand: 1.9, foot: [3.2, 1.5] },
+          prop: blade(4.8, 1.6, 2), grip: 0,
+          speed: 30, walk: { stride: 19, knee: 28, swing: 4, armRest: 4, elbow: 6, elbowSwing: 2, lean: 0 },
+          act: [
+            { at: 0, pose: {} },
+            { at: 400, pose: {} },
+            { at: 1300, pose: { tilt: 17 } },
+            { at: 1900, pose: {} },
+            { at: 2500, pose: { nearArm: [172, 28], prop: 25, tilt: 9, farArm: [10, 14] } },
+            { at: 2850, pose: {} },
+            { at: 3000, pose: { nearArm: [58, 8], prop: 72, lean: 8 }, hit: true },
+            { at: 3500, pose: {} },
+            { at: 4200, pose: { nearArm: rest.nearArm, prop: undefined, lean: 0, tilt: 0, farArm: rest.farArm } },
+          ],
+        },
+        // Ghostface: the black hood and long robe with wide sleeves, the long
+        // white mask, a hunting knife.
+        ghostface: {
+          colors: { o: "#2b2b33", O: "#4a4a57", q: "#1d1d23", w: "#f2f2ef", k: "#141418",
+                    sleeve: "#2b2b33", hand: "#1d1d23", pants: "#24242b", shoe: "#16161a", handle: "#2a2420", steel: "#c3c9d2", edge: "#f4f6f9" },
+          head: { neck: [5, 11.4], art: [
+            "...ooooo..",
+            "..oowwwoo.",
+            ".oowwwwwwo",
+            ".owwwwwwww",
+            ".owkkwwkkw",
+            ".owkkwwkkw",
+            ".owwkwwkww",
+            ".oowwwwwwo",
+            ".oowwkkwwo",
+            "..oowkkwo.",
+            "..oowkkwo.",
+            "...oowwo..",
+          ] },
+          torso: { hips: [6.5, 10.5], neck: [6.5, .3], near: [10.6, 1.8], far: [2.4, 1.8], art: [
+            "...qqooooO...",
+            "..qqoOOooooO.",
+            ".qqoooooooooO",
+            ".qqooooooooooO",
+            ".qqoooOoooooO",
+            ".qqooooooooooO",
+            ".qqoooooooooO.",
+            "..qqoooOooooO.",
+            "..qqoooooooO.",
+            "..qqooooooooO",
+            ".qqooooooooooO",
+            ".qqoooooooooooO",
+            "qqoooooOooooooO",
+            "qqoooooooooooO.",
+            "qoo.ooo.oo.ooO.",
+            "o...o....o..O..",
+          ] },
+          limbs: { thigh: 7, shin: 6.6, upper: 4.6, fore: 4.4, legWidth: 2.6, armWidth: 3.2, hand: 1.9, foot: [3, 1.5] },
+          prop: blade(5, 1.6, 2), grip: 0,
+          speed: 46, walk: { stride: 24, knee: 40, swing: 16, armRest: 8, elbow: 18, elbowSwing: 10, lean: 6 },
+          act: [
+            { at: 0, pose: {} },
+            { at: 600, pose: { tilt: -16, lean: 4 } },
+            { at: 1100, pose: { nearArm: [62, 88], prop: 178, farArm: [55, 62] } },
+            { at: 1450, pose: { farArm: [85, 38] } },
+            { at: 1750, pose: { farArm: [55, 62] } },
+            { at: 2050, pose: { farArm: [85, 38] } },
+            { at: 2400, pose: { farArm: [20, 20], tilt: 0 } },
+            { at: 2750, pose: { lean: 14, nearArm: [96, 0], prop: 96, nearLeg: [26, 8], farLeg: [-20, 4], shift: 1.5 }, hit: true },
+            { at: 3200, pose: {} },
+            { at: 3700, pose: { lean: 0, nearArm: rest.nearArm, prop: undefined, nearLeg: rest.nearLeg, farLeg: rest.farLeg, shift: 0 } },
+          ],
+        },
+        // Chucky: the doll. Wild orange hair, freckles, a scar, wide blue eyes and
+        // a nasty grin; the striped Good Guys shirt, denim overalls, white sneakers
+        // with red soles, and a knife nearly as long as his arm.
+        chucky: {
+          colors: { r: "#e0521e", R: "#a8380f", s: "#f2c9a2", S: "#d9a87e", f: "#c9855a", c: "#a5463a", b: "#2f6be0", B: "#ffffff", e: "#5a2a12",
+                    k: "#7a1f1f", t: "#f4efe6", d: "#4f73b4", D: "#3c5a90", p: "#6b8fd0", x: "#c33030", y: "#e8c840", u: "#2f8a4a", n: "#3a5ab0",
+                    sleeve: ["#c33030", "#3a5ab0", "#e8c840", "#2f8a4a"], hand: "#f2c9a2", pants: "#4f73b4", shoe: "#ece8e0", handle: "#2a2420", steel: "#c3c9d2", edge: "#f4f6f9" },
+          head: { neck: [5.5, 10.4], art: [
+            "..r.rR.r...",
+            ".rrrrrrrrr.",
+            "rrRrrrrrrrr",
+            "rrrrrrRrrrr",
+            "rrsssssssrr",
+            "rseesssseer",
+            "rsbBsssbBsr",
+            ".sfsssSsfss",
+            ".ssscsSsss.",
+            ".sktttttks.",
+            "..skkkkks..",
+            "...ssss....",
+          ] },
+          torso: { hips: [4.5, 7.5], neck: [4.6, .3], near: [7.4, 1.4], far: [1.8, 1.4], art: [
+            "..xnyuxn..",
+            ".xDdddddx.",
+            ".nDdpppdn.",
+            ".DDdpppdd.",
+            ".DDdddddd.",
+            ".DDdddddd.",
+            ".DDdddddd.",
+            ".DDdddddd.",
+          ] },
+          limbs: { thigh: 3.6, shin: 3.4, upper: 3, fore: 2.8, legWidth: 2.2, armWidth: 2.2, hand: 1.6, foot: [2.6, 1.4], band: .9 },
+          prop: blade(4.4, 1.5, 1.6), grip: 0,
+          speed: 40, walk: { stride: 30, knee: 55, swing: 32, armRest: 10, elbow: 28, elbowSwing: 18, lean: 6 },
+          act: [
+            { at: 0, pose: {} },
+            { at: 320, pose: { nearArm: [172, 20], prop: 15, lean: -4 } },
+            { at: 460, pose: { nearArm: [55, 4], prop: 62, lean: 10 }, hit: true },
+            { at: 680, pose: { nearArm: [172, 20], prop: 15, lean: -4 } },
+            { at: 820, pose: { nearArm: [55, 4], prop: 62, lean: 10 }, hit: true },
+            { at: 1150, pose: { tilt: -22, lean: -8, nearArm: [25, 50], farArm: [35, 95], hop: 0 } },
+            { at: 1300, pose: { hop: 1.6 } },
+            { at: 1450, pose: { hop: 0 } },
+            { at: 1600, pose: { hop: 1.6 } },
+            { at: 1750, pose: { hop: 0 } },
+            { at: 1900, pose: { hop: 1.6 } },
+            { at: 2050, pose: { hop: 0 } },
+            { at: 2600, pose: { tilt: 0, lean: 0, nearArm: rest.nearArm, farArm: rest.farArm, prop: undefined } },
+          ],
+        },
+        };
+
+        // Walking: legs and arms swinging opposite ways, the knee of the
+        // leg coming through bending to lift its foot.
+        const walkPose = (who, p) => {
+          const w = who.walk, s = Math.sin(p), c = Math.cos(p);
+          return { ...rest, lean: w.lean, grip: who.grip,
+            nearLeg: [w.stride * s, w.knee * Math.max(0, c) + 4], farLeg: [-w.stride * s, w.knee * Math.max(0, -c) + 4],
+            nearArm: [-w.swing * s + w.armRest, w.elbow + w.elbowSwing * Math.max(0, -s)],
+            farArm: [w.swing * s + w.armRest, w.elbow + w.elbowSwing * Math.max(0, s)] };
+        };
+        // The act: each step's pose eases into the next.
+        const actPose = (who, ms) => {
+          const steps = [];
+          let state = { ...rest, grip: who.grip };
+          for (const step of who.act) { state = { ...state, ...step.pose }; steps.push(state); }
+          const i = who.act.findIndex((step, n) => n === who.act.length - 1 || who.act[n + 1].at > ms);
+          const a = steps[i], b = steps[Math.min(i + 1, steps.length - 1)];
+          const span = (who.act[i + 1]?.at ?? who.act[i].at) - who.act[i].at;
+          const t = span ? smooth(Math.min(1, (ms - who.act[i].at) / span)) : 0;
+          const blend = (x, y) => Array.isArray(x) ? x.map((v, n) => v + ((y?.[n] ?? v) - v) * t)
+            : typeof x === "number" && typeof y === "number" ? x + (y - x) * t : t < .5 ? x : y;
+          const pose = {};
+          for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) pose[key] = blend(a[key], b[key]);
+          return pose;
+        };
+
         const el = document.createElement("canvas");
         el.className = "villain";
         stage.appendChild(el);
-        const pen = el.getContext("2d"), wide = 13, tall = 21;
-        let ratio = 1, cell = 4, unit = 2, shown = null, bag = [], side = Math.random() < .5 ? -1 : 1, walker = null, last = 0, running = false;
+        const pen = el.getContext("2d");
+        let ratio = 1, cell = 4, unit = 2, bag = [], side = Math.random() < .5 ? -1 : 1, walker = null, last = 0, running = false;
         const measure = () => {
           ratio = Math.min(3, devicePixelRatio || 1);
-          cell = Math.max(2, Math.round((innerWidth <= 600 ? 2 : 2.2) * ratio));
+          cell = Math.max(2, Math.round((innerWidth <= 600 ? 1.45 : 1.6) * ratio));
           unit = cell / ratio;
-          el.width = wide * cell;
-          el.height = tall * cell;
-          el.style.width = wide * unit + "px";
-          el.style.height = tall * unit + "px";
-          shown = null;
+          el.width = W * cell;
+          el.height = H * cell;
+          el.style.width = W * unit + "px";
+          el.style.height = H * unit + "px";
+          // Mirrored about the hips, so turning round doesn't move them.
+          el.style.transformOrigin = `${HIP_X * unit}px 50%`;
         };
-        // One frame, standing on the bottom of the canvas, centred in it.
-        const paint = (who, frame) => {
-          if (shown === frame) return;
-          shown = frame;
-          const gap = cell >= 4 ? 1 : 0, left = Math.floor((wide - frame[0].length) / 2), top = tall - frame.length;
+        const paint = cells => {
+          const gap = cell >= 4 ? 1 : 0;
           pen.clearRect(0, 0, el.width, el.height);
-          frame.forEach((line, row) => {
-            for (let col = 0; col < line.length; col++) {
-              const key = line[col];
-              if (key === ".") continue;
-              pen.fillStyle = who.colors[key];
-              pen.fillRect((left + col) * cell, (top + row) * cell, cell - gap, cell - gap);
-            }
-          });
+          for (const [at, color] of cells) {
+            pen.fillStyle = color;
+            pen.fillRect((at % W) * cell, Math.floor(at / W) * cell, cell - gap, cell - gap);
+          }
         };
-        const place = (x, floor, facing, lift) => {
-          el.style.transform = `translate3d(${(x - wide / 2 * unit).toFixed(1)}px, ${(floor - tall * unit - lift).toFixed(1)}px, 0) scaleX(${facing})`;
+        // Standing on the floor, its hips at x.
+        const place = (x, floor, facing) => {
+          el.style.transform = `translate3d(${(x - HIP_X * unit).toFixed(1)}px, ${(floor - H * unit).toFixed(1)}px, 0) scaleX(${facing})`;
         };
         // The next to come on: through all five in a shuffled order, and
         // from the other side from the last, most of the time.
@@ -1782,8 +2140,8 @@
           if (!bag.length) bag = Object.keys(cast).sort(() => Math.random() - .5);
           const who = cast[bag.pop()];
           if (Math.random() < .8) side = -side;
-          const off = wide / 2 * unit + 6;
-          walker = { who, from: side < 0 ? -off : innerWidth + off, facing: side < 0 ? 1 : -1, stage: "in", stepped: 0, frame: 0, since: 0 };
+          const off = (W - HIP_X) * unit + 4;
+          walker = { who, from: side < 0 ? -off : innerWidth + off, facing: side < 0 ? 1 : -1, stage: "in", phase: 0, since: 0, struck: 0 };
           walker.x = walker.from;
           el.style.opacity = "1";
           if (!running) { running = true; last = 0; requestAnimationFrame(walk); }
@@ -1797,28 +2155,25 @@
           // Quicker across a wider screen, so the walk never drags.
           const pace = Math.min(2.2, Math.max(1, innerWidth / 600));
           // Up to the pumpkin, stopping a step short of it.
-          const stop = walker.from < 0 ? box.left - 8 - wide / 2 * unit : box.right + 8 + wide / 2 * unit;
-          let lift = 0;
-          if (walker.stage === "pose") {
+          const gap = 7 * unit + 4, stop = walker.from < 0 ? box.left - gap : box.right + gap;
+          let pose;
+          if (walker.stage === "act") {
             walker.since += dt * 1000;
-            paint(who, who.pose);
-            // Chucky can't keep still; he hops as he laughs.
-            if (who === cast.chucky) lift = Math.abs(Math.sin(walker.since / 1000 * 9)) * unit * 1.5;
-            if (walker.since > who.hold) {
-              walker.stage = "out";
-              walker.facing = -walker.facing;
-            }
+            pose = actPose(who, walker.since);
+            // Each blow lands on the pumpkin's candle.
+            const blows = who.act.filter(step => step.hit && step.at <= walker.since).length;
+            if (blows > walker.struck) { walker.struck = blows; dispatchEvent(new CustomEvent("fright")); }
+            if (walker.since > who.act[who.act.length - 1].at) { walker.stage = "out"; walker.facing = -walker.facing; }
           } else {
             const target = walker.stage === "in" ? stop : walker.from;
-            const way = Math.sign(target - walker.x), move = who.speed * pace * dt;
+            const move = who.speed * pace * dt, way = Math.sign(target - walker.x);
             walker.x = Math.abs(target - walker.x) <= move ? target : walker.x + way * move;
-            walker.stepped += dt * 1000 * pace;
-            if (walker.stepped > who.step) { walker.stepped = 0; walker.frame = 1 - walker.frame; }
-            paint(who, who.walk[walker.frame]);
-            // Up a little as the legs pass each other.
-            lift = walker.frame ? unit : 0;
+            // A stride's length in pixels, so the feet don't slide.
+            const step = 2 * (who.limbs.thigh + who.limbs.shin) * Math.sin(rad(who.walk.stride)) * unit;
+            walker.phase += move / step * Math.PI;
+            pose = walkPose(who, walker.phase);
             if (walker.x === target) {
-              if (walker.stage === "in") { walker.stage = "pose"; walker.since = 0; walker.facing = walker.from < 0 ? 1 : -1; }
+              if (walker.stage === "in") { walker.stage = "act"; walker.since = 0; walker.struck = 0; walker.facing = walker.from < 0 ? 1 : -1; }
               else {
                 // Gone at the edge of the screen; the next comes a little later.
                 el.style.opacity = "0";
@@ -1829,18 +2184,19 @@
               }
             }
           }
-          place(walker.x, box.floor, walker.facing, lift);
+          paint(draw(who, pose));
+          place(walker.x, box.floor, walker.facing);
           requestAnimationFrame(walk);
         };
-        addEventListener("resize", () => { measure(); if (calm.matches) standStill(); }, { passive: true });
         // With reduced motion, Michael waits by the pumpkin instead.
         const standStill = () => {
           const box = markBounds();
           if (!box) return;
-          paint(cast.michael, cast.michael.walk[1]);
-          place(box.left - 8 - wide / 2 * unit, box.floor, 1, 0);
+          paint(draw(cast.michael, { ...rest, grip: cast.michael.grip }));
+          place(box.left - 7 * unit - 4, box.floor, 1);
           el.style.opacity = "1";
         };
+        addEventListener("resize", () => { measure(); if (calm.matches) standStill(); }, { passive: true });
         measure();
         if (calm.matches) standStill();
         else setTimeout(enter, 1500);
