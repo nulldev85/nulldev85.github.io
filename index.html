@@ -3,159 +3,202 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0c0d10">
-  <meta name="description" content="Explore Lineup, Aether and NullSign: what each app does, its key features, and the latest builds.">
+  <meta name="theme-color" content="#0a0a0b">
+  <meta name="description" content="Lineup, Aether and NullSign for iPhone and Apple TV: what each app does, what changed in its latest build, and where to download it.">
+  <meta property="og:title" content="Null’s Apps">
+  <meta property="og:description" content="Lineup, Aether and NullSign for iPhone and Apple TV.">
   <title>Null’s Apps</title>
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0c0d10;
-      --panel: #15171b;
-      --panel-raised: #1b1e23;
-      --line: rgba(255,255,255,.085);
-      --text: #f3f4f6;
-      --muted: #a0a5af;
+      --bg: #0a0a0b;
+      --surface: #111113;
+      --raised: #19191c;
+      --line: rgba(255,255,255,.075);
+      --line-strong: rgba(255,255,255,.13);
+      --text: #ececee;
+      --text-body: #d2d2d6;
+      --text-2: #a3a3a9;
+      --text-3: #808087;
       --accent: #f42e55;
-      --blue: #8094ff;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-synthesis: none;
-      text-rendering: optimizeLegibility;
+      --focus: rgba(255,255,255,.75);
+      --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--text);
-      background: radial-gradient(ellipse at 16% -10%, rgba(86,103,184,.16), transparent 36rem), var(--bg);
+      background: var(--bg);
+      font: 15px/1.6 var(--sans);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
     }
+    ::selection { background: rgba(244,46,85,.35); }
     a { color: inherit; }
-    .shell { width: min(1100px, calc(100% - 40px)); margin: 0 auto; }
-    .topbar { height: 82px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
-    .brand { display: inline-flex; gap: 11px; align-items: center; font-size: 14px; font-weight: 800; letter-spacing: .015em; text-decoration: none; }
-    .brand-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; color: white; background: linear-gradient(145deg, #fa3c63, #a9163c); box-shadow: 0 5px 22px #f42e5530; }
-    .brand-mark svg { width: 17px; height: 17px; }
-    .copy-repo { min-width: 112px; min-height: 42px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid rgba(255,255,255,.15); border-radius: 13px; color: var(--text); background: rgba(255,255,255,.07); font: inherit; font-size: 13px; font-weight: 750; cursor: pointer; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
-    .copy-repo:hover, .copy-repo:focus-visible { background: rgba(255,255,255,.13); border-color: rgba(255,255,255,.3); transform: translateY(-1px); outline: none; }
-    .copy-repo svg { width: 16px; height: 16px; color: #c8cedb; }
-    .hero { padding: 34px 0 27px; }
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-    .intro { max-width: 700px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
-    .projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding-bottom: 28px; }
-    .project-card { position: relative; overflow: hidden; padding: 22px; border: 1px solid var(--line); border-radius: 24px; background: linear-gradient(145deg, rgba(255,255,255,.035), transparent 42%), var(--panel); box-shadow: 0 18px 60px rgba(0,0,0,.16); transition: border-color .25s ease, background .25s ease, opacity .45s ease, transform .45s cubic-bezier(.2,.8,.2,1); }
-    .project-card:hover, .project-card:focus-within { border-color: rgba(255,255,255,.18); background-color: #191b20; }
-    .lineup-card { grid-column: 1 / -1; }
-    .lineup-card .feature-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
-    .project-head { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-    .icon-shell { flex: 0 0 auto; width: 58px; height: 58px; overflow: hidden; border: 1px solid rgba(255,255,255,.12); border-radius: 16px; background: #22252b; box-shadow: 0 9px 28px rgba(0,0,0,.28); transition: transform .45s cubic-bezier(.2,.8,.2,1), opacity .45s ease; }
-    .icon-shell img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .55s cubic-bezier(.2,.8,.2,1), filter .35s ease; }
-    .project-card:hover .icon-shell, .project-card:focus-within .icon-shell { transform: translateY(-2px) rotate(-3deg); }
-    .project-card:hover .icon-shell img, .project-card:focus-within .icon-shell img { transform: scale(1.13); filter: saturate(1.12); }
-    .project-name { margin: 0; font-size: 23px; letter-spacing: -.035em; }
-    .project-kind { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
-    .release-trigger { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; gap: 7px; margin-left: auto; padding: 0 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 11px; color: #dce0e7; background: rgba(255,255,255,.055); font: inherit; font-size: 10px; font-weight: 750; white-space: nowrap; cursor: pointer; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
-    .release-trigger:hover, .release-trigger:focus-visible { border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.11); transform: translateY(-1px); outline: none; }
-    .release-trigger svg { width: 14px; height: 14px; color: #ff7b93; }
-    .project-summary { margin: 0 0 16px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-    .feature-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-bottom: 17px; }
-    .feature { min-width: 0; padding: 11px 12px; border: 1px solid rgba(255,255,255,.065); border-radius: 13px; background: rgba(255,255,255,.025); }
-    .feature h3 { margin: 0 0 5px; color: #e6e8ed; font-size: 13px; font-weight: 750; }
-    .feature p { margin: 0; color: #a0a5af; font-size: 12.5px; line-height: 1.55; }
-    .build-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-    .single-build { grid-template-columns: 1fr; }
-    .build { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: rgba(0,0,0,.16); }
-    .build-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 9px; }
-    .build h3 { margin: 0; font-size: 14px; }
-    .build-number { color: #afb5c0; font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .build-meta { min-width: 0; text-align: right; }
-    .release-time { display: block; margin-top: 4px; color: #969daa; font-size: 10px; font-variant-numeric: tabular-nums; line-height: 1.4; }
-    .notes-label { margin: 17px 0 8px; color: #818894; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-    .notes { min-height: 90px; margin: 0; padding-left: 17px; color: #c6cad1; font-size: 12px; line-height: 1.55; }
-    .notes li + li { margin-top: 5px; }
-    .release-pending { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .release-dialog { width: min(640px, calc(100% - 28px)); max-width: none; max-height: min(86dvh, 780px); padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.14); border-radius: 23px; color: var(--text); background: linear-gradient(145deg, rgba(255,255,255,.035), transparent 38%), #17191e; box-shadow: 0 30px 100px rgba(0,0,0,.55); }
-    .release-dialog::backdrop { background: rgba(4,5,8,.72); backdrop-filter: blur(10px); }
-    .dialog-body { max-height: min(86dvh, 780px); overflow: auto; padding: 24px; }
-    .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 16px; }
-    .dialog-kicker { margin: 0 0 6px; color: #ff7891; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-    .dialog-head h2 { margin: 0; font-size: 25px; letter-spacing: -.035em; }
-    .dialog-close { display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; color: #e7e9ee; background: rgba(255,255,255,.06); font: inherit; font-size: 20px; line-height: 1; cursor: pointer; }
-    .dialog-close:hover, .dialog-close:focus-visible { background: rgba(255,255,255,.13); outline: 2px solid rgba(255,255,255,.25); outline-offset: 2px; }
-    .dialog-intro { margin: 0 0 18px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-    .release-build { padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: rgba(0,0,0,.16); }
-    .release-build + .release-build { margin-top: 10px; }
-    .release-build-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 11px; border-bottom: 1px solid var(--line); }
-    .release-build-head h3 { margin: 0; font-size: 14px; }
-    .release-build-version { color: #aeb4bf; font-size: 11px; font-variant-numeric: tabular-nums; text-align: right; }
-    .release-build-info { margin: 11px 0 0; color: #858c98; font-size: 10px; line-height: 1.5; }
-    .release-list { margin: 12px 0 0; padding-left: 18px; color: #c5cad2; font-size: 12px; line-height: 1.65; }
-    .release-list li + li { margin-top: 7px; }
-    .notes-pending { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
-    .download { display: inline-flex; width: max-content; min-height: 40px; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; padding: 0 14px; border: 1px solid rgba(255,255,255,.2); border-radius: 13px; color: white; background: linear-gradient(135deg, #f74365, #cf2148); box-shadow: 0 5px 15px rgba(244,46,85,.16), inset 0 1px 0 rgba(255,255,255,.17); font-size: 12px; font-weight: 800; text-decoration: none; transition: filter .2s ease, transform .2s ease, box-shadow .2s ease; }
-    .download:hover, .download:focus-visible { filter: brightness(1.1); box-shadow: 0 8px 20px rgba(244,46,85,.24), inset 0 1px 0 rgba(255,255,255,.22); transform: translateY(-1px); outline: none; }
-    .download svg { width: 15px; height: 15px; }
-    .secondary-card { display: flex; flex-direction: column; }
-    .secondary-card .project-head { margin-bottom: 12px; }
-    .secondary-card .project-name { font-size: 20px; }
-    .secondary-card .project-summary { margin: 0 0 13px; }
-    .secondary-card .build-grid { margin-top: auto; }
-    .feed-note { padding: 13px 0 25px; border-top: 1px solid var(--line); color: #777e89; font-size: 11px; line-height: 1.55; }
-    .feed-note strong { color: #abb1bc; font-weight: 650; }
-    footer { padding: 0 0 30px; color: #646b75; font-size: 11px; }
-    .has-js .project-card { opacity: 0; transform: translateY(14px) scale(.985); }
-    .has-js .project-card.is-visible { opacity: 1; transform: translateY(0) scale(1); }
-    .has-js .project-card.is-visible .icon-shell { animation: icon-arrive .48s cubic-bezier(.2,.8,.2,1) both; }
-    @keyframes icon-arrive { from { opacity: .65; transform: scale(.82) rotate(-5deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
-    @media (max-width: 760px) {
-      .shell { width: min(100% - 28px, 560px); }
-      .topbar { height: 70px; }
-      .hero { padding: 25px 0 20px; }
-      .projects { grid-template-columns: 1fr; gap: 12px; }
-      .lineup-card { grid-column: auto; }
-      .lineup-card .feature-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .project-card { padding: 18px; border-radius: 21px; }
+    button { font: inherit; color: inherit; }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+    svg { flex: 0 0 auto; }
+    .wrap { width: min(960px, 100% - 48px); margin: 0 auto; }
+
+    /* Header */
+    .site-header { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .wordmark { font-size: 15px; font-weight: 600; letter-spacing: -.01em; text-decoration: none; }
+    .site-nav { display: flex; gap: 24px; font-size: 14px; }
+    .site-nav a { color: var(--text-2); text-decoration: none; transition: color .15s ease; }
+    .site-nav a:hover { color: var(--text); }
+
+    /* Intro */
+    .intro { padding: 80px 0 64px; }
+    .intro h1 { max-width: 640px; margin: 0; font-size: clamp(32px, 5.2vw, 46px); font-weight: 600; line-height: 1.08; letter-spacing: -.035em; }
+    .lede { max-width: 580px; margin: 18px 0 0; color: var(--text-2); font-size: 17px; line-height: 1.6; }
+    .source { display: flex; align-items: stretch; max-width: 700px; height: 44px; margin-top: 36px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); }
+    .source-label { display: flex; align-items: center; padding: 0 14px; border-right: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
+    .source-url { flex: 1 1 auto; min-width: 0; align-self: center; padding: 0 14px; overflow: hidden; color: var(--text); font: 13px var(--mono); white-space: nowrap; text-overflow: ellipsis; }
+    .copy-repo { display: inline-flex; align-items: center; gap: 8px; min-width: 96px; padding: 0 16px; border: 0; border-left: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s ease; }
+    .copy-repo:hover { background: var(--raised); }
+    .copy-repo:focus-visible { outline-offset: -3px; border-radius: 0 9px 9px 0; }
+    .copy-repo svg { width: 15px; height: 15px; color: var(--text-2); }
+    .copy-repo .icon-done { display: none; color: var(--text); }
+    .copy-repo.is-copied .icon-copy { display: none; }
+    .copy-repo.is-copied .icon-done { display: block; }
+    .source-hint { max-width: 700px; margin: 12px 0 0; color: var(--text-3); font-size: 13px; line-height: 1.55; }
+    .feed-status:not(:empty)::before { content: " "; }
+
+    /* Apps */
+    .app { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 0 56px; padding: 56px 0 64px; border-top: 1px solid var(--line); scroll-margin-top: 8px; }
+    .app-side { position: sticky; top: 40px; align-self: start; display: flex; flex-direction: column; align-items: flex-start; }
+    .app-icon { position: relative; display: block; width: 56px; height: 56px; overflow: hidden; border-radius: 13px; background: var(--raised); }
+    .app-icon::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255,255,255,.09); }
+    .app-icon img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .app-title { margin-top: 18px; }
+    .app-name { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -.02em; }
+    .app-kind { margin: 4px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.45; }
+    .notes-button { display: inline-flex; align-items: center; gap: 7px; height: 32px; margin-top: 20px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+    .notes-button:hover { border-color: rgba(255,255,255,.22); background: var(--raised); }
+    .notes-button svg { width: 15px; height: 15px; color: var(--text-2); }
+    .app-summary { max-width: 62ch; margin: 0; color: var(--text-body); font-size: 16px; line-height: 1.65; }
+    .features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; margin-top: 36px; }
+    .feature { padding: 18px 0 22px; border-top: 1px solid var(--line); }
+    .feature h3 { margin: 0 0 6px; font-size: 14px; font-weight: 600; letter-spacing: -.005em; }
+    .feature p { margin: 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
+    .builds { margin-top: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .build { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 16px 18px; }
+    .build + .build { border-top: 1px solid var(--line); }
+    .build-info { min-width: 0; }
+    .build h3 { margin: 0; font-size: 15px; font-weight: 600; }
+    .build-meta { display: flex; flex-wrap: wrap; gap: 0 8px; margin: 3px 0 0; color: var(--text-3); font-size: 13px; font-variant-numeric: tabular-nums; }
+    .build-meta .build-number { color: var(--text-2); font-family: var(--mono); font-size: 12.5px; }
+    .build-meta .sep { color: rgba(255,255,255,.2); }
+    .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 8px; color: #0a0a0b; background: #ececee; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
+    .download:hover { background: #fff; }
+    .download svg { width: 14px; height: 14px; }
+
+    /* Release notes */
+    .release-dialog { width: min(560px, 100% - 32px); max-width: none; max-height: min(85dvh, 760px); padding: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; color: var(--text); background: var(--surface); box-shadow: 0 24px 80px rgba(0,0,0,.6); }
+    .release-dialog[open] { animation: dialog-in .2s cubic-bezier(.2,.7,.2,1); }
+    .release-dialog::backdrop { background: rgba(0,0,0,.62); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    .dialog-body { max-height: min(85dvh, 760px); overflow: auto; padding: 26px 28px 30px; overscroll-behavior: contain; }
+    .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+    .dialog-kicker { margin: 0 0 2px; color: var(--text-2); font-size: 13px; }
+    .dialog-head h2 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+    .dialog-close { display: grid; width: 32px; height: 32px; flex: 0 0 auto; margin: -4px -8px 0 0; place-items: center; border: 0; border-radius: 8px; color: var(--text-2); background: transparent; cursor: pointer; transition: background .15s ease, color .15s ease; }
+    .dialog-close:hover { color: var(--text); background: var(--raised); }
+    .dialog-close svg { width: 16px; height: 16px; }
+    .dialog-intro { margin: 10px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
+    .release-build { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .release-build-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .release-build-head h3 { margin: 0; font-size: 15px; font-weight: 600; }
+    .release-build-version { color: var(--text-2); font: 12.5px var(--mono); text-align: right; }
+    .release-build-info { margin: 3px 0 0; color: var(--text-3); font-size: 13px; line-height: 1.5; }
+    .release-list { margin: 14px 0 0; padding: 0; list-style: none; }
+    .release-list li { position: relative; padding-left: 18px; color: var(--text-body); font-size: 14px; line-height: 1.6; }
+    .release-list li::before { content: ""; position: absolute; top: .68em; left: 2px; width: 5px; height: 5px; border-radius: 50%; background: var(--text-3); }
+    .release-list li + li { margin-top: 10px; }
+    .notes-pending { margin: 14px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
+
+    /* Footer */
+    .site-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding: 28px 0 48px; border-top: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
+    .site-footer a { color: var(--text-2); text-decoration: none; transition: color .15s ease; }
+    .site-footer a:hover { color: var(--text); }
+
+    /* Motion */
+    .has-js [data-project-card] { opacity: 0; transform: translateY(10px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
+    .has-js [data-project-card].is-visible { opacity: 1; transform: none; }
+    @keyframes dialog-in { from { opacity: 0; transform: translateY(6px) scale(.99); } }
+
+    @media (max-width: 820px) {
+      .app { grid-template-columns: minmax(0, 1fr); padding: 40px 0 48px; }
+      .app-side { position: static; flex-direction: row; align-items: center; gap: 14px; margin-bottom: 24px; }
+      .app-icon { width: 48px; height: 48px; border-radius: 11px; }
+      .app-title { min-width: 0; margin: 0; }
+      .app-name { font-size: 20px; }
+      .app-kind { margin-top: 2px; font-size: 13px; }
+      .notes-button { margin: 0 0 0 auto; }
     }
-    @media (max-width: 480px) {
-      .brand { font-size: 12px; }
-      .copy-repo { min-width: 100px; min-height: 40px; }
-      .build-grid { grid-template-columns: 1fr; }
-      .notes { min-height: 0; }
-      .project-head { gap: 9px; }
-      .release-trigger { min-height: 32px; padding: 0 8px; font-size: 9px; }
-      .feature-grid, .lineup-card .feature-grid { grid-template-columns: 1fr; }
-      .dialog-body { padding: 18px; }
-      .release-build { padding: 13px; }
+    @media (max-width: 600px) {
+      .wrap { width: calc(100% - 32px); }
+      .site-nav { gap: 18px; }
+      .intro { padding: 48px 0 44px; }
+      .lede { font-size: 16px; }
+      .source-label { display: none; }
+      .features { grid-template-columns: minmax(0, 1fr); margin-top: 28px; }
+      .build { flex-direction: column; align-items: stretch; }
+      .build-meta .sep { display: none; }
+      .build-meta time { flex-basis: 100%; }
+      .download { width: 100%; height: 40px; }
+      .dialog-body { padding: 22px 20px 26px; }
+    }
+    @media (max-width: 400px) {
+      .site-nav { gap: 14px; font-size: 13px; }
+      .notes-button { padding: 0 10px; }
+      .notes-button svg { display: none; }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-      .has-js .project-card { opacity: 1; transform: none; }
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .has-js [data-project-card] { opacity: 1; transform: none; }
     }
   </style>
 </head>
 <body>
-  <header class="topbar shell">
-    <a class="brand" href="#top" aria-label="Null’s Apps home">
-      <span>Null’s Apps</span>
-    </a>
-    <button class="copy-repo" id="repo-copy" type="button" aria-live="polite" aria-label="Copy the AppSource repo URL for your signer" title="Copy AppSource URL">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
-      <span id="repo-copy-label">repo url</span>
-    </button>
+  <header class="site-header wrap">
+    <a class="wordmark" href="#top">Null’s Apps</a>
+    <nav class="site-nav" aria-label="Apps">
+      <a href="#lineup">Lineup</a>
+      <a href="#aether">Aether</a>
+      <a href="#nullsign">NullSign</a>
+    </nav>
   </header>
-  <main class="shell" id="top">
-    <section class="hero">
-      <h1 class="sr-only">Null’s Apps</h1>
-      <p class="intro">Explore what Lineup, Aether and NullSign do, browse their features, and get the latest builds. Open each app’s release notes for the changes in its current release, add the repo URL to your signer, or download an IPA directly.</p>
+
+  <main class="wrap" id="top">
+    <section class="intro">
+      <h1>Apps for iPhone and Apple&nbsp;TV.</h1>
+      <p class="lede">Lineup, Aether and NullSign. See what each one does and what changed in its latest build, then download the IPA, or add the source to your signer so new builds show up as updates.</p>
+      <div class="source">
+        <span class="source-label">Source</span>
+        <code class="source-url" title="https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json">raw.githubusercontent.com/nulldev85/AppSource/main/apps.json</code>
+        <button class="copy-repo" id="repo-copy" type="button" aria-label="Copy the AppSource URL for your signer">
+          <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
+          <svg class="icon-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+          <span id="repo-copy-label" aria-live="polite">Copy</span>
+        </button>
+      </div>
+      <p class="source-hint">Every IPA here is unsigned, so install it through a compatible signer.<span class="feed-status" data-feed-status></span></p>
     </section>
 
-    <section class="projects" aria-label="NullDev apps">
-      <article class="project-card lineup-card" data-project-card>
-        <header class="project-head">
-          <span class="icon-shell"><img src="assets/lineup-wave-8d1ddc3150c5.png" alt="" width="58" height="58"></span>
-          <div><h2 class="project-name">Lineup</h2><p class="project-kind">Live sports · iPhone &amp; Apple TV</p></div>
-          <button class="release-trigger" type="button" data-open-dialog="lineup-release" aria-haspopup="dialog" aria-controls="lineup-release"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.75h7l4.25 4.5v12H7a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2Z"/><path d="M14 4v5h4M9 13h6M9 16.5h6"/></svg>Release notes</button>
-        </header>
-        <p class="project-summary">Lineup puts live sports, live TV and your own media library in one app on iPhone and Apple TV. Connect your IPTV provider and media servers, follow the teams you care about, and watch everything from one place.</p>
-        <div class="feature-grid" aria-label="Lineup features">
+    <article class="app" id="lineup" data-project-card aria-labelledby="lineup-name">
+      <header class="app-side">
+        <span class="app-icon"><img src="assets/lineup-wave-8d1ddc3150c5.png" alt="" width="56" height="56"></span>
+        <div class="app-title"><h2 class="app-name" id="lineup-name">Lineup</h2><p class="app-kind">Live sports · iPhone &amp; Apple TV</p></div>
+        <button class="notes-button" type="button" data-open-dialog="lineup-release" aria-haspopup="dialog" aria-controls="lineup-release"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.75h7l4.25 4.5v12H7a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2Z"/><path d="M14 4v5h4M9 13h6M9 16.5h6"/></svg>Release notes</button>
+      </header>
+      <div class="app-main">
+        <p class="app-summary">Lineup puts live sports, live TV and your own media library in one app on iPhone and Apple TV. Connect your IPTV provider and media servers, follow the teams you care about, and watch everything from one place.</p>
+        <div class="features" aria-label="Lineup features">
           <section class="feature"><h3>Live sports &amp; teams</h3><p>Follow the NFL, NBA, NHL, MLB, college sports, soccer, tennis, UFC, Formula 1 and NASCAR. Check schedules, live scores and team pages, then jump straight to the channel showing a game, or to your provider’s catch-up when it has one. NFL teams you follow also get Game Replays.</p></section>
           <section class="feature"><h3>Live TV guide</h3><p>Browse and search channels and listings from one IPTV provider or several at once. Keep your favorite channels in the order you like, and start live TV or a catch-up recording right from the guide.</p></section>
           <section class="feature"><h3>Media servers &amp; progress</h3><p>Connect Jellyfin, Emby, Plex or Silo, and add your IPTV provider’s movies and shows. Trending and streaming-service rows show what’s popular, and Seerr handles discovery and requests. Track progress on the device, with MDBList, or both, and pick up where you left off from Continue Watching.</p></section>
@@ -163,69 +206,85 @@
           <section class="feature"><h3>Playback tools</h3><p>Pick a player for each part of the app: AetherEngine, VLC or MPVKit, plus Apple’s own player on iPhone. Depending on the device and stream, you also get live stats with Auto Sync, multiview, online subtitle search and Skip Intro for library episodes, and picture-in-picture on iPhone.</p></section>
           <section class="feature"><h3>Built for each screen</h3><p>Lineup has touch-first iPhone controls and a remote-friendly Apple TV interface, with settings and playback choices adapted to each platform.</p></section>
         </div>
-        <div class="build-grid">
+        <div class="builds">
           <section class="build" data-bundle="com.nulldev85.NullSports.iOS" aria-labelledby="iphone-build-title">
-            <div class="build-top"><h3 id="iphone-build-title">iPhone</h3><div class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>943</span></span><time class="release-time" data-release-time datetime="2026-10-26T23:02:59Z">Released Oct 26, 2026, 11:02 PM UTC</time></div></div>
-            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-40414135805/Lineup-iPhone-unsigned.ipa" aria-label="Download the latest Lineup iPhone IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+            <div class="build-info">
+              <h3 id="iphone-build-title">iPhone</h3>
+              <p class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>943</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-10-26T23:02:59Z">Oct 26, 2026, 11:02 PM UTC</time></p>
+            </div>
+            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-40414135805/Lineup-iPhone-unsigned.ipa" aria-label="Download the latest Lineup iPhone IPA">Download IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
           </section>
           <section class="build" data-bundle="com.nulldev85.NullSports" aria-labelledby="tvos-build-title">
-            <div class="build-top"><h3 id="tvos-build-title">Apple TV</h3><div class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>674</span></span><time class="release-time" data-release-time datetime="2026-10-26T22:54:10Z">Released Oct 26, 2026, 10:54 PM UTC</time></div></div>
-            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-40414135730-1/Lineup-tvOS-unsigned.ipa" aria-label="Download the latest Lineup Apple TV IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+            <div class="build-info">
+              <h3 id="tvos-build-title">Apple TV</h3>
+              <p class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>674</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-10-26T22:54:10Z">Oct 26, 2026, 10:54 PM UTC</time></p>
+            </div>
+            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-40414135730-1/Lineup-tvOS-unsigned.ipa" aria-label="Download the latest Lineup Apple TV IPA">Download IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
           </section>
         </div>
-      </article>
+      </div>
+    </article>
 
-      <article class="project-card secondary-card" data-project-card>
-        <header class="project-head">
-          <span class="icon-shell"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/aether.png" alt="" width="58" height="58" loading="lazy"></span>
-          <div><h2 class="project-name">Aether</h2><p class="project-kind">IPTV radio</p></div>
-          <button class="release-trigger" type="button" data-open-dialog="aether-release" aria-haspopup="dialog" aria-controls="aether-release"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.75h7l4.25 4.5v12H7a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2Z"/><path d="M14 4v5h4M9 13h6M9 16.5h6"/></svg>Release notes</button>
-        </header>
-        <p class="project-summary">Aether is a radio-first iPhone app for listening to audio stations from your own IPTV subscription, imported playlists, and public radio directories. It filters out TV channels and gives listening, discovery, and now-playing information their own focused experience.</p>
-        <div class="feature-grid" aria-label="Aether features">
+    <article class="app" id="aether" data-project-card aria-labelledby="aether-name">
+      <header class="app-side">
+        <span class="app-icon"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/aether.png" alt="" width="56" height="56" loading="lazy"></span>
+        <div class="app-title"><h2 class="app-name" id="aether-name">Aether</h2><p class="app-kind">IPTV radio · iPhone</p></div>
+        <button class="notes-button" type="button" data-open-dialog="aether-release" aria-haspopup="dialog" aria-controls="aether-release"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.75h7l4.25 4.5v12H7a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2Z"/><path d="M14 4v5h4M9 13h6M9 16.5h6"/></svg>Release notes</button>
+      </header>
+      <div class="app-main">
+        <p class="app-summary">Aether is a radio-first iPhone app for listening to audio stations from your own IPTV subscription, imported playlists, and public radio directories. It filters out TV channels and gives listening, discovery, and now-playing information their own focused experience.</p>
+        <div class="features" aria-label="Aether features">
           <section class="feature"><h3>Bring your stations</h3><p>Connect with Xtream credentials or import an M3U/M3U8 playlist. Account credentials are stored in the iOS Keychain.</p></section>
           <section class="feature"><h3>Radio-only library</h3><p>Automatically detect audio stations, tune the filter rules, search by station or genre, and choose whether to include every detected station.</p></section>
           <section class="feature"><h3>Discover with Aether Dial</h3><p>Explore public radio by country, state, station name or genre, preview a station, and save it without pasting a stream URL.</p></section>
           <section class="feature"><h3>Now playing &amp; background audio</h3><p>See track and artist details with available album art. Listen in the background with Lock Screen and Control Center controls, AirPlay and Bluetooth routing.</p></section>
           <section class="feature"><h3>Everyday listening</h3><p>Keep favorites and recent plays, use the mini-player or full Now Playing screen, set a sleep timer, and recover from temporary stream drops with automatic reconnect.</p></section>
         </div>
-        <div class="build-grid single-build">
+        <div class="builds">
           <section class="build" data-bundle="com.example.IPTVRadio" aria-label="Latest Aether build">
-            <div class="build-top"><h3>Latest build</h3><div class="build-meta"><span class="build-number">v<span data-version-number>1.0.0</span> · Build <span data-build-number>1</span></span><time class="release-time" data-release-time datetime="2026-10-21T02:15:44Z">Released Oct 21, 2026, 2:15 AM UTC</time></div></div>
-            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-aether-source-39529689019/IPTVRadio-unsigned-device.ipa" aria-label="Download the latest Aether IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+            <div class="build-info">
+              <h3>iPhone</h3>
+              <p class="build-meta"><span class="build-number">v<span data-version-number>1.0.0</span> · Build <span data-build-number>1</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-10-21T02:15:44Z">Oct 21, 2026, 2:15 AM UTC</time></p>
+            </div>
+            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-aether-source-39529689019/IPTVRadio-unsigned-device.ipa" aria-label="Download the latest Aether IPA">Download IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
           </section>
         </div>
-      </article>
+      </div>
+    </article>
 
-      <article class="project-card secondary-card" data-project-card>
-        <header class="project-head">
-          <span class="icon-shell"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/nullsign.png" alt="" width="58" height="58" loading="lazy"></span>
-          <div><h2 class="project-name">NullSign</h2><p class="project-kind">iOS signing &amp; install</p></div>
-          <button class="release-trigger" type="button" data-open-dialog="nullsign-release" aria-haspopup="dialog" aria-controls="nullsign-release"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.75h7l4.25 4.5v12H7a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2Z"/><path d="M14 4v5h4M9 13h6M9 16.5h6"/></svg>Release notes</button>
-        </header>
-        <p class="project-summary">NullSign signs and installs iOS apps directly on your device using your own Apple signing certificate and provisioning profile. Import an IPA, choose a saved signing identity, and complete the signing workflow locally instead of uploading your app and certificate to a signing website.</p>
-        <div class="feature-grid" aria-label="NullSign features">
+    <article class="app" id="nullsign" data-project-card aria-labelledby="nullsign-name">
+      <header class="app-side">
+        <span class="app-icon"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/nullsign.png" alt="" width="56" height="56" loading="lazy"></span>
+        <div class="app-title"><h2 class="app-name" id="nullsign-name">NullSign</h2><p class="app-kind">iOS signing &amp; install</p></div>
+        <button class="notes-button" type="button" data-open-dialog="nullsign-release" aria-haspopup="dialog" aria-controls="nullsign-release"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.75h7l4.25 4.5v12H7a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2Z"/><path d="M14 4v5h4M9 13h6M9 16.5h6"/></svg>Release notes</button>
+      </header>
+      <div class="app-main">
+        <p class="app-summary">NullSign signs and installs iOS apps directly on your device using your own Apple signing certificate and provisioning profile. Import an IPA, choose a saved signing identity, and complete the signing workflow locally instead of uploading your app and certificate to a signing website.</p>
+        <div class="features" aria-label="NullSign features">
           <section class="feature"><h3>Sign on your device</h3><p>Use your own .p12 certificate and matching .mobileprovision profile to sign an IPA locally. NullSign does not need your certificate uploaded to a remote signing service.</p></section>
           <section class="feature"><h3>Import IPAs easily</h3><p>Bring an IPA in from the Files app or from a URL, then select it from the Signer tab.</p></section>
           <section class="feature"><h3>Manage signing identities</h3><p>Save multiple certificate and profile pairs, give them names, inspect them, select the one you need, or remove an old identity.</p></section>
           <section class="feature"><h3>Browse app sources</h3><p>Add AltStore-compatible repositories to browse their apps and releases from inside NullSign.</p></section>
           <section class="feature"><h3>Optional tweaks</h3><p>Import .deb and .dylib tweaks for supported signing workflows, including ElleKit support when required.</p></section>
         </div>
-        <div class="build-grid single-build">
+        <div class="builds">
           <section class="build" data-bundle="com.elmat.NullSign" aria-label="Latest NullSign build">
-            <div class="build-top"><h3>Latest build</h3><div class="build-meta"><span class="build-number">v<span data-version-number>1.4.0</span> · Build <span data-build-number>29</span></span><time class="release-time" data-release-time datetime="2026-10-21T02:11:55Z">Released Oct 21, 2026, 2:11 AM UTC</time></div></div>
-            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-39530787902/NullSign-unsigned.ipa" aria-label="Download the latest NullSign IPA">IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+            <div class="build-info">
+              <h3>iOS</h3>
+              <p class="build-meta"><span class="build-number">v<span data-version-number>1.4.0</span> · Build <span data-build-number>29</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-10-21T02:11:55Z">Oct 21, 2026, 2:11 AM UTC</time></p>
+            </div>
+            <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-39530787902/NullSign-unsigned.ipa" aria-label="Download the latest NullSign IPA">Download IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
           </section>
         </div>
-      </article>
-    </section>
+      </div>
+    </article>
 
     <dialog class="release-dialog" id="lineup-release" aria-labelledby="lineup-release-title">
       <div class="dialog-body">
-        <header class="dialog-head"><div><p class="dialog-kicker">Lineup · latest release</p><h2 id="lineup-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes">×</button></header>
+        <header class="dialog-head"><div><p class="dialog-kicker">Lineup · latest release</p><h2 id="lineup-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
         <p class="dialog-intro">Here’s what’s new in Lineup on iPhone and Apple TV.</p>
         <section class="release-build" data-release-notes-bundle="com.nulldev85.NullSports.iOS" data-notes-build="0.19.0-943">
-          <div class="release-build-head"><h3>iPhone</h3><span class="release-build-version">Version <span data-release-version-for="com.nulldev85.NullSports.iOS">0.19.0</span> · Build <span data-release-build-for="com.nulldev85.NullSports.iOS">943</span></span></div>
+          <div class="release-build-head"><h3>iPhone</h3><span class="release-build-version">v<span data-release-version-for="com.nulldev85.NullSports.iOS">0.19.0</span> · Build <span data-release-build-for="com.nulldev85.NullSports.iOS">943</span></span></div>
           <p class="release-build-info" data-feed-description-for="com.nulldev85.NullSports.iOS">Published from the latest successful main-branch build.</p>
           <ul class="release-list" data-release-notes-list>
             <li>Text across the app now uses Apple’s own rounded system font instead of one bundled with Lineup, so the download is a little smaller.</li>
@@ -233,7 +292,7 @@
           </ul>
         </section>
         <section class="release-build" data-release-notes-bundle="com.nulldev85.NullSports" data-notes-build="0.19.0-674">
-          <div class="release-build-head"><h3>Apple TV</h3><span class="release-build-version">Version <span data-release-version-for="com.nulldev85.NullSports">0.19.0</span> · Build <span data-release-build-for="com.nulldev85.NullSports">674</span></span></div>
+          <div class="release-build-head"><h3>Apple TV</h3><span class="release-build-version">v<span data-release-version-for="com.nulldev85.NullSports">0.19.0</span> · Build <span data-release-build-for="com.nulldev85.NullSports">674</span></span></div>
           <p class="release-build-info" data-feed-description-for="com.nulldev85.NullSports">Published from the latest successful main-branch build.</p>
           <ul class="release-list" data-release-notes-list>
             <li>Text across the app now uses Apple’s own rounded system font instead of one bundled with Lineup, so the download is a little smaller.</li>
@@ -245,10 +304,10 @@
 
     <dialog class="release-dialog" id="aether-release" aria-labelledby="aether-release-title">
       <div class="dialog-body">
-        <header class="dialog-head"><div><p class="dialog-kicker">Aether · latest release</p><h2 id="aether-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes">×</button></header>
+        <header class="dialog-head"><div><p class="dialog-kicker">Aether · latest release</p><h2 id="aether-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
         <p class="dialog-intro">The latest Aether release introduces its AetherEngine-based audio playback runtime and refreshes the listening experience.</p>
         <section class="release-build" data-release-notes-bundle="com.example.IPTVRadio" data-notes-build="1.0.0-1">
-          <div class="release-build-head"><h3>Aether</h3><span class="release-build-version">Version <span data-release-version-for="com.example.IPTVRadio">1.0.0</span> · Build <span data-release-build-for="com.example.IPTVRadio">1</span></span></div>
+          <div class="release-build-head"><h3>iPhone</h3><span class="release-build-version">v<span data-release-version-for="com.example.IPTVRadio">1.0.0</span> · Build <span data-release-build-for="com.example.IPTVRadio">1</span></span></div>
           <p class="release-build-info" data-feed-description-for="com.example.IPTVRadio">Published from the latest successful main-branch build.</p>
           <ul class="release-list" data-release-notes-list>
             <li>Radio playback now uses AetherEngine, with improvements to how streams start, stop and recover.</li>
@@ -263,10 +322,10 @@
 
     <dialog class="release-dialog" id="nullsign-release" aria-labelledby="nullsign-release-title">
       <div class="dialog-body">
-        <header class="dialog-head"><div><p class="dialog-kicker">NullSign · latest release</p><h2 id="nullsign-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes">×</button></header>
+        <header class="dialog-head"><div><p class="dialog-kicker">NullSign · latest release</p><h2 id="nullsign-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
         <p class="dialog-intro">The latest NullSign build is the current iOS signing and installation release.</p>
         <section class="release-build" data-release-notes-bundle="com.elmat.NullSign" data-notes-build="1.4.0-29">
-          <div class="release-build-head"><h3>NullSign</h3><span class="release-build-version">Version <span data-release-version-for="com.elmat.NullSign">1.4.0</span> · Build <span data-release-build-for="com.elmat.NullSign">29</span></span></div>
+          <div class="release-build-head"><h3>iOS</h3><span class="release-build-version">v<span data-release-version-for="com.elmat.NullSign">1.4.0</span> · Build <span data-release-build-for="com.elmat.NullSign">29</span></span></div>
           <p class="release-build-info" data-feed-description-for="com.elmat.NullSign">Published from the latest successful main-branch build.</p>
           <ul class="release-list" data-release-notes-list>
             <li>Fixed signing failures caused by unreadable files inside an imported app.</li>
@@ -277,10 +336,12 @@
         </section>
       </div>
     </dialog>
-
-    <p class="feed-note"><strong>Unsigned IPAs:</strong> install through a compatible signer. The Repo URL button copies the public AppSource feed.</p>
   </main>
-  <footer class="shell">© Null’s Apps</footer>
+
+  <footer class="site-footer wrap">
+    <span>© Null’s Apps</span>
+    <a href="https://github.com/nulldev85/AppSource">AppSource on GitHub</a>
+  </footer>
 
   <script src="release-notes.js?v=1"></script>
   <script>
@@ -290,7 +351,7 @@
       if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
         const observer = new IntersectionObserver(entries => entries.forEach(entry => {
           if (entry.isIntersecting) { entry.target.classList.add("is-visible"); observer.unobserve(entry.target); }
-        }), { threshold: .12 });
+        }), { rootMargin: "0px 0px -8% 0px" });
         cards.forEach(card => observer.observe(card));
       } else cards.forEach(card => card.classList.add("is-visible"));
 
@@ -305,7 +366,7 @@
       };
       document.querySelectorAll("[data-release-time]").forEach(node => {
         const formatted = formatReleaseTime(node.dateTime);
-        if (formatted) node.textContent = `Released ${formatted}`;
+        if (formatted) node.textContent = formatted;
       });
       document.querySelectorAll("[data-open-dialog]").forEach(button => {
         const dialog = document.getElementById(button.dataset.openDialog);
@@ -354,8 +415,12 @@
       repoButton.addEventListener("click", async () => {
         window.clearTimeout(resetCopyLabel);
         const copied = await copyText(appSourceURL);
-        repoLabel.textContent = copied ? "copied!" : "copy failed";
-        resetCopyLabel = window.setTimeout(() => { repoLabel.textContent = "repo url"; }, 1900);
+        repoLabel.textContent = copied ? "Copied" : "Copy failed";
+        repoButton.classList.toggle("is-copied", copied);
+        resetCopyLabel = window.setTimeout(() => {
+          repoLabel.textContent = "Copy";
+          repoButton.classList.remove("is-copied");
+        }, 1900);
       });
 
       const updateBuild = (release, container) => {
@@ -373,7 +438,7 @@
         const formattedReleaseTime = formatReleaseTime(release.date);
         if (releaseTime && formattedReleaseTime) {
           releaseTime.dateTime = new Date(release.date).toISOString();
-          releaseTime.textContent = `Released ${formattedReleaseTime}`;
+          releaseTime.textContent = formattedReleaseTime;
         } else if (releaseTime) {
           releaseTime.textContent = "Release time unavailable";
           releaseTime.removeAttribute("datetime");
@@ -412,6 +477,7 @@
           section.dataset.notesBuild = buildKey;
         });
       };
+      const feedStatus = document.querySelector("[data-feed-status]");
       fetch(appSourceURL, { cache: "no-store" }).then(response => {
         if (!response.ok) throw new Error("AppSource unavailable");
         return response.json();
@@ -423,7 +489,10 @@
           const release = app && Array.isArray(app.versions) ? app.versions[0] : null;
           if (release) updateBuild(release, container);
         });
-      }).catch(() => { /* The page keeps its last-known direct download links. */ });
+      }).catch(() => {
+        // The page keeps its last-known direct download links.
+        if (feedStatus) feedStatus.textContent = "The source couldn’t be reached, so these are the last builds saved here.";
+      });
     })();
   </script>
 </body>
