@@ -154,7 +154,8 @@
     .web.top-right { top: 0; right: 0; transform: scaleX(-1); }
     .web.bottom-left { bottom: 0; left: 0; transform: scaleY(-1); }
     .web.bottom-right { bottom: 0; right: 0; transform: scale(-1, -1); }
-    .spider { top: 0; right: 0; }
+    .spider.left { top: 0; left: 0; }
+    .spider.right { top: 0; right: 0; transform: scaleX(-1); }
     @media print { .float-mark, .bats, .webs { display: none; } }
 
     /* Motion */
@@ -958,74 +959,92 @@
         stretch();
       }
 
-      // Ghosts, in the same pixels: pale, see-through things that drift
-      // about the screen on slow, wandering paths, bobbing as they go, their
-      // hems rippling and their eyes turned the way they are heading. Now and
-      // then one fades away and comes back somewhere else, and when the page
-      // scrolls they are left behind a little and float back.
+      // Ghosts, in the same pixels: sheets of pale light with hollow eyes and
+      // a wailing mouth, sleeves raised, the body thinning to a tail that
+      // trails behind them. They wander the screen slowly, rippling from head
+      // to tail, leaning into their drift and stretching as they rise. Like a
+      // weak signal their edges flicker, a slice of one slips sideways now
+      // and then, and a faint scan runs down them. Now and then one comes
+      // apart pixel by pixel, tail first, and builds itself again somewhere
+      // else; when the page scrolls they are left behind a little and float back.
       const haunt = document.querySelector("[data-bats] .bats-screen");
       if (haunt) {
         const calm = matchMedia("(prefers-reduced-motion: reduce)");
-        const shape = [
-          "...wwwww...",
-          "..wwwwwws..",
-          ".wwwwwwwws.",
-          "wwwwwwwwwws",
-          "wwkkwwwkkws",
-          "wwkkwwwkkws",
-          "wwwwwwwwwws",
-          "wwwwwkwwwws",
-          "wwwwwkwwwws",
-          "wwwwwwwwwws",
-          "wwwwwwwwwws",
-          "ww.ww.ww.ws"
-        ];
-        const colors = { w: "#eef1f8", s: "#b9c0cf", k: "#1d2027" };
         const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
-        const ghosts = [];
+        const ghosts = [], cols = 22, rows = 30;
         let ratio = 1, cell = 3, unit = 1.5, last = 0, lastScroll = scrollY;
         const measure = () => {
           ratio = Math.min(3, devicePixelRatio || 1);
-          cell = Math.max(2, Math.round((innerWidth <= 600 ? 2.3 : 2.6) * ratio));
+          cell = Math.max(2, Math.round((innerWidth <= 600 ? 1.6 : 2) * ratio));
           unit = cell / ratio;
           for (const ghost of ghosts) {
-            ghost.el.width = 15 * cell;
-            ghost.el.height = 16 * cell;
-            ghost.el.style.width = 15 * unit + "px";
-            ghost.el.style.height = 16 * unit + "px";
+            ghost.el.width = cols * cell;
+            ghost.el.height = rows * cell;
+            ghost.el.style.width = cols * unit + "px";
+            ghost.el.style.height = rows * unit + "px";
           }
         };
-        const somewhere = () => ({ x: 30 + Math.random() * (innerWidth - 60), y: 40 + Math.random() * (innerHeight - 110) });
-        // One frame of a ghost: its hem rippling row by row like cloth, the
-        // tips lifting and dropping, its eyes looking where it goes.
+        const somewhere = () => ({ x: 30 + Math.random() * (innerWidth - 60), y: 40 + Math.random() * (innerHeight - 120) });
+        // The same number for a pixel every frame, so a ghost comes apart and
+        // builds back in a fixed order.
+        const grain = (col, row, seed) => {
+          const n = Math.sin(col * 127.1 + row * 311.7 + seed * 74.7) * 43758.5453;
+          return n - Math.floor(n);
+        };
+        // One frame of a ghost, worked out pixel by pixel from its shape: a
+        // round head, a body narrowing to a tail that swings behind where it
+        // is going, a ripple running down it, sleeves waving in turn, hollow
+        // eyes that look ahead and blink, and a mouth that opens and closes.
         const paint = (ghost, time) => {
           const { pen } = ghost, t = time / 1000 + ghost.seed * 20, gap = cell >= 4 ? 1 : 0, still = calm.matches;
           pen.clearRect(0, 0, ghost.el.width, ghost.el.height);
-          shape.forEach((line, row) => {
-            const hem = !still && row >= 8 ? (row - 7) / 4 : 0;
-            const shift = Math.round(hem * Math.sin(t * 2.6 - row * .9) * .6 * cell);
-            for (let col = 0; col < line.length; col++) {
-              let key = line[col];
-              if (key === ".") continue;
-              if (key === "k") key = "w";
-              const tip = !still && row === shape.length - 1 ? Math.round(Math.sin(t * 3 + col * .9) * .35 * cell) : 0;
-              pen.fillStyle = colors[key];
-              pen.fillRect(2 * cell + col * cell + shift, 2 * cell + row * cell + tip, cell - gap, cell - gap);
+          ghost.trail += (clamp(-ghost.vx * .1, -4.5, 4.5) - ghost.trail) * .06;
+          ghost.stretch += (clamp(1 - ghost.vy * .006, .86, 1.1) - ghost.stretch) * .05;
+          const headX = cols / 2, headY = 8, radius = 6.2 + (still ? 0 : .3 * Math.sin(t * 1.5));
+          const wave = still ? 0 : 1, lift = still ? 0 : Math.sin(t * 2.1), length = 19 * ghost.stretch;
+          const mouth = still ? .4 : .45 + .55 * Math.max(0, Math.sin(t * .8 + ghost.seed * 4)) ** 2;
+          const look = clamp(ghost.vx * .035, -1, 1);
+          const blink = !still && (t + ghost.seed * 3) % 4.6 < .13;
+          const scan = still ? -9 : (t * 11) % (rows + 14) - 7;
+          const slip = ghost.glitch && time < ghost.glitch.until ? ghost.glitch : null;
+          const oval = (x, y, cx, cy, rx, ry) => ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1;
+          // A sleeve: thick at the shoulder, thin at the hand, the hands
+          // rising and falling in turn.
+          const sleeve = (x, y, side) => {
+            const sx = headX + side * (radius - .8), sy = headY + 3.6;
+            const hx = headX + side * (radius + 3.6) + ghost.trail * .2, hy = headY + 2.4 - side * lift * 1.7 - lift * .4;
+            const vx = hx - sx, vy = hy - sy, along = clamp(((x - sx) * vx + (y - sy) * vy) / (vx * vx + vy * vy), 0, 1);
+            const reach = Math.hypot(x - (sx + vx * along), y - (sy + vy * along));
+            return reach <= 1.75 - .95 * along || oval(x, y, hx + side * .2, hy + 1, .75, 1.05);
+          };
+          for (let row = 0; row < rows; row++) {
+            const y = row + .5, down = clamp((y - headY) / length, 0, 1);
+            const middle = headX + ghost.trail * down * down + wave * Math.sin(t * 2.6 - y * .42) * 1.2 * down;
+            const half = y < headY ? Math.sqrt(Math.max(0, radius * radius - (y - headY) ** 2)) : radius * (1 - down) ** .85;
+            const shift = slip && row >= slip.from && row < slip.to ? slip.by : 0;
+            const lit = Math.max(0, 1 - Math.abs(y - scan) / 1.6) * .22;
+            for (let col = 0; col < cols; col++) {
+              const x = col + .5;
+              const body = Math.abs(x - middle) <= half;
+              const arm = !body && (sleeve(x, y, -1) || sleeve(x, y, 1));
+              if (!body && !arm) continue;
+              // Coming apart, or building back: the tail goes first and returns last.
+              if (ghost.dissolve > 0 && grain(col, row, ghost.seed) * .72 + (1 - row / rows) * .28 < ghost.dissolve) continue;
+              const rim = body && y > headY && Math.abs(x - middle) > half - 1.1;
+              // A weak signal: some of the edge drops out each frame.
+              if ((rim || arm) && !still && Math.random() < .08) continue;
+              const hollow = [-1, 1].some(side => oval(x, y, headX + side * 2.5 + look, headY - .3, 1.15, blink ? .35 : 1.8))
+                || oval(x, y, headX + look * .6, headY + 3.6, 1.15, .9 + mouth);
+              const core = Math.hypot(x - headX, (y - headY - 1) * .8) < radius * .62;
+              pen.globalAlpha = Math.min(1, (1 - down * .8) * (rim || arm ? .74 : 1) + (hollow ? 0 : lit));
+              pen.fillStyle = hollow ? "#0b0d14" : core ? "#ffffff" : x > middle + half * .35 || arm && y > headY + 4 ? "#adb9d8" : "#e7edfb";
+              pen.fillRect((col + shift) * cell, row * cell, cell - gap, cell - gap);
             }
-          });
-          // The eyes and mouth, drawn over, turned toward where it drifts.
-          const look = clamp(Math.round(ghost.vx / 14), -1, 1);
-          pen.fillStyle = colors.k;
-          shape.forEach((line, row) => {
-            for (let col = 0; col < line.length; col++) {
-              if (line[col] !== "k") continue;
-              const turn = row < 6 ? look : 0;
-              pen.fillRect(2 * cell + (col + turn) * cell, 2 * cell + row * cell, cell - gap, cell - gap);
-            }
-          });
+          }
+          pen.globalAlpha = 1;
         };
-        const place = (ghost, x, y) => {
-          ghost.el.style.transform = `translate3d(${(x - 7.5 * unit).toFixed(1)}px, ${(y - 8 * unit).toFixed(1)}px, 0)`;
+        const place = (ghost, x, y, lean) => {
+          ghost.el.style.transform = `translate3d(${(x - cols / 2 * unit).toFixed(1)}px, ${(y - 11 * unit).toFixed(1)}px, 0) rotate(${lean.toFixed(2)}deg)`;
         };
         const float = time => {
           const dt = last ? Math.min(.05, (time - last) / 1000) : 1 / 60;
@@ -1042,7 +1061,15 @@
             ghost.x += ghost.vx * dt;
             ghost.y += ghost.vy * dt;
             ghost.lag *= Math.exp(-dt * 1.1);
-            // Fading away, moving while unseen, and coming back.
+            // Now and then a slice of it slips sideways for a moment.
+            if (!ghost.glitch || time > ghost.glitch.until + 1200) {
+              if (Math.random() < dt * .22) {
+                const from = 2 + Math.floor(Math.random() * 20);
+                ghost.glitch = { from, to: from + 1 + Math.floor(Math.random() * 3), by: Math.random() < .5 ? -1 : 1,
+                                 until: time + 70 + Math.random() * 90 };
+              }
+            }
+            // Coming apart, moving while unseen, and building back.
             if (time > ghost.nextFade && !ghost.fade) ghost.fade = { start: time, out: 1400, back: 1900 };
             let seen = 1;
             if (ghost.fade) {
@@ -1059,10 +1086,11 @@
                 if (seen >= 1) { ghost.fade = null; ghost.nextFade = time + 9000 + Math.random() * 9000; }
               }
             }
-            const arrive = Math.min(1, (time - ghost.born) / 2200);
-            ghost.el.style.opacity = ((.62 + .22 * Math.sin(t * .9)) * seen * arrive).toFixed(3);
+            const arrive = clamp((time - ghost.born) / 1900, 0, 1), here = Math.min(seen, arrive);
+            ghost.dissolve = 1 - here * here * (3 - 2 * here);
+            ghost.el.style.opacity = ((.8 + .14 * Math.sin(t * .9)) * (.4 + .6 * here)).toFixed(3);
             paint(ghost, time);
-            place(ghost, ghost.x + 4 * Math.sin(t * .7), ghost.y + 6 * Math.sin(t * 1.3) + ghost.lag);
+            place(ghost, ghost.x + 4 * Math.sin(t * .7), ghost.y + 6 * Math.sin(t * 1.3) + ghost.lag, clamp(ghost.vx * .3, -12, 12));
           }
           if (!calm.matches) requestAnimationFrame(float);
         };
@@ -1086,53 +1114,185 @@
           const el = document.createElement("canvas");
           el.className = "spirit";
           haunt.appendChild(el);
-          ghosts.push({ el, pen: el.getContext("2d"), ...somewhere(), target: somewhere(), vx: 0, vy: 0, lag: 0,
+          ghosts.push({ el, pen: el.getContext("2d"), ...somewhere(), target: somewhere(), vx: 0, vy: 0, lag: 0, trail: 0,
+                        stretch: 1, dissolve: 1, glitch: null,
                         speed: 22 + Math.random() * 18, seed: Math.random(), born: now + i * 900,
                         nextFade: now + 7000 + Math.random() * 9000, fade: null });
         }
         measure();
         if (calm.matches) {
           for (const ghost of ghosts) {
-            ghost.el.style.opacity = ".55";
+            ghost.el.style.opacity = ".7";
+            ghost.dissolve = 0;
             paint(ghost, now);
-            place(ghost, ghost.x, ghost.y);
+            place(ghost, ghost.x, ghost.y, 0);
           }
         } else requestAnimationFrame(float);
       }
 
       // Cobwebs in the four corners of the screen, staying there however far
-      // the page scrolls. Each is spun once from its own seed, so it keeps
-      // its shape: threads fanning out from the corner, sagging rings
-      // between them, a few broken and a few hanging loose. A scroll sets
-      // them swaying, as if in a draught, and they settle. A small spider
-      // lets itself down from the top right one and climbs back up.
+      // the page scrolls. Each is spun once from its own seed, the way a
+      // spider builds in a corner: spokes fanning out from it, a little bent
+      // and unevenly spaced, a frame thread across their ends, and one long
+      // sticky thread zigzagging from wall to wall, sagging between spokes,
+      // spacing out as it goes. A patch has torn away, a few broken ends hang
+      // under their own weight, and drops of dew catch the light. A scroll
+      // sets them swaying as if in a draught. Two small spiders let
+      // themselves down from the top webs on threads and climb back up.
       const corners = document.querySelector("[data-webs]");
       if (corners) {
         const calm = matchMedia("(prefers-reduced-motion: reduce)");
         const seeded = seed => () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+        const silk = "226, 230, 240";
         const webs = ["top-left", "top-right", "bottom-left", "bottom-right"].map((corner, index) => {
           const el = document.createElement("canvas");
           el.className = "web " + corner;
           corners.appendChild(el);
-          // Spun in the top left; the others are mirrored copies.
-          const random = seeded(4049 + index * 7919), spokes = [];
-          const count = 7 + Math.floor(random() * 3);
+          // Spun in the top left; the others are mirrored copies, so the bottom
+          // ones hang their loose ends the other way to fall downward.
+          const random = seeded(4049 + index * 7919), spokes = [], count = 11 + Math.floor(random() * 3);
           for (let i = 0; i < count; i++) {
-            const along = i / (count - 1);
-            spokes.push({ angle: (along * 90 + (i && i < count - 1 ? (random() - .5) * 8 : 0)) * Math.PI / 180,
-                          length: i && i < count - 1 ? .78 + random() * .3 : 1.02 });
+            const wall = i === 0 || i === count - 1;
+            spokes.push({
+              angle: (i / (count - 1) * 90 + (wall ? 0 : (random() - .5) * 6)) * Math.PI / 180,
+              length: wall ? 1.04 : .86 + random() * .16,
+              bend: wall ? 0 : (random() - .5) * .06
+            });
           }
-          const rings = [];
-          for (let k = 0; k < 6; k++) {
-            const radius = .15 + k * .145 + (random() - .5) * .03;
-            const gaps = spokes.slice(1).map(() => random() < (k > 3 ? .16 : .07));
-            rings.push({ radius, gaps, sag: .1 + random() * .08 });
+          // The sticky thread, pass by pass from the middle outward.
+          const passes = [];
+          for (let radius = .1 + random() * .03; radius < .9; radius += .045 + radius * .05 + random() * .02) {
+            passes.push({ radius, wobble: spokes.map(() => 1 + (random() - .5) * .07), sag: .16 + random() * .1 });
           }
-          const loose = Array.from({ length: 2 }, () => ({ spoke: 1 + Math.floor(random() * (count - 2)), at: .4 + random() * .4,
-                                                            drop: .12 + random() * .14 }));
-          return { el, spokes, rings, loose, size: 0, ratio: 1, phase: random() * 6 };
+          const tear = { from: .3 + random() * .35, to: 0, inner: .45 + random() * .2, outer: 0 };
+          tear.to = tear.from + .12 + random() * .1;
+          tear.outer = tear.inner + .18 + random() * .12;
+          const missing = passes.map(() => spokes.map(() => random() < .05));
+          const dew = Array.from({ length: 9 }, () => ({ pass: Math.floor(random() * passes.length), spoke: 1 + Math.floor(random() * (count - 2)),
+                                                          size: .6 + random() * .7 }));
+          const loose = Array.from({ length: 3 }, () => ({ spoke: 1 + Math.floor(random() * (count - 2)), at: .35 + random() * .5,
+                                                            drop: .1 + random() * .16, curl: (random() - .5) * .1 }));
+          return { el, spokes, passes, tear, missing, dew, loose, size: 0, ratio: 1,
+                   fall: index > 1 ? -1 : 1, phase: random() * 6 };
         });
-        let sway = 0, last = 0, frame = 0, lastScroll = scrollY;
+        let sway = 0, last = 0, lastScroll = scrollY, swaying = false;
+        const torn = (web, along, reach) => along > web.tear.from && along < web.tear.to
+          && reach > web.tear.inner && reach < web.tear.outer;
+        const spin = (web, time) => {
+          const pen = web.el.getContext("2d"), s = web.size * web.ratio, px = web.ratio, t = time / 1000;
+          pen.setTransform(1, 0, 0, 1, 0, 0);
+          pen.clearRect(0, 0, s, s);
+          // Every point is pushed sideways a little by the sway, more the
+          // further it is from the corner.
+          const point = (angle, reach) => {
+            const r = reach * s, push = sway * 4 * px * reach * Math.sin(t * 5.5 + web.phase + reach * 3);
+            return [Math.cos(angle) * r - Math.sin(angle) * push, Math.sin(angle) * r + Math.cos(angle) * push];
+          };
+          // Light from above and to one side catches some threads more than others.
+          const sheen = angle => .65 + .55 * Math.max(0, Math.cos(angle - .35));
+          const along = index => index / (web.spokes.length - 1);
+          pen.lineCap = "round";
+          pen.shadowColor = "rgba(255, 255, 255, .22)";
+          pen.shadowBlur = 1.5 * px;
+          for (const spoke of web.spokes) {
+            const [x, y] = point(spoke.angle, spoke.length), [mx, my] = point(spoke.angle + spoke.bend, spoke.length / 2);
+            const fade = pen.createLinearGradient(0, 0, x, y);
+            fade.addColorStop(0, `rgba(${silk}, ${(.52 * sheen(spoke.angle)).toFixed(3)})`);
+            fade.addColorStop(1, `rgba(${silk}, .06)`);
+            pen.strokeStyle = fade;
+            pen.lineWidth = .85 * px;
+            pen.beginPath();
+            pen.moveTo(0, 0);
+            pen.quadraticCurveTo(mx, my, x, y);
+            pen.stroke();
+          }
+          // The frame thread, slack between the outer ends of the spokes.
+          pen.strokeStyle = `rgba(${silk}, .2)`;
+          pen.lineWidth = 1 * px;
+          pen.beginPath();
+          web.spokes.forEach((spoke, i) => {
+            const [x, y] = point(spoke.angle, spoke.length * .97);
+            if (!i) pen.moveTo(x, y);
+            else {
+              const prev = web.spokes[i - 1], [cx, cy] = point((prev.angle + spoke.angle) / 2, (prev.length + spoke.length) / 2 * .9);
+              pen.quadraticCurveTo(cx, cy, x, y);
+            }
+          });
+          pen.stroke();
+          // The sticky thread: each pass runs wall to wall, then the next
+          // comes back a little further out, joined along the wall.
+          pen.lineWidth = .6 * px;
+          web.passes.forEach((pass, p) => {
+            pen.strokeStyle = `rgba(${silk}, ${(.4 - pass.radius * .26).toFixed(3)})`;
+            const reach = i => pass.radius * pass.wobble[i] * Math.min(1, web.spokes[i].length / .9);
+            for (let i = 0; i < web.spokes.length - 1; i++) {
+              const middleAlong = (along(i) + along(i + 1)) / 2;
+              if (web.missing[p][i] || torn(web, middleAlong, pass.radius)) continue;
+              const a = web.spokes[i], b = web.spokes[i + 1];
+              const [x1, y1] = point(a.angle, reach(i)), [x2, y2] = point(b.angle, reach(i + 1));
+              const [cx, cy] = point((a.angle + b.angle) / 2, (reach(i) + reach(i + 1)) / 2 * (1 - pass.sag * .5));
+              pen.globalAlpha = sheen((a.angle + b.angle) / 2) * .9;
+              pen.beginPath();
+              pen.moveTo(x1, y1);
+              pen.quadraticCurveTo(cx, cy, x2, y2);
+              pen.stroke();
+            }
+            // The turn at the wall onto the next pass.
+            const next = web.passes[p + 1];
+            if (next) {
+              const wall = p % 2 ? 0 : web.spokes.length - 1, spoke = web.spokes[wall];
+              const [x1, y1] = point(spoke.angle, reach(wall)), [x2, y2] = point(spoke.angle, next.radius * Math.min(1, spoke.length / .9));
+              pen.beginPath();
+              pen.moveTo(x1, y1);
+              pen.lineTo(x2, y2);
+              pen.stroke();
+            }
+          });
+          pen.globalAlpha = 1;
+          // Broken ends hanging down under their own weight.
+          pen.strokeStyle = `rgba(${silk}, .24)`;
+          pen.lineWidth = .55 * px;
+          for (const thread of web.loose) {
+            const spoke = web.spokes[thread.spoke], [x, y] = point(spoke.angle, thread.at);
+            const hang = thread.drop * s * web.fall, drift = (thread.curl * s + sway * 4 * px * Math.sin(t * 3 + thread.at * 9));
+            pen.beginPath();
+            pen.moveTo(x, y);
+            pen.bezierCurveTo(x + drift * .3, y + hang * .4, x + drift, y + hang * .7, x + drift * .6, y + hang);
+            pen.stroke();
+          }
+          // Dew, catching the light where the sticky thread crosses a spoke.
+          pen.shadowColor = "rgba(255, 255, 255, .7)";
+          pen.shadowBlur = 3 * px;
+          for (const drop of web.dew) {
+            const pass = web.passes[drop.pass], spoke = web.spokes[drop.spoke];
+            if (!pass || torn(web, along(drop.spoke), pass.radius)) continue;
+            const [x, y] = point(spoke.angle, pass.radius * pass.wobble[drop.spoke] * Math.min(1, spoke.length / .9));
+            pen.fillStyle = `rgba(255, 255, 255, ${(.4 + .4 * sheen(spoke.angle) * .7).toFixed(3)})`;
+            pen.beginPath();
+            pen.arc(x, y, drop.size * px, 0, Math.PI * 2);
+            pen.fill();
+          }
+          pen.shadowBlur = 0;
+        };
+
+        // The spiders: pixels like the bats, each on a thread of silk from its
+        // top web. Both are drawn as if in the top left; the right one is a
+        // mirrored copy.
+        const legs = [
+          "x..x...x..x",
+          ".x..x.x..x.",
+          "..xbbbbbx..",
+          "xxbbbbbbbxx",
+          "..xbebebx..",
+          ".x.bbbbb.x.",
+          "x...bbb...x"
+        ];
+        const spiders = ["left", "right"].map((side, index) => {
+          const el = document.createElement("canvas");
+          el.className = "spider " + side;
+          corners.appendChild(el);
+          return { el, anchor: index ? .5 : .38, pace: index ? .55 : .43, offset: index ? 0 : 2.4, reach: index ? 1.35 : 1.1 };
+        });
         const measure = () => {
           const size = innerWidth <= 600 ? 96 : 150, ratio = Math.min(3, devicePixelRatio || 1);
           for (const web of webs) {
@@ -1141,102 +1301,42 @@
             web.el.width = web.el.height = Math.round(size * ratio);
             web.el.style.width = web.el.style.height = size + "px";
           }
-          spider.size = size;
-          spider.el.width = Math.round(size * ratio);
-          spider.el.height = Math.round(size * 2.2 * ratio);
-          spider.el.style.width = size + "px";
-          spider.el.style.height = size * 2.2 + "px";
-        };
-        // One web, with every point nudged sideways a little by the sway,
-        // more the further it is from the corner.
-        const spin = (web, time) => {
-          const pen = web.el.getContext("2d"), s = web.size * web.ratio, t = time / 1000;
-          pen.setTransform(1, 0, 0, 1, 0, 0);
-          pen.clearRect(0, 0, s, s);
-          const point = (angle, reach) => {
-            const r = reach * s, push = sway * 4 * web.ratio * reach * Math.sin(t * 5.5 + web.phase + reach * 3);
-            return [Math.cos(angle) * r - Math.sin(angle) * push, Math.sin(angle) * r + Math.cos(angle) * push];
-          };
-          pen.lineCap = "round";
-          pen.shadowColor = "rgba(255, 255, 255, .25)";
-          pen.shadowBlur = 2 * web.ratio;
-          // Spokes, fading as they reach out.
-          for (const spoke of web.spokes) {
-            const [x, y] = point(spoke.angle, spoke.length);
-            const fade = pen.createLinearGradient(0, 0, x, y);
-            fade.addColorStop(0, "rgba(226, 230, 240, .5)");
-            fade.addColorStop(1, "rgba(226, 230, 240, .08)");
-            pen.strokeStyle = fade;
-            pen.lineWidth = .9 * web.ratio;
-            pen.beginPath();
-            pen.moveTo(0, 0);
-            pen.lineTo(x, y);
-            pen.stroke();
-          }
-          // Rings, each strand sagging toward the corner.
-          web.rings.forEach(ring => {
-            pen.strokeStyle = `rgba(226, 230, 240, ${(.46 - ring.radius * .32).toFixed(3)})`;
-            pen.lineWidth = .7 * web.ratio;
-            for (let i = 0; i < web.spokes.length - 1; i++) {
-              if (ring.gaps[i]) continue;
-              const a = web.spokes[i], b = web.spokes[i + 1];
-              const reachA = ring.radius * Math.min(1, a.length / .9), reachB = ring.radius * Math.min(1, b.length / .9);
-              const [x1, y1] = point(a.angle, reachA), [x2, y2] = point(b.angle, reachB);
-              const [cx, cy] = point((a.angle + b.angle) / 2, (reachA + reachB) / 2 * (1 - ring.sag));
-              pen.beginPath();
-              pen.moveTo(x1, y1);
-              pen.quadraticCurveTo(cx, cy, x2, y2);
-              pen.stroke();
-            }
-          });
-          // A few broken threads hanging down.
-          pen.strokeStyle = "rgba(226, 230, 240, .22)";
-          for (const thread of web.loose) {
-            const spoke = web.spokes[thread.spoke], [x, y] = point(spoke.angle, thread.at);
-            pen.beginPath();
-            pen.moveTo(x, y);
-            pen.quadraticCurveTo(x + 3 * web.ratio, y + thread.drop * s * .6, x + sway * 3 * web.ratio, y + thread.drop * s);
-            pen.stroke();
+          for (const spider of spiders) {
+            spider.size = size;
+            spider.el.width = Math.round(size * ratio);
+            spider.el.height = Math.round(size * 2.2 * ratio);
+            spider.el.style.width = size + "px";
+            spider.el.style.height = size * 2.2 + "px";
           }
         };
-
-        // The spider: pixels like the bats, on a thread of silk.
-        const legs = [
-          "..x...x..",
-          ".x.bbb.x.",
-          "x.bbbbb.x",
-          ".xbebebx.",
-          "x.bbbbb.x",
-          ".x.....x."
-        ];
-        const spider = { el: document.createElement("canvas"), size: 0 };
-        spider.el.className = "spider";
-        corners.appendChild(spider.el);
-        const crawl = time => {
+        const crawl = (spider, time) => {
           const pen = spider.el.getContext("2d"), ratio = webs[0].ratio, size = spider.size, t = time / 1000;
           pen.setTransform(1, 0, 0, 1, 0, 0);
           pen.clearRect(0, 0, spider.el.width, spider.el.height);
           // Down slowly, a pause, back up; never all the way off its web.
-          const swing = calm.matches ? .5 : .5 - .5 * Math.cos(t * .55);
-          const hang = size * (.42 + swing * 1.35), x = size * .46 + (calm.matches ? 0 : Math.sin(t * .9) * 2.5 + sway * 3);
-          pen.strokeStyle = "rgba(226, 230, 240, .45)";
-          pen.lineWidth = .8 * ratio;
+          const still = calm.matches, swing = still ? .5 : .5 - .5 * Math.cos(t * spider.pace + spider.offset);
+          const top = size * spider.anchor * .62, hang = size * (spider.anchor + swing * spider.reach);
+          const x = size * spider.anchor + (still ? 0 : Math.sin(t * .9 + spider.offset) * 2.5 + sway * 3);
+          pen.strokeStyle = `rgba(${silk}, .45)`;
+          pen.lineWidth = .7 * ratio;
           pen.beginPath();
-          pen.moveTo(size * .46 * ratio, size * .3 * ratio);
+          pen.moveTo(size * spider.anchor * ratio, top * ratio);
           pen.lineTo(x * ratio, hang * ratio);
           pen.stroke();
-          const cell = Math.max(2, Math.round(1.8 * ratio)), gap = cell >= 4 ? 1 : 0;
-          const left = Math.round(x * ratio - legs[0].length * cell / 2), top = Math.round(hang * ratio);
-          const wiggle = !calm.matches && Math.floor(t * 3) % 2;
+          const cell = Math.max(2, Math.round(1.6 * ratio)), gap = cell >= 4 ? 1 : 0;
+          const left = Math.round(x * ratio - legs[0].length * cell / 2), y = Math.round(hang * ratio);
+          // Its legs work as it climbs.
+          const step = !still && Math.floor(t * 4 + spider.offset) % 2;
           legs.forEach((line, row) => {
             for (let col = 0; col < line.length; col++) {
               const key = line[col];
               if (key === ".") continue;
-              const eye = key === "e";
+              const eye = key === "e", leg = key === "x";
               pen.shadowColor = eye ? "rgba(255, 90, 70, .9)" : "transparent";
               pen.shadowBlur = eye ? cell * 1.4 : 0;
-              pen.fillStyle = key === "x" ? "#6b6080" : eye ? "#ff6a57" : "#554b68";
-              pen.fillRect(left + col * cell, top + (key === "x" && wiggle && row % 2 ? cell * .5 : row * cell), cell - gap, cell - gap);
+              pen.fillStyle = leg ? "#6b6080" : eye ? "#ff6a57" : "#554b68";
+              const shift = leg && step ? (col < 5 ? -1 : 1) * Math.round(cell * .5) : 0;
+              pen.fillRect(left + col * cell, y + row * cell + shift, cell - gap, cell - gap);
             }
           });
         };
@@ -1244,21 +1344,32 @@
         const tick = time => {
           const dt = last ? Math.min(.05, (time - last) / 1000) : 1 / 60;
           last = time;
-          sway *= Math.exp(-dt * 1.8);
-          if (sway < .01) sway = 0;
-          for (const web of webs) spin(web, time);
-          crawl(time);
-          frame = calm.matches ? 0 : requestAnimationFrame(tick);
+          // The webs are only drawn again while they sway.
+          if (sway || swaying) {
+            sway *= Math.exp(-dt * 1.8);
+            if (sway < .01) sway = 0;
+            for (const web of webs) spin(web, time);
+            swaying = sway > 0;
+          }
+          for (const spider of spiders) crawl(spider, time);
+          if (!calm.matches) requestAnimationFrame(tick);
         };
         addEventListener("scroll", () => {
           const delta = Math.abs(scrollY - lastScroll);
           lastScroll = scrollY;
-          if (!calm.matches) sway = Math.min(1, sway + delta / 400);
+          if (!calm.matches) { sway = Math.min(1, sway + delta / 400); swaying = true; }
         }, { passive: true });
-        addEventListener("resize", () => { measure(); if (calm.matches) tick(performance.now()); }, { passive: true });
+        addEventListener("resize", () => {
+          measure();
+          const now = performance.now();
+          for (const web of webs) spin(web, now);
+          if (calm.matches) for (const spider of spiders) crawl(spider, now);
+        }, { passive: true });
         measure();
-        if (calm.matches) tick(performance.now());
-        else frame = requestAnimationFrame(tick);
+        const now = performance.now();
+        for (const web of webs) spin(web, now);
+        if (calm.matches) for (const spider of spiders) crawl(spider, now);
+        else requestAnimationFrame(tick);
       }
 
       const appSourceURL = "https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json";
