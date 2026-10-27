@@ -966,13 +966,14 @@
       // weak signal their edges flicker, a slice of one slips sideways now
       // and then, and a faint scan runs down them. Now and then one comes
       // apart pixel by pixel, tail first, and builds itself again somewhere
-      // else; when the page scrolls they are left behind a little and float back.
+      // else. When the page scrolls it pulls them along a little, as a draught
+      // would: they glide with it, their tails streaming, and drift back.
       const haunt = document.querySelector("[data-bats] .bats-screen");
       if (haunt) {
         const calm = matchMedia("(prefers-reduced-motion: reduce)");
         const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
         const ghosts = [], cols = 22, rows = 30;
-        let ratio = 1, cell = 3, unit = 1.5, last = 0, lastScroll = scrollY;
+        let ratio = 1, cell = 3, unit = 1.5, last = 0, lastScroll = scrollY, sizedFor = "";
         const measure = () => {
           ratio = Math.min(3, devicePixelRatio || 1);
           cell = Math.max(2, Math.round((innerWidth <= 600 ? 1.6 : 2) * ratio));
@@ -998,8 +999,6 @@
         const paint = (ghost, time) => {
           const { pen } = ghost, t = time / 1000 + ghost.seed * 20, gap = cell >= 4 ? 1 : 0, still = calm.matches;
           pen.clearRect(0, 0, ghost.el.width, ghost.el.height);
-          ghost.trail += (clamp(-ghost.vx * .1, -4.5, 4.5) - ghost.trail) * .06;
-          ghost.stretch += (clamp(1 - ghost.vy * .006, .86, 1.1) - ghost.stretch) * .05;
           const headX = cols / 2, headY = 8, radius = 6.2 + (still ? 0 : .3 * Math.sin(t * 1.5));
           const wave = still ? 0 : 1, lift = still ? 0 : Math.sin(t * 2.1), length = 19 * ghost.stretch;
           const mouth = still ? .4 : .45 + .55 * Math.max(0, Math.sin(t * .8 + ghost.seed * 4)) ** 2;
@@ -1060,7 +1059,14 @@
             ghost.vy += ((far ? dy / far : 0) * speed - ghost.vy) * ease;
             ghost.x += ghost.vx * dt;
             ghost.y += ghost.vy * dt;
-            ghost.lag *= Math.exp(-dt * 1.1);
+            // Pulled by the scroll: the pull eases off, and the ghost glides
+            // after it rather than jumping, its body answering the motion.
+            ghost.pull *= Math.exp(-dt * 1.2);
+            const before = ghost.lag;
+            ghost.lag += (ghost.pull - ghost.lag) * (1 - Math.exp(-dt * 5));
+            const rise = ghost.vy + (ghost.lag - before) / dt;
+            ghost.trail += (clamp(-ghost.vx * .1, -4.5, 4.5) - ghost.trail) * (1 - Math.exp(-dt * 3.7));
+            ghost.stretch += (clamp(1 - rise * .006, .86, 1.1) - ghost.stretch) * (1 - Math.exp(-dt * 3.1));
             // Now and then a slice of it slips sideways for a moment.
             if (!ghost.glitch || time > ghost.glitch.until + 1200) {
               if (Math.random() < dt * .22) {
@@ -1098,15 +1104,26 @@
           const delta = scrollY - lastScroll;
           lastScroll = scrollY;
           if (calm.matches) return;
-          for (const ghost of ghosts) ghost.lag = clamp(ghost.lag - delta * .4, -160, 160);
-        }, { passive: true });
-        addEventListener("resize", () => {
-          measure();
+          // The further it has been pulled, the less more scrolling pulls it.
           for (const ghost of ghosts) {
-            ghost.x = clamp(ghost.x, 30, innerWidth - 30);
-            ghost.y = clamp(ghost.y, 40, innerHeight - 70);
-            ghost.target = somewhere();
+            const away = delta * ghost.pull < 0;
+            ghost.pull -= delta * .3 * (away ? Math.max(0, 1 - Math.abs(ghost.pull) / 110) : 1);
           }
+        }, { passive: true });
+        // A phone's toolbars come and go as it scrolls, changing the height;
+        // only a new width moves the ghosts on. Otherwise they keep course,
+        // and only one heading off the bottom of a shorter screen turns back.
+        addEventListener("resize", () => {
+          const size = innerWidth + "x" + devicePixelRatio;
+          if (size !== sizedFor) {
+            sizedFor = size;
+            measure();
+            for (const ghost of ghosts) {
+              ghost.x = clamp(ghost.x, 30, innerWidth - 30);
+              ghost.target = somewhere();
+            }
+          }
+          for (const ghost of ghosts) if (ghost.target.y > innerHeight - 80) ghost.target = somewhere();
         }, { passive: true });
 
         const count = innerWidth <= 600 ? 3 : 4, now = performance.now();
@@ -1114,11 +1131,12 @@
           const el = document.createElement("canvas");
           el.className = "spirit";
           haunt.appendChild(el);
-          ghosts.push({ el, pen: el.getContext("2d"), ...somewhere(), target: somewhere(), vx: 0, vy: 0, lag: 0, trail: 0,
+          ghosts.push({ el, pen: el.getContext("2d"), ...somewhere(), target: somewhere(), vx: 0, vy: 0, lag: 0, pull: 0, trail: 0,
                         stretch: 1, dissolve: 1, glitch: null,
                         speed: 22 + Math.random() * 18, seed: Math.random(), born: now + i * 900,
                         nextFade: now + 7000 + Math.random() * 9000, fade: null });
         }
+        sizedFor = innerWidth + "x" + devicePixelRatio;
         measure();
         if (calm.matches) {
           for (const ghost of ghosts) {
