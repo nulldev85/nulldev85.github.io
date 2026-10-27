@@ -1232,8 +1232,9 @@
       // sticky thread zigzagging from wall to wall, sagging between spokes,
       // spacing out as it goes. A patch has torn away, a few broken ends hang
       // under their own weight, and drops of dew catch the light. A scroll
-      // sets it swaying as if in a draught. Two small spiders let themselves
-      // down from it on threads and climb back up.
+      // sets it swaying as if in a draught, and thunder shakes it harder.
+      // Two small spiders let themselves down from it on threads and climb
+      // back up, and swing on them when the thunder knocks them aside.
       const corners = document.querySelector("[data-webs]");
       if (corners) {
         const calm = matchMedia("(prefers-reduced-motion: reduce)");
@@ -1401,7 +1402,8 @@
           const el = document.createElement("canvas");
           el.className = "spider";
           corners.appendChild(el);
-          return { el, ...spider };
+          // How far it has swung aside on its thread, and how fast it is going.
+          return { el, ...spider, drift: 0, speed: 0, length: 60 };
         });
         const measure = () => {
           const size = innerWidth <= 600 ? 96 : 150, ratio = Math.min(3, devicePixelRatio || 1);
@@ -1426,7 +1428,8 @@
           // Down slowly, a pause, back up; never all the way off its web.
           const still = calm.matches, swing = still ? .5 : .5 - .5 * Math.cos(t * spider.pace + spider.offset);
           const top = size * spider.anchor * .62, hang = size * (spider.anchor + swing * spider.reach);
-          const x = size * spider.anchor + (still ? 0 : Math.sin(t * .9 + spider.offset) * 2.5 + sway * 3);
+          const x = size * spider.anchor + (still ? 0 : Math.sin(t * .9 + spider.offset) * 2.5 + sway * 3 + spider.drift);
+          spider.length = hang - top;
           pen.strokeStyle = `rgba(${silk}, .45)`;
           pen.lineWidth = .7 * ratio;
           pen.beginPath();
@@ -1472,7 +1475,14 @@
             for (const web of webs) spin(web, time);
             swaying = sway > 0;
           }
-          for (const spider of spiders) crawl(spider, time);
+          for (const spider of spiders) {
+            // A pendulum: once knocked aside it swings back and forth, the
+            // slower the longer its thread, and settles.
+            spider.rate = 2 * Math.PI * Math.min(1.4, Math.max(.5, 1.6 / Math.sqrt(Math.max(30, spider.length) / 40)));
+            spider.speed += (-spider.rate * spider.rate * spider.drift - .16 * spider.rate * spider.speed) * dt;
+            spider.drift += spider.speed * dt;
+            crawl(spider, time);
+          }
           if (!calm.matches) requestAnimationFrame(tick);
         };
         addEventListener("scroll", () => {
@@ -1480,6 +1490,17 @@
           lastScroll = scrollY;
           if (!calm.matches) { sway = Math.min(1, sway + delta / 400); swaying = true; }
         }, { passive: true });
+        // Thunder shakes the web harder than any scroll, and knocks each
+        // spider swinging on its thread.
+        addEventListener("thunder", event => {
+          if (calm.matches) return;
+          const strength = event.detail?.strength ?? .5;
+          sway = Math.min(1.3, sway + .5 + .7 * strength);
+          swaying = true;
+          for (const spider of spiders) {
+            spider.speed += (5 + 6 * strength) * (spider.size / 150) * (spider.rate || 6) * (Math.random() < .5 ? -1 : 1);
+          }
+        });
         addEventListener("resize", () => {
           measure();
           const now = performance.now();
@@ -1565,6 +1586,8 @@
           const nudge = steps.map(([x, y]) => ({ translate: `${x}px ${y}px` }));
           for (const part of document.querySelectorAll(".site-header, main, .float-mark, .bats-page, .bats-screen")) part.animate(shake, timing);
           for (const part of document.querySelectorAll(".web, .spider")) part.animate(nudge, timing);
+          // The web and its spiders feel it as it arrives.
+          setTimeout(() => dispatchEvent(new CustomEvent("thunder", { detail: { strength } })), delay);
         };
         // Each strike is worked out, and its bolt drawn, while the last one's
         // light is still fading, ready to go.
