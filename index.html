@@ -126,16 +126,16 @@
     .site-footer a { color: var(--text-2); text-decoration: none; transition: color .15s ease; }
     .site-footer a:hover { color: var(--text); }
 
-    /* Floating mark: a pixel Apple logo between a jack-o'-lantern and a
-       ghost. It rests between the header and the headline and stays there
-       as the page moves under it. */
-    .float-mark { --mark-size: 56px; --pixel: 2.4px; --glass: 0; position: fixed; top: 86px; left: 50%; z-index: 30; display: none; width: var(--mark-size); height: var(--mark-size); margin-left: calc(var(--mark-size) / -2); border-radius: 50%; color: inherit; -webkit-tap-highlight-color: transparent; }
+    /* Floating mark: a pixel jack-o'-lantern in the shape of the Apple logo.
+       It rests between the header and the headline and stays there as the
+       page moves under it. */
+    .float-mark { --mark-size: 56px; --pixel: 2.5px; --glass: 0; position: fixed; top: 86px; left: 50%; z-index: 30; display: none; width: var(--mark-size); height: var(--mark-size); margin-left: calc(var(--mark-size) / -2); border-radius: 50%; color: inherit; -webkit-tap-highlight-color: transparent; }
     .has-js .float-mark { display: block; }
     .float-mark:focus-visible { outline: none; }
     .float-mark:focus-visible .mark-orb { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus); }
     .mark-orb { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 50%; transition: transform .25s cubic-bezier(.2,.7,.2,1); }
     .float-mark:active .mark-orb { transform: scale(.94); transition-duration: .08s; }
-    .mark-glow { position: absolute; inset: -30% -95%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,255,255,.075), rgba(255,255,255,.025) 55%, transparent); opacity: calc(1 - var(--glass)); transition: opacity .3s ease; pointer-events: none; }
+    .mark-glow { position: absolute; inset: -55% -60%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,255,255,.075), rgba(255,255,255,.025) 55%, transparent); opacity: calc(1 - var(--glass)); transition: opacity .3s ease; pointer-events: none; }
     .mark-scene { position: absolute; top: calc(50% - 2px); left: 50%; display: block; transform: translate(-50%, -50%); filter: drop-shadow(0 3px 8px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(0,0,0,.6)); }
     /* Bats. Those hanging from words sit in the page and scroll with it;
        those in the air or on the mark sit on the screen. */
@@ -145,7 +145,7 @@
     .bats-page { position: absolute; z-index: 25; }
     .bats-screen { position: fixed; z-index: 31; }
     .bat, .spirit { position: absolute; top: 0; left: 0; display: block; pointer-events: none; will-change: transform; }
-    .spirit { opacity: 0; filter: drop-shadow(0 0 6px rgba(205, 220, 255, .45)); }
+    .spirit { opacity: 0; }
     /* Cobwebs in the corners of the screen, under the bats and ghosts. */
     .webs { display: none; }
     .has-js .webs { display: block; }
@@ -403,95 +403,57 @@
       // Where bats can hang from the mark; filled in once it is drawn.
       let markPerches = () => [];
 
-      // The floating mark: a pixel Apple logo with a jack-o'-lantern on one
-      // side and a ghost on the other, drawn once as lit pixels with a
-      // hairline between them, like a screen seen up close.
+      // The floating mark: a jack-o'-lantern in the shape of the Apple logo,
+      // its leaf growing from the stem, drawn as lit pixels with a hairline
+      // between them, like a screen seen up close. The outline is the logo's,
+      // sampled 24 pixels tall; the ribs curve round it like a real pumpkin's,
+      // shaded down the right side and round the bite.
       const mark = document.querySelector("[data-float-mark]");
       if (mark) {
         const canvas = mark.querySelector(".mark-scene");
         const pen = canvas.getContext("2d");
         const pumpkin = [
-          "........g......",
-          ".......gg......",
-          ".......g.ll....",
-          "....ooodooo....",
-          "..oodoodoodoo..",
-          ".ohodoodoodooo.",
-          "ohhodoodoodoooo",
-          "ohooyoodooyoooo",
-          "ohoyyyodoyyyooo",
-          "oooodooyoodoooo",
-          "oooodoodoodoooo",
-          "oooyyoyyyoyyooo",
-          "ooooyyyoyyyoooo",
-          ".ooodoyyyodooo.",
-          "..oodoodoodoo..",
-          "....ooodooo...."
+          "..............vg.....",
+          "............gvg......",
+          "...........glvg......",
+          "...........gvlg......",
+          "..........uglg.......",
+          ".........ttg.........",
+          "....ooooorttooooor...",
+          "...oodhodoodohdooor..",
+          "..oodhoodoodoohdooor.",
+          "..ohdyodoooodyodoor..",
+          ".ohoyyydooooyyydor...",
+          ".ohyyyyyoooyyyyydr...",
+          ".ohdooodoooodooor....",
+          ".oodooodoyoodooor....",
+          ".oodooodyyyodooodr...",
+          ".oodooodoooodooodr...",
+          ".royooodoooodoooyor..",
+          "..oyyyoyyyyyyoyyyoor.",
+          "..royyyyyyyyyyyyooor.",
+          "...odyyyoyyoyyydooor.",
+          "...rdooodoodooodoor..",
+          "....rdoodoodoodooor..",
+          ".....rdodrrrrdooor...",
+          "......rrr....rrrr...."
         ];
-        const colors = { o: "#f7841e", d: "#c65a10", h: "#ffb257", y: "#fff1a8", g: "#4f8f2a", l: "#6fb83a",
-                         w: "#f3f5fa", s: "#c3c9d6", k: "#1d2027" };
-        // The logo, sampled onto a grid 16 pixels tall: a pixel is lit when
-        // the logo covers most of it.
-        const logo = (() => {
-          const shape = new Path2D("M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701");
-          const rows = 16, cols = 13, sample = 8, step = 24 / rows, left = 11.725 - cols * step / 2;
-          const probe = document.createElement("canvas");
-          probe.width = cols * sample;
-          probe.height = rows * sample;
-          const probePen = probe.getContext("2d", { willReadFrequently: true });
-          probePen.setTransform(sample / step, 0, 0, sample / step, -left * sample / step, 0);
-          probePen.fill(shape);
-          const ink = probePen.getImageData(0, 0, probe.width, probe.height).data;
-          const grid = [];
-          for (let row = 0; row < rows; row++) {
-            let line = "";
-            for (let col = 0; col < cols; col++) {
-              let sum = 0;
-              for (let y = 0; y < sample; y++) {
-                for (let x = 0; x < sample; x++) sum += ink[((row * sample + y) * probe.width + col * sample + x) * 4 + 3];
-              }
-              line += sum / (sample * sample * 255) > .42 ? "a" : ".";
-            }
-            grid.push(line);
-          }
-          return grid;
-        })();
-        // Brushed metal, lighter at the top.
-        const metal = (() => {
-          const stops = [[0, [255, 255, 255]], [.42, [220, 222, 227]], [.78, [166, 170, 179]], [1, [133, 138, 148]]];
-          return at => {
-            const upper = stops.findIndex(([offset]) => offset >= at);
-            const [a, from] = stops[Math.max(0, upper - 1)], [b, to] = stops[Math.max(0, upper)];
-            const mix = b > a ? (at - a) / (b - a) : 0;
-            return `rgb(${from.map((value, index) => Math.round(value + (to[index] - value) * mix)).join(",")})`;
-          };
-        })();
-        // Side by side on one baseline, the pumpkin as tall as the logo, the
-        // pair centred on the mark. The margin leaves room for the
-        // pumpkin's light to spill out.
-        const parts = [
-          { art: pumpkin, x: 0, bottom: 16 },
-          { art: logo, x: 18, bottom: 16, metal: true }
-        ];
-        const columns = 31, rows = 16, margin = 6;
-        // Under each of the two: the run of pixels nearest the middle of its
-        // bottom row, in screen points.
+        const colors = { o: "#f7841e", d: "#c65a10", r: "#dd6c14", h: "#ffb257", y: "#fff1a8",
+                         g: "#3f7d24", l: "#6fb83a", v: "#8fd14f", t: "#6b5b2e", u: "#8c7a3c" };
+        const columns = pumpkin[0].length, rows = pumpkin.length, margin = 6;
+        // Under each of its two lower lobes, in screen points.
         markPerches = () => {
           const box = canvas.getBoundingClientRect();
           const ratio = Math.min(3, devicePixelRatio || 1);
-          const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 2.4;
+          const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 2.5;
           const unit = Math.max(2, Math.round(pixel * ratio)) / ratio, pad = unit * margin;
-          return parts.map(part => {
-            const bottom = part.art[part.art.length - 1], runs = [];
-            let start = -1;
-            [...bottom, "."].forEach((key, col) => {
-              if (key !== "." && start < 0) start = col;
-              else if (key === "." && start >= 0) { runs.push((start + col - 1) / 2); start = -1; }
-            });
-            const middle = (bottom.length - 1) / 2;
-            const col = runs.sort((a, b) => Math.abs(a - middle) - Math.abs(b - middle))[0] ?? middle;
-            return { x: box.left + pad + (part.x + col + .5) * unit, y: box.top + pad + part.bottom * unit - 1 };
+          const runs = [];
+          let start = -1;
+          [...pumpkin[rows - 1], "."].forEach((key, col) => {
+            if (key !== "." && start < 0) start = col;
+            else if (key === "." && start >= 0) { runs.push((start + col - 1) / 2); start = -1; }
           });
+          return runs.map(col => ({ x: box.left + pad + (col + .5) * unit, y: box.top + pad + rows * unit - 1 }));
         };
         // A candle inside the jack-o'-lantern: a slow sway, a quicker flutter
         // and now and then a gutter, never quite going out.
@@ -506,14 +468,14 @@
         const rgb = hex => [1, 3, 5].map(at => parseInt(hex.slice(at, at + 2), 16));
         const mix = (from, to, amount) => `rgb(${from.map((value, index) => Math.round(value + (to[index] - value) * amount)).join(",")})`;
         const warm = [255, 214, 140], ember = [255, 192, 84], flare = [255, 248, 200];
-        // The stem is drawn once, here. The pumpkin, the logo and the ghost
-        // are drawn over it every frame: the candle breathing inside the
-        // pumpkin and a shine crossing the logo.
+        // The stem and the leaf are drawn once, here. The skin and the face
+        // are drawn over them every frame: the candle breathing inside, and
+        // now and then a soft shine crossing the skin.
         const base = document.createElement("canvas"), basePen = base.getContext("2d");
         let drawn = "", scene = null;
         const draw = () => {
           const ratio = Math.min(3, devicePixelRatio || 1);
-          const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 2.4;
+          const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 2.5;
           const cell = Math.max(2, Math.round(pixel * ratio));
           const key = ratio + "|" + cell;
           if (key === drawn) return;
@@ -523,27 +485,25 @@
           canvas.height = base.height = rows * cell + pad * 2;
           canvas.style.width = canvas.width / ratio + "px";
           canvas.style.height = canvas.height / ratio + "px";
-          scene = { cell, gap, ratio, skin: [], face: [], apple: [],
-                    middle: { x: pad + (parts[0].x + 7.5) * cell, y: pad + 10 * cell } };
-          for (const part of parts) {
-            const top = part.bottom - part.art.length;
-            part.art.forEach((line, row) => [...line].forEach((key, col) => {
-              if (key === ".") return;
-              const x = pad + (part.x + col) * cell, y = pad + (top + row) * cell;
-              if (part.art === pumpkin && "odhy".includes(key)) {
-                // How close to the candle, which sits low behind the face.
-                if (key === "y") scene.face.push({ x, y, near: Math.exp(-((col - 7) ** 2 + (row - 12) ** 2) / 14) });
-                else scene.skin.push({ x, y, near: Math.exp(-((col - 7) ** 2 + (row - 10.5) ** 2) / 20), rgb: rgb(colors[key]) });
-              } else if (part.metal) {
-                scene.apple.push({ x, y, along: col + row * .6,
-                                   rgb: metal(row / (part.art.length - 1)).match(/\d+/g).map(Number) });
-              } else {
-                basePen.fillStyle = colors[key];
-                basePen.fillRect(x, y, cell - gap, cell - gap);
-              }
-            }));
-          }
-          scene.width = parts[1].art[0].length + parts[1].art.length * .6;
+          // The candle sits low behind the face.
+          scene = { cell, gap, ratio, skin: [], face: [], middle: { x: pad + 9.5 * cell, y: pad + 15 * cell } };
+          pumpkin.forEach((line, row) => [...line].forEach((key, col) => {
+            if (key === ".") return;
+            const x = pad + col * cell, y = pad + row * cell;
+            // How close to the candle.
+            if (key === "y") scene.face.push({ x, y, near: Math.exp(-((col - 9.5) ** 2 + (row - 15.5) ** 2) / 22) });
+            // The skin at the edge of a cut is the pumpkin's inner wall, in shadow.
+            else if ("odrh".includes(key)) {
+              const cut = [[0, 1], [0, -1], [1, 0], [-1, 0]].some(([down, across]) => pumpkin[row + down]?.[col + across] === "y");
+              scene.skin.push({ x, y, along: col + row * .6, rgb: rgb(colors[key]).map(value => cut ? value * .74 : value),
+                                near: Math.exp(-((col - 9.5) ** 2 + (row - 14.5) ** 2) / 26) });
+            }
+            else {
+              basePen.fillStyle = colors[key];
+              basePen.fillRect(x, y, cell - gap, cell - gap);
+            }
+          }));
+          scene.width = columns + rows * .6;
           light(performance.now());
         };
         const light = time => {
@@ -554,7 +514,7 @@
           const breath = moving ? .35 + .65 * (.5 + .5 * (.6 * Math.sin(t * 1.9) + .4 * Math.sin(t * .83 + 1.2))) : .85;
           pen.clearRect(0, 0, canvas.width, canvas.height);
           // Light through the skin, spilling a little way out around it.
-          const reach = cell * 13, strength = .62 * glow * breath;
+          const reach = cell * 17, strength = .62 * glow * breath;
           const aura = pen.createRadialGradient(scene.middle.x, scene.middle.y, cell, scene.middle.x, scene.middle.y, reach);
           aura.addColorStop(0, `rgba(255, 160, 60, ${strength.toFixed(3)})`);
           aura.addColorStop(.45, `rgba(255, 130, 40, ${(strength * .4).toFixed(3)})`);
@@ -562,9 +522,13 @@
           pen.fillStyle = aura;
           pen.fillRect(scene.middle.x - reach, scene.middle.y - reach, reach * 2, reach * 2);
           pen.drawImage(base, 0, 0);
-          // The skin warms nearest the face as the flame rises.
+          // The skin warms nearest the face as the flame rises, and a soft
+          // shine crosses it every few seconds.
+          const sweep = (time % 6200) / 1400, band = -3 + sweep * (scene.width + 6);
           for (const spot of scene.skin) {
-            pen.fillStyle = mix(spot.rgb, warm, spot.near * spot.near * glow * (.1 + .26 * breath));
+            const lit = spot.rgb.map((value, index) => value + (warm[index] - value) * spot.near * spot.near * glow * (.05 + .17 * breath));
+            const shine = moving && sweep < 1 ? .32 * Math.exp(-((spot.along - band) ** 2) / 3) : 0;
+            pen.fillStyle = mix(lit, [255, 236, 200], shine);
             pen.fillRect(spot.x, spot.y, size, size);
           }
           // The carved face, lit from inside, its light spilling out.
@@ -576,13 +540,6 @@
           }
           pen.shadowBlur = 0;
           pen.shadowColor = "transparent";
-          // A soft shine crosses the logo every few seconds.
-          const sweep = (time % 4600) / 1100, band = -3 + sweep * (scene.width + 6);
-          for (const spot of scene.apple) {
-            const shine = moving && sweep < 1 ? .5 * Math.exp(-((spot.along - band) ** 2) / 3) : 0;
-            pen.fillStyle = mix(spot.rgb, [255, 255, 255], shine);
-            pen.fillRect(spot.x, spot.y, size, size);
-          }
         };
         const candle = time => {
           light(time);
@@ -609,12 +566,12 @@
       }
 
       // Bats, in the mark's pixels. They hang from words and buttons all
-      // over the part of the page you are on, and from the pumpkin, the logo
-      // and the ghost, and keep flitting between them. A bat on a word goes
-      // with the page as it scrolls; once the page comes to rest, any left
-      // out of sight fly after you and find somewhere new to hang. Each bat
-      // is its own little canvas, so one on a word moves with the page
-      // exactly, and frames are drawn only while one is in the air.
+      // over the part of the page you are on, and from the mark, and keep
+      // flitting between them. A bat on a word, or flying to one, lives in
+      // the page and goes with it as it scrolls, however fast; once the page
+      // comes to rest, any left out of sight fly in after you from the edge
+      // of the screen, one by one, at their own unhurried pace. Each bat is
+      // its own little canvas, and frames are drawn only while one is in the air.
       const roost = document.querySelector("[data-bats]");
       if (roost) {
         const page = roost.querySelector(".bats-page"), screen = roost.querySelector(".bats-screen");
@@ -809,6 +766,21 @@
         // one side on a curve and comes up into the next perch from below,
         // the way bats land, never flying straight and never still. Wings
         // beat quicker climbing and slower, half gliding, on the way down.
+        // A flight to a word is worked out in the page, so a scroll carries
+        // it along; one to the mark, which stays on the screen, on the screen.
+        // Where a flight's path is at `t`, from 0 to 1, without the flutter.
+        const course = (flight, d, t) => {
+          // Easing off the perch and into the next, with small surges between.
+          const u = clamp(.7 * (.5 - .5 * Math.cos(Math.PI * t)) + .3 * t + .03 * Math.sin(Math.PI * 4 * t), 0, 1), v = 1 - u;
+          const a = flight.from;
+          const b = { x: clamp(a.x + flight.out.x, 12, innerWidth - 12), y: a.y + flight.out.y };
+          const c = { x: clamp(d.x + flight.in.x, 12, innerWidth - 12), y: d.y + flight.in.y };
+          const curve = (p, q, r, s) => v * v * v * p + 3 * v * v * u * q + 3 * v * u * u * r + u * u * u * s;
+          // A long way is taken in a weave from side to side, not a straight drop.
+          const midway = Math.sin(Math.PI * t), across = Math.hypot(d.x - a.x, d.y - a.y) || 1;
+          const weave = flight.weave * Math.sin(Math.PI * flight.turns * u) * midway;
+          return { x: curve(a.x, b.x, c.x, d.x) - (d.y - a.y) / across * weave, y: curve(a.y, b.y, c.y, d.y) + (d.x - a.x) / across * weave, midway };
+        };
         const fly = time => {
           let flying = false;
           for (const bat of bats) {
@@ -823,19 +795,10 @@
               continue;
             }
             flying = true;
-            // Easing off the perch and into the next, with small surges between.
-            const u = clamp(.7 * (.5 - .5 * Math.cos(Math.PI * t)) + .3 * t + .03 * Math.sin(Math.PI * 4 * t), 0, 1), v = 1 - u;
-            const a = flight.from, d = onScreen(bat.perch);
-            const b = { x: clamp(a.x + flight.out.x, 12, innerWidth - 12), y: a.y + flight.out.y };
-            const c = { x: clamp(d.x + flight.in.x, 12, innerWidth - 12), y: d.y + flight.in.y };
-            const curve = (p, q, r, s) => v * v * v * p + 3 * v * v * u * q + 3 * v * u * u * r + u * u * u * s;
-            const midway = Math.sin(Math.PI * t), seed = bat.seed;
-            // A long way is taken in a weave from side to side, not a straight drop.
-            const across = Math.hypot(d.x - a.x, d.y - a.y) || 1, weave = flight.weave * Math.sin(Math.PI * flight.turns * u) * midway;
-            const x = curve(a.x, b.x, c.x, d.x) - (d.y - a.y) / across * weave
-              + midway * (2.4 * Math.sin(time / 83 + seed * 9) + 1.4 * Math.sin(time / 47 + seed * 3));
-            const y = curve(a.y, b.y, c.y, d.y) + (d.x - a.x) / across * weave
-              + midway * (2.8 * Math.sin(time / 71 + seed * 5) + 1.2 * Math.sin(time / 39 + seed * 11));
+            const path = course(flight, flight.inPage ? pageSpot(bat.perch) : onScreen(bat.perch), t);
+            const { midway } = path, seed = bat.seed;
+            const x = path.x + midway * (2.4 * Math.sin(time / 83 + seed * 9) + 1.4 * Math.sin(time / 47 + seed * 3));
+            const y = path.y + midway * (2.8 * Math.sin(time / 71 + seed * 5) + 1.2 * Math.sin(time / 39 + seed * 11));
             // Always beating, harder when climbing; a bat that glides here
             // just looks as though it is falling.
             const rising = flight.now ? flight.now.y - y : 0;
@@ -849,32 +812,45 @@
         };
         // `loop` sends it out and back to the same perch, swinging to the side
         // its sign gives.
+        // `from` is a point on the screen.
         const takeOff = (bat, to, from, loop = 0) => {
-          from = from || (bat.flight ? bat.flight.now || bat.flight.from : onScreen(bat.perch));
+          from = from || seen(bat);
           if (!from) return;
           bat.perch = to;
           if (still.matches) { bat.flight = null; settle(bat); return; }
-          if (bat.el.parentNode !== screen) screen.appendChild(bat.el);
-          const end = onScreen(to), dx = end.x - from.x, distance = Math.hypot(dx, end.y - from.y);
+          const inPage = to.kind === "word", layer = inPage ? page : screen;
+          if (bat.el.parentNode !== layer) layer.appendChild(bat.el);
+          if (inPage) from = { x: from.x, y: from.y + scrollY };
+          const end = inPage ? pageSpot(to) : onScreen(to), dx = end.x - from.x, distance = Math.hypot(dx, end.y - from.y);
           const side = loop ? Math.sign(loop) : Math.random() < .5 ? -1 : 1;
           const swing = loop ? Math.abs(loop) * 3 : clamp(distance * .35, 40, 150) * (.6 + Math.random() * .6);
           bat.flight = {
-            from, now: null, beat: Math.random() * 2, start: performance.now(),
+            from, inPage, now: null, beat: Math.random() * 2, start: performance.now(),
             out: { x: side * swing + dx * .2, y: 26 + Math.random() * 30 },
             in: { x: -side * swing * .5 - dx * .1, y: 40 + Math.random() * 40 },
             turns: 1 + Math.floor(distance / 150), weave: (Math.random() < .5 ? -1 : 1) * clamp(distance * .18, 16, 70),
-            // Unhurried, and slower still up or down the page, so every
-            // wingbeat shows.
-            duration: loop ? 1800 + Math.random() * 900
-              : clamp(Math.max((distance + swing) / .09, Math.abs(end.y - from.y) / .055), 2000, 7000)
+            duration: 1800 + Math.random() * 900
           };
+          // Unhurried, however far: long enough that even the quickest part
+          // of the way, swings and weave and all, is flown at no more than
+          // about 110 pixels a second, so every wingbeat shows.
+          if (!loop) {
+            let quickest = 0, before = course(bat.flight, end, 0);
+            for (let step = 1; step <= 60; step++) {
+              const next = course(bat.flight, end, step / 60);
+              quickest = Math.max(quickest, Math.hypot(next.x - before.x, next.y - before.y) * 60);
+              before = next;
+            }
+            bat.flight.duration = clamp(Math.max(quickest / .11, (distance + swing) / .09), 2000, 16000);
+          }
           place(bat, from.x, from.y);
           if (!frame) frame = requestAnimationFrame(fly);
         };
         // One goes: a loop off its perch and back now and then, sometimes to
-        // a free spot under the mark, mostly to a word somewhere else.
+        // a free spot under the mark, mostly to a word somewhere else. Those
+        // out of sight wait to come after you.
         const launchOne = () => {
-          const resting = bats.filter(bat => !bat.flight);
+          const resting = bats.filter(bat => !bat.flight && !offScreen(bat.perch));
           if (document.hidden || !resting.length) return;
           const bat = pick(resting), roll = Math.random();
           if (roll < .22 && !offScreen(bat.perch)) return takeOff(bat, bat.perch, null, (Math.random() < .5 ? -1 : 1) * (14 + Math.random() * 24));
@@ -906,15 +882,33 @@
             stretch();
           }, 600 + Math.random() * 1000);
         };
+        // Where a bat is on the screen now, perched or flying.
+        const seen = bat => {
+          const flight = bat.flight;
+          if (!flight) return onScreen(bat.perch);
+          const at = flight.now || flight.from;
+          return flight.inPage ? { x: at.x, y: at.y - scrollY } : at;
+        };
+        // Left out of sight: on a word the page has scrolled away, or in the
+        // air over a part of the page now off the screen.
+        const lost = bat => {
+          if (!bat.flight) return offScreen(bat.perch);
+          const y = seen(bat).y;
+          return bat.flight.inPage && (y < -20 || y > innerHeight + 20);
+        };
         // Once the page comes to rest, the bats left out of sight come after
-        // you, and a couple more take off for the fun of it.
+        // you: each sets off from just past the edge of the screen it was
+        // left beyond, a little after the one before, so they trickle in
+        // rather than pour. A couple more take off for the fun of it.
         const regroup = () => {
           found = null;
-          bats.filter(bat => !bat.flight && offScreen(bat.perch)).forEach((bat, index) => {
+          bats.filter(lost).forEach((bat, index) => {
             setTimeout(() => {
-              if (bat.flight || !offScreen(bat.perch)) return;
-              takeOff(bat, freeWord(bat) || freeMark(bat) || top());
-            }, index * 70 + Math.random() * 160);
+              if (!lost(bat)) return;
+              const at = seen(bat);
+              takeOff(bat, freeWord(bat) || freeMark(bat) || top(),
+                      { x: clamp(at.x, 24, innerWidth - 24), y: at.y < innerHeight / 2 ? -24 : innerHeight + 24 });
+            }, index * 260 + Math.random() * 500);
           });
           setTimeout(launchOne, 120);
           setTimeout(launchOne, 320);
@@ -924,10 +918,15 @@
           clearTimeout(settled);
           settled = setTimeout(regroup, 200);
         }, { passive: true });
-        let resized = 0;
+        // A phone's toolbars come and go as it scrolls, changing only the
+        // height; words move only when the width does.
+        let resized = 0, sizedFor = innerWidth + "x" + devicePixelRatio;
         addEventListener("resize", () => {
           clearTimeout(resized);
           resized = setTimeout(() => {
+            found = null;
+            if (innerWidth + "x" + devicePixelRatio === sizedFor) return;
+            sizedFor = innerWidth + "x" + devicePixelRatio;
             // Words move when the page reflows, so the bats on them find new ones.
             measure();
             found = null;
@@ -961,23 +960,35 @@
 
       // Ghosts, in the same pixels: sheets of pale light with hollow eyes and
       // a wailing mouth, sleeves raised, the body thinning to a tail that
-      // trails behind them. They wander the screen slowly, rippling from head
+      // trails behind them. They wander the page slowly, rippling from head
       // to tail, leaning into their drift and stretching as they rise. Like a
       // weak signal their edges flicker, a slice of one slips sideways now
       // and then, and a faint scan runs down them. Now and then one comes
       // apart pixel by pixel, tail first, and builds itself again somewhere
-      // else. When the page scrolls it pulls them along a little, as a draught
-      // would: they glide with it, their tails streaming, and drift back.
-      const haunt = document.querySelector("[data-bats] .bats-screen");
+      // else. They live in the page, so it carries them as it scrolls, however
+      // fast; once it comes to rest, any left out of sight come after you,
+      // swooping in from where you left them or building back in view.
+      const haunt = document.querySelector("[data-bats] .bats-page");
       if (haunt) {
         const calm = matchMedia("(prefers-reduced-motion: reduce)");
         const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
         const ghosts = [], cols = 22, rows = 30;
-        let ratio = 1, cell = 3, unit = 1.5, last = 0, lastScroll = scrollY, sizedFor = "";
+        let ratio = 1, cell = 3, unit = 1.5, last = 0, sizedFor = "", settle = 0;
+        // The pale light around a ghost, drawn once for each size and laid
+        // under it every frame.
+        const aura = document.createElement("canvas");
         const measure = () => {
           ratio = Math.min(3, devicePixelRatio || 1);
           cell = Math.max(2, Math.round((innerWidth <= 600 ? 1.6 : 2) * ratio));
           unit = cell / ratio;
+          aura.width = cols * cell;
+          aura.height = rows * cell;
+          const light = aura.getContext("2d"), glow = light.createRadialGradient(cols / 2 * cell, 10.5 * cell, 0, cols / 2 * cell, 10.5 * cell, 10.5 * cell);
+          glow.addColorStop(0, "rgba(205, 220, 255, .2)");
+          glow.addColorStop(.5, "rgba(205, 220, 255, .08)");
+          glow.addColorStop(1, "rgba(205, 220, 255, 0)");
+          light.fillStyle = glow;
+          light.fillRect(0, 0, aura.width, aura.height);
           for (const ghost of ghosts) {
             ghost.el.width = cols * cell;
             ghost.el.height = rows * cell;
@@ -985,7 +996,8 @@
             ghost.el.style.height = rows * unit + "px";
           }
         };
-        const somewhere = () => ({ x: 30 + Math.random() * (innerWidth - 60), y: 40 + Math.random() * (innerHeight - 120) });
+        // Somewhere in the part of the page on screen.
+        const somewhere = () => ({ x: 40 + Math.random() * (innerWidth - 80), y: scrollY + 40 + Math.random() * Math.max(40, innerHeight - 120) });
         // The same number for a pixel every frame, so a ghost comes apart and
         // builds back in a fixed order.
         const grain = (col, row, seed) => {
@@ -999,6 +1011,8 @@
         const paint = (ghost, time) => {
           const { pen } = ghost, t = time / 1000 + ghost.seed * 20, gap = cell >= 4 ? 1 : 0, still = calm.matches;
           pen.clearRect(0, 0, ghost.el.width, ghost.el.height);
+          pen.globalAlpha = 1 - ghost.dissolve;
+          pen.drawImage(aura, 0, 0);
           const headX = cols / 2, headY = 8, radius = 6.2 + (still ? 0 : .3 * Math.sin(t * 1.5));
           const wave = still ? 0 : 1, lift = still ? 0 : Math.sin(t * 2.1), length = 19 * ghost.stretch;
           const mouth = still ? .4 : .45 + .55 * Math.max(0, Math.sin(t * .8 + ghost.seed * 4)) ** 2;
@@ -1053,20 +1067,17 @@
             // Drifting after somewhere new, slowing as it gets there.
             const dx = ghost.target.x - ghost.x, dy = ghost.target.y - ghost.y, far = Math.hypot(dx, dy);
             if (far < 24) ghost.target = somewhere();
-            const speed = ghost.speed * Math.min(1, far / 120);
+            // One coming after you hurries, until it is back in view.
+            const inView = ghost.y > scrollY && ghost.y < scrollY + innerHeight;
+            if (inView) ghost.hurry *= Math.exp(-dt * .9);
+            const speed = ghost.speed * Math.min(1, far / 120) * (1 + 1.8 * ghost.hurry);
             const ease = 1 - Math.exp(-dt * .7);
             ghost.vx += ((far ? dx / far : 0) * speed - ghost.vx) * ease;
             ghost.vy += ((far ? dy / far : 0) * speed - ghost.vy) * ease;
             ghost.x += ghost.vx * dt;
             ghost.y += ghost.vy * dt;
-            // Pulled by the scroll: the pull eases off, and the ghost glides
-            // after it rather than jumping, its body answering the motion.
-            ghost.pull *= Math.exp(-dt * 1.2);
-            const before = ghost.lag;
-            ghost.lag += (ghost.pull - ghost.lag) * (1 - Math.exp(-dt * 5));
-            const rise = ghost.vy + (ghost.lag - before) / dt;
             ghost.trail += (clamp(-ghost.vx * .1, -4.5, 4.5) - ghost.trail) * (1 - Math.exp(-dt * 3.7));
-            ghost.stretch += (clamp(1 - rise * .006, .86, 1.1) - ghost.stretch) * (1 - Math.exp(-dt * 3.1));
+            ghost.stretch += (clamp(1 - ghost.vy * .006, .86, 1.1) - ghost.stretch) * (1 - Math.exp(-dt * 3.1));
             // Now and then a slice of it slips sideways for a moment.
             if (!ghost.glitch || time > ghost.glitch.until + 1200) {
               if (Math.random() < dt * .22) {
@@ -1096,34 +1107,56 @@
             ghost.dissolve = 1 - here * here * (3 - 2 * here);
             ghost.el.style.opacity = ((.8 + .14 * Math.sin(t * .9)) * (.4 + .6 * here)).toFixed(3);
             paint(ghost, time);
-            place(ghost, ghost.x + 4 * Math.sin(t * .7), ghost.y + 6 * Math.sin(t * 1.3) + ghost.lag, clamp(ghost.vx * .3, -12, 12));
+            place(ghost, ghost.x + 4 * Math.sin(t * .7), ghost.y + 6 * Math.sin(t * 1.3), clamp(ghost.vx * .3, -12, 12));
           }
           if (!calm.matches) requestAnimationFrame(float);
         };
-        addEventListener("scroll", () => {
-          const delta = scrollY - lastScroll;
-          lastScroll = scrollY;
-          if (calm.matches) return;
-          // The further it has been pulled, the less more scrolling pulls it.
+        // Once the page has come to rest: ghosts heading somewhere now out of
+        // sight pick somewhere in view, and any left out of sight come after
+        // you. Half swoop in from the edge you left them past, if the page
+        // has room there; the rest build themselves back in view.
+        const regather = () => {
+          const top = scrollY, bottom = scrollY + innerHeight, now = performance.now();
+          const room = document.documentElement.scrollHeight - (bottom + 80);
           for (const ghost of ghosts) {
-            const away = delta * ghost.pull < 0;
-            ghost.pull -= delta * .3 * (away ? Math.max(0, 1 - Math.abs(ghost.pull) / 110) : 1);
+            if (ghost.target.y < top + 40 || ghost.target.y > bottom - 80) ghost.target = somewhere();
+            // One fading out of sight need not finish before it moves into
+            // view; one building back was left behind, and starts again.
+            const above = ghost.y < top - 40, below = ghost.y > bottom + 24;
+            if (!above && !below) continue;
+            if (ghost.fade && !ghost.fade.moved) {
+              ghost.fade.start = Math.min(ghost.fade.start, now - ghost.fade.out);
+              continue;
+            }
+            if (calm.matches) {
+              Object.assign(ghost, somewhere());
+              paint(ghost, now);
+              place(ghost, ghost.x, ghost.y, 0);
+            } else if (Math.random() < .5 && (above ? top > 60 : room > 0)) {
+              Object.assign(ghost, { x: clamp(ghost.x, 40, innerWidth - 40), y: above ? top - 40 : bottom + 30, vx: 0, vy: 0, hurry: 1, fade: null });
+            } else {
+              ghost.fade = { start: now - 1400, out: 1400, back: 1900 };
+            }
           }
+        };
+        addEventListener("scroll", () => {
+          clearTimeout(settle);
+          settle = setTimeout(regather, 200);
         }, { passive: true });
         // A phone's toolbars come and go as it scrolls, changing the height;
-        // only a new width moves the ghosts on. Otherwise they keep course,
-        // and only one heading off the bottom of a shorter screen turns back.
+        // only a new width resizes the ghosts and moves them on.
         addEventListener("resize", () => {
           const size = innerWidth + "x" + devicePixelRatio;
           if (size !== sizedFor) {
             sizedFor = size;
             measure();
             for (const ghost of ghosts) {
-              ghost.x = clamp(ghost.x, 30, innerWidth - 30);
+              ghost.x = clamp(ghost.x, 40, innerWidth - 40);
               ghost.target = somewhere();
             }
           }
-          for (const ghost of ghosts) if (ghost.target.y > innerHeight - 80) ghost.target = somewhere();
+          clearTimeout(settle);
+          settle = setTimeout(regather, 200);
         }, { passive: true });
 
         const count = innerWidth <= 600 ? 3 : 4, now = performance.now();
@@ -1131,7 +1164,7 @@
           const el = document.createElement("canvas");
           el.className = "spirit";
           haunt.appendChild(el);
-          ghosts.push({ el, pen: el.getContext("2d"), ...somewhere(), target: somewhere(), vx: 0, vy: 0, lag: 0, pull: 0, trail: 0,
+          ghosts.push({ el, pen: el.getContext("2d"), ...somewhere(), target: somewhere(), vx: 0, vy: 0, hurry: 0, trail: 0,
                         stretch: 1, dissolve: 1, glitch: null,
                         speed: 22 + Math.random() * 18, seed: Math.random(), born: now + i * 900,
                         nextFade: now + 7000 + Math.random() * 9000, fade: null });
