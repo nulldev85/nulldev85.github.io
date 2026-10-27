@@ -125,21 +125,17 @@
     .site-footer a { color: var(--text-2); text-decoration: none; transition: color .15s ease; }
     .site-footer a:hover { color: var(--text); }
 
-    /* Floating mark: rests between the header and the headline, and stays
-       there as the page moves under it, while a wave of tiny blocks rolls
-       through it without end. Each layer owns one transform, so the drift
-       and the scroll and pointer response never fight. */
-    .float-mark { --mark-size: 56px; --glass: 0; position: fixed; top: 86px; left: 50%; z-index: 30; display: none; width: var(--mark-size); height: var(--mark-size); margin-left: calc(var(--mark-size) / -2); border-radius: 50%; color: inherit; -webkit-tap-highlight-color: transparent; }
+    /* Floating mark: a pixel Apple logo between a jack-o'-lantern and a
+       ghost. It rests between the header and the headline and stays there
+       as the page moves under it. */
+    .float-mark { --mark-size: 56px; --pixel: 1.9px; --glass: 0; position: fixed; top: 86px; left: 50%; z-index: 30; display: none; width: var(--mark-size); height: var(--mark-size); margin-left: calc(var(--mark-size) / -2); border-radius: 50%; color: inherit; -webkit-tap-highlight-color: transparent; }
     .has-js .float-mark { display: block; }
     .float-mark:focus-visible { outline: none; }
     .float-mark:focus-visible .mark-orb { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus); }
-    .mark-drift, .mark-orb { position: absolute; inset: 0; border-radius: 50%; }
-    .mark-drift { animation: mark-drift 7s ease-in-out 1.6s infinite; }
-    .mark-orb { display: grid; place-items: center; will-change: transform; }
-    .mark-glow { position: absolute; inset: -40%; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.09), rgba(255,255,255,.03) 38%, transparent 66%); opacity: calc(1 - var(--glass)); pointer-events: none; animation: mark-glow-in 1.6s ease .3s backwards; }
-    .mark-logo { position: relative; display: block; width: 52%; height: 52%; margin-top: -4%; animation: mark-glow-in 1s ease .1s backwards; filter: drop-shadow(0 1px 0 rgba(255,255,255,.18)) drop-shadow(0 4px 10px rgba(0,0,0,.75)) drop-shadow(0 0 3px rgba(0,0,0,.6)); }
-    @keyframes mark-drift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-    @keyframes mark-glow-in { from { opacity: 0; } }
+    .mark-orb { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 50%; transition: transform .25s cubic-bezier(.2,.7,.2,1); }
+    .float-mark:active .mark-orb { transform: scale(.94); transition-duration: .08s; }
+    .mark-glow { position: absolute; inset: -30% -95%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,255,255,.075), rgba(255,255,255,.025) 55%, transparent); opacity: calc(1 - var(--glass)); transition: opacity .3s ease; pointer-events: none; }
+    .mark-scene { position: absolute; top: calc(50% - 2px); left: 50%; display: block; transform: translate(-50%, -50%); filter: drop-shadow(0 3px 8px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(0,0,0,.6)); }
     @media print { .float-mark { display: none; } }
 
     /* Motion */
@@ -160,7 +156,7 @@
       .wrap { width: calc(100% - 32px); }
       .site-nav { gap: 18px; }
       .intro { padding: 84px 0 44px; }
-      .float-mark { --mark-size: 48px; top: 74px; }
+      .float-mark { --mark-size: 48px; --pixel: 1.7px; top: 74px; }
       .lede { font-size: 16px; }
       .source-label { display: none; }
       .features { grid-template-columns: minmax(0, 1fr); margin-top: 28px; }
@@ -193,11 +189,9 @@
   </header>
 
   <a class="float-mark" href="#top" aria-label="Back to top" data-float-mark>
-    <span class="mark-drift" aria-hidden="true">
-      <span class="mark-orb">
-        <span class="mark-glow"></span>
-        <canvas class="mark-logo"></canvas>
-      </span>
+    <span class="mark-orb" aria-hidden="true">
+      <span class="mark-glow"></span>
+      <canvas class="mark-scene"></canvas>
     </span>
   </a>
 
@@ -386,181 +380,127 @@
         cards.forEach(card => observer.observe(card));
       } else cards.forEach(card => card.classList.add("is-visible"));
 
-      // The floating mark, drawn on a canvas so it can come apart. One loop
-      // eases the lean, tilt and light toward where they are headed and stops
-      // once they arrive; the other keeps the wave of blocks rolling, and
-      // pauses with the page when it is out of sight.
+      // The floating mark: a pixel Apple logo with a jack-o'-lantern on one
+      // side and a ghost on the other, drawn once as lit pixels with a
+      // hairline between them, like a screen seen up close.
       const mark = document.querySelector("[data-float-mark]");
       if (mark) {
-        const orb = mark.querySelector(".mark-orb");
-        const canvas = mark.querySelector(".mark-logo");
+        const canvas = mark.querySelector(".mark-scene");
         const pen = canvas.getContext("2d");
-        const art = document.createElement("canvas");
-        const artPen = art.getContext("2d", { willReadFrequently: true });
-        const apple = new Path2D("M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701");
-        const still = matchMedia("(prefers-reduced-motion: reduce)");
-        const fine = matchMedia("(hover: hover) and (pointer: fine)");
-        const now = { glass: 0, light: 0, tilt: 0, rx: 0, ry: 0, mx: 0, my: 0, press: 1 };
-        const goal = { ...now };
-        const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
-        let lastY = Math.max(0, scrollY), lastScroll = performance.now(), lastFrame = 0, frame = 0;
-
-        // The blocks. A wave rolls down the mark without end: as it reaches a
-        // block, the block fades out, catches the light and comes back, and
-        // by the time it leaves the bottom it is already turning the top
-        // over again, so one pass runs into the next with no seam. Each
-        // block's place in the wave is mostly its height, with a little
-        // chance, so it reads as tiny pixels rather than a line.
-        const period = 2800;
-        const dip = .62;
-        const ramp = .32;
-        const moving = !still.matches;
-        let blocks = [], cell = 3, painted = NaN, blockFrame = 0;
-        const shine = () => now.light * 50 - 25 + now.ry;
-        const paint = () => {
-          const size = art.width, angle = shine() * Math.PI / 180;
-          const dx = -Math.sin(angle) * 12, dy = Math.cos(angle) * 12;
-          artPen.setTransform(1, 0, 0, 1, 0, 0);
-          artPen.clearRect(0, 0, size, size);
-          artPen.setTransform(size / 24, 0, 0, size / 24, 0, 0);
-          const metal = artPen.createLinearGradient(12 - dx, 12 - dy, 12 + dx, 12 + dy);
-          metal.addColorStop(0, "#ffffff");
-          metal.addColorStop(.42, "#dcdee3");
-          metal.addColorStop(.78, "#a6aab3");
-          metal.addColorStop(1, "#858a94");
-          artPen.fillStyle = metal;
-          artPen.fill(apple);
-          painted = shine();
-        };
-        const layout = () => {
-          const ratio = Math.min(3, devicePixelRatio || 1);
-          const size = Math.round(canvas.offsetWidth * ratio);
-          if (!size || (size === canvas.width && blocks.length)) return;
-          canvas.width = canvas.height = art.width = art.height = size;
-          paint();
-          cell = Math.max(2, Math.round(1.5 * ratio));
-          const ink = artPen.getImageData(0, 0, size, size).data;
-          blocks = [];
-          for (let y = 0; y < size; y += cell) {
-            for (let x = 0; x < size; x += cell) {
-              let inked = false;
-              for (let row = y; row < Math.min(size, y + cell) && !inked; row++) {
-                for (let column = x; column < Math.min(size, x + cell); column++) {
-                  if (ink[(row * size + column) * 4 + 3] > 10) { inked = true; break; }
-                }
+        const pumpkin = [
+          ".......g.....",
+          "......gg.....",
+          "..odoodoodo..",
+          ".ohdoodoodoo.",
+          "ohooyodoyoooo",
+          "ohoyyydyyyooo",
+          "ooooooyoooooo",
+          "oooyyoyoyyooo",
+          ".oooyyyyyooo.",
+          "..odoodoodo.."
+        ];
+        const ghost = [
+          "...wwwww...",
+          "..wwwwwws..",
+          ".wwwwwwwws.",
+          "wwwwwwwwwws",
+          "wwkkwwwkkws",
+          "wwkkwwwkkws",
+          "wwwwwwwwwws",
+          "wwwwwkwwwws",
+          "wwwwwkwwwws",
+          "wwwwwwwwwws",
+          "wwwwwwwwwws",
+          "ww.ww.ww.ws"
+        ];
+        const colors = { o: "#f7841e", d: "#c65a10", h: "#ffb257", y: "#fff1a8", g: "#4f8f2a",
+                         w: "#f3f5fa", s: "#c3c9d6", k: "#1d2027" };
+        // The logo, sampled onto a grid 16 pixels tall: a pixel is lit when
+        // the logo covers most of it.
+        const logo = (() => {
+          const shape = new Path2D("M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701");
+          const rows = 16, cols = 13, sample = 8, step = 24 / rows, left = 11.725 - cols * step / 2;
+          const probe = document.createElement("canvas");
+          probe.width = cols * sample;
+          probe.height = rows * sample;
+          const probePen = probe.getContext("2d", { willReadFrequently: true });
+          probePen.setTransform(sample / step, 0, 0, sample / step, -left * sample / step, 0);
+          probePen.fill(shape);
+          const ink = probePen.getImageData(0, 0, probe.width, probe.height).data;
+          const grid = [];
+          for (let row = 0; row < rows; row++) {
+            let line = "";
+            for (let col = 0; col < cols; col++) {
+              let sum = 0;
+              for (let y = 0; y < sample; y++) {
+                for (let x = 0; x < sample; x++) sum += ink[((row * sample + y) * probe.width + col * sample + x) * 4 + 3];
               }
-              if (inked) blocks.push({ x, y, seen: 1,
-                                       place: y / size * .62 + x / size * .12 + Math.random() * .26 });
+              line += sum / (sample * sample * 255) > .42 ? "a" : ".";
             }
+            grid.push(line);
           }
-          // Spread the places evenly round the wave, keeping their order, so
-          // there is always as much turning over as at any other moment.
-          blocks.sort((a, b) => a.place - b.place).forEach((block, rank) => { block.place = rank / blocks.length; });
-        };
-        const draw = time => {
-          const size = canvas.width;
-          if (Math.abs(shine() - painted) > .05) paint();
-          pen.globalCompositeOperation = "source-over";
-          pen.globalAlpha = 1;
-          pen.clearRect(0, 0, size, size);
-          pen.drawImage(art, 0, 0);
-          if (!moving) return;
-          const wave = time / period;
-          // A block catches the light as it turns over.
-          pen.globalCompositeOperation = "source-atop";
-          pen.fillStyle = "#fff";
-          for (const block of blocks) {
-            const turn = wave - block.place;
-            const into = (turn - Math.floor(turn)) / dip;
-            // Out, a moment gone, and back, each end eased.
-            block.seen = into >= 1 ? 1
-              : into < ramp ? .5 + .5 * Math.cos(Math.PI * into / ramp)
-              : into > 1 - ramp ? .5 - .5 * Math.cos(Math.PI * (into - 1 + ramp) / ramp)
-              : 0;
-            if (block.seen > .005 && block.seen < .995) {
-              pen.globalAlpha = block.seen * (1 - block.seen) * 2.4;
-              pen.fillRect(block.x, block.y, cell, cell);
-            }
+          return grid;
+        })();
+        // Brushed metal, lighter at the top.
+        const metal = (() => {
+          const stops = [[0, [255, 255, 255]], [.42, [220, 222, 227]], [.78, [166, 170, 179]], [1, [133, 138, 148]]];
+          return at => {
+            const upper = stops.findIndex(([offset]) => offset >= at);
+            const [a, from] = stops[Math.max(0, upper - 1)], [b, to] = stops[Math.max(0, upper)];
+            const mix = b > a ? (at - a) / (b - a) : 0;
+            return `rgb(${from.map((value, index) => Math.round(value + (to[index] - value) * mix)).join(",")})`;
+          };
+        })();
+        // Side by side on one baseline, the ghost hovering a pixel above it.
+        const parts = [
+          { art: pumpkin, x: 0, bottom: 16 },
+          { art: logo, x: 16, bottom: 16, metal: true },
+          { art: ghost, x: 32, bottom: 15 }
+        ];
+        const columns = 43, rows = 16;
+        let drawn = "";
+        const draw = () => {
+          const ratio = Math.min(3, devicePixelRatio || 1);
+          const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 1.9;
+          const cell = Math.max(2, Math.round(pixel * ratio));
+          const key = ratio + "|" + cell;
+          if (key === drawn) return;
+          drawn = key;
+          const gap = cell >= 4 ? 1 : 0, pad = cell * 3;
+          canvas.width = columns * cell + pad * 2;
+          canvas.height = rows * cell + pad * 2;
+          canvas.style.width = canvas.width / ratio + "px";
+          canvas.style.height = canvas.height / ratio + "px";
+          for (const part of parts) {
+            const top = part.bottom - part.art.length;
+            part.art.forEach((line, row) => [...line].forEach((key, col) => {
+              if (key === ".") return;
+              // The jack-o'-lantern's face glows.
+              const lit = key === "y";
+              pen.shadowColor = lit ? "rgba(255, 196, 60, .85)" : "transparent";
+              pen.shadowBlur = lit ? cell * 1.8 : 0;
+              pen.fillStyle = part.metal ? metal(row / (part.art.length - 1)) : colors[key];
+              pen.fillRect(pad + (part.x + col) * cell, pad + (top + row) * cell, cell - gap, cell - gap);
+            }));
           }
-          pen.globalCompositeOperation = "destination-out";
-          pen.fillStyle = "#000";
-          for (const block of blocks) {
-            if (block.seen >= 1) continue;
-            pen.globalAlpha = 1 - block.seen;
-            pen.fillRect(block.x, block.y, cell, cell);
-          }
-          pen.globalAlpha = 1;
-          pen.globalCompositeOperation = "source-over";
         };
-        const blocksStep = time => {
-          draw(time);
-          blockFrame = requestAnimationFrame(blocksStep);
-        };
-
-        const render = () => {
-          mark.style.setProperty("--glass", now.glass.toFixed(3));
-          const scale = now.press * (1 - now.glass * .06);
-          orb.style.transform = `translate3d(${now.mx.toFixed(2)}px, ${now.my.toFixed(2)}px, 0) perspective(360px) `
-            + `rotateX(${now.rx.toFixed(2)}deg) rotateY(${now.ry.toFixed(2)}deg) rotate(${now.tilt.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
-          // The light on the metal turns as the page goes by.
-          if (!blockFrame && Math.abs(shine() - painted) > .05) draw(performance.now());
-        };
-        const step = time => {
-          const dt = lastFrame ? Math.min(.05, (time - lastFrame) / 1000) : 1 / 60;
-          lastFrame = time;
-          goal.tilt = Math.abs(goal.tilt) < .02 ? 0 : goal.tilt * Math.exp(-dt * 7);
-          let moving = Math.abs(goal.tilt) > .02;
-          for (const key in now) {
-            const rate = key === "press" ? 24 : key === "glass" ? 9 : 11;
-            const next = now[key] + (goal[key] - now[key]) * (1 - Math.exp(-rate * dt));
-            if (Math.abs(goal[key] - next) < .001) now[key] = goal[key];
-            else { now[key] = next; moving = true; }
-          }
-          render();
-          frame = moving ? requestAnimationFrame(step) : 0;
-          if (!frame) lastFrame = 0;
-        };
-        const wake = () => { if (!frame) frame = requestAnimationFrame(step); };
+        let queued = false;
         const follow = () => {
-          const y = Math.max(0, scrollY), time = performance.now();
-          const speed = (y - lastY) / Math.max(8, time - lastScroll);
-          lastY = y; lastScroll = time;
-          goal.glass = clamp(y / 90, 0, 1);
-          const room = document.documentElement.scrollHeight - innerHeight;
-          goal.light = room > 0 ? clamp(y / room, 0, 1) : 0;
-          // A flick of the page leans the mark, and it rights itself.
-          if (!still.matches) goal.tilt = clamp(goal.tilt + speed * 2.2, -9, 9);
-          wake();
+          if (queued) return;
+          queued = true;
+          requestAnimationFrame(() => {
+            queued = false;
+            mark.style.setProperty("--glass", Math.min(1, Math.max(0, scrollY / 90)).toFixed(3));
+          });
         };
         addEventListener("scroll", follow, { passive: true });
-        addEventListener("resize", () => {
-          layout();
-          if (!blockFrame) draw(performance.now());
-          follow();
-        }, { passive: true });
-        mark.addEventListener("pointermove", event => {
-          if (still.matches || !fine.matches) return;
-          const box = mark.getBoundingClientRect();
-          const x = (event.clientX - box.left) / box.width - .5;
-          const y = (event.clientY - box.top) / box.height - .5;
-          goal.ry = x * 24; goal.rx = -y * 24; goal.mx = x * 6; goal.my = y * 6;
-          wake();
-        });
-        const settle = () => { goal.rx = goal.ry = goal.mx = goal.my = 0; goal.press = 1; wake(); };
-        mark.addEventListener("pointerleave", settle);
-        mark.addEventListener("pointercancel", settle);
-        mark.addEventListener("pointerdown", () => { goal.press = .9; wake(); });
-        mark.addEventListener("pointerup", () => { goal.press = 1; wake(); });
+        addEventListener("resize", () => { draw(); follow(); }, { passive: true });
         mark.addEventListener("click", event => {
           event.preventDefault();
-          scrollTo({ top: 0, behavior: still.matches ? "auto" : "smooth" });
+          scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
         });
+        draw();
         follow();
-        now.glass = goal.glass; now.light = goal.light; now.tilt = goal.tilt = 0;
-        layout();
-        if (moving) blockFrame = requestAnimationFrame(blocksStep);
-        else draw(performance.now());
-        render();
       }
 
       const appSourceURL = "https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json";
