@@ -489,7 +489,23 @@
             return { x: box.left + pad + (part.x + col + .5) * unit, y: box.top + pad + part.bottom * unit - 1 };
           });
         };
-        let drawn = "";
+        // A candle inside the jack-o'-lantern: a slow sway, a quicker flutter
+        // and now and then a gutter, never quite going out.
+        const calm = matchMedia("(prefers-reduced-motion: reduce)");
+        const flame = time => {
+          const t = time / 1000;
+          const sway = Math.sin(t * 2.1) * .11 + Math.sin(t * 3.7 + 1.1) * .08;
+          const flutter = Math.sin(t * 11.3 + .7) * .07 + Math.sin(t * 17.9 + 2.3) * .05 + Math.sin(t * 29.3) * .035;
+          const gutter = Math.max(0, Math.sin(t * .9 + 2) - .9) * 3;
+          return Math.min(1, Math.max(.28, .72 + sway + flutter - gutter));
+        };
+        const rgb = hex => [1, 3, 5].map(at => parseInt(hex.slice(at, at + 2), 16));
+        const mix = (from, to, amount) => `rgb(${from.map((value, index) => Math.round(value + (to[index] - value) * amount)).join(",")})`;
+        const warm = [255, 214, 140], ember = [255, 150, 40], flare = [255, 246, 190];
+        // Everything but the pumpkin's lit pixels is drawn once, here; the
+        // pumpkin is drawn over it as the candle moves.
+        const base = document.createElement("canvas"), basePen = base.getContext("2d");
+        let drawn = "", lantern = null;
         const draw = () => {
           const ratio = Math.min(3, devicePixelRatio || 1);
           const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 1.9;
@@ -498,25 +514,57 @@
           if (key === drawn) return;
           drawn = key;
           const gap = cell >= 4 ? 1 : 0, pad = cell * 3;
-          canvas.width = columns * cell + pad * 2;
-          canvas.height = rows * cell + pad * 2;
+          canvas.width = base.width = columns * cell + pad * 2;
+          canvas.height = base.height = rows * cell + pad * 2;
           canvas.style.width = canvas.width / ratio + "px";
           canvas.style.height = canvas.height / ratio + "px";
           // The logo stays centred on the mark, whatever sits either side.
           const logoMiddle = parts[1].x + parts[1].art[0].length / 2;
           canvas.style.marginLeft = (columns / 2 - logoMiddle) * cell / ratio + "px";
+          lantern = { cell, gap, skin: [], face: [] };
           for (const part of parts) {
             const top = part.bottom - part.art.length;
             part.art.forEach((line, row) => [...line].forEach((key, col) => {
               if (key === ".") return;
-              // The jack-o'-lantern's face glows.
-              const lit = key === "y";
-              pen.shadowColor = lit ? "rgba(255, 196, 60, .85)" : "transparent";
-              pen.shadowBlur = lit ? cell * 1.8 : 0;
-              pen.fillStyle = part.metal ? metal(row / (part.art.length - 1)) : colors[key];
-              pen.fillRect(pad + (part.x + col) * cell, pad + (top + row) * cell, cell - gap, cell - gap);
+              const x = pad + (part.x + col) * cell, y = pad + (top + row) * cell;
+              if (part.art === pumpkin && "odhy".includes(key)) {
+                // How close to the candle, which sits low behind the face.
+                const near = Math.exp(-((col - 7) ** 2 + (row - 10.5) ** 2) / 20);
+                if (key === "y") lantern.face.push({ x, y, near: Math.exp(-((col - 7) ** 2 + (row - 12) ** 2) / 14) });
+                else lantern.skin.push({ x, y, near, rgb: rgb(colors[key]) });
+                return;
+              }
+              basePen.fillStyle = part.metal ? metal(row / (part.art.length - 1)) : colors[key];
+              basePen.fillRect(x, y, cell - gap, cell - gap);
             }));
           }
+          light(performance.now());
+        };
+        const light = time => {
+          if (!lantern) return;
+          const glow = calm.matches ? .8 : flame(time), { cell, gap } = lantern;
+          pen.clearRect(0, 0, canvas.width, canvas.height);
+          pen.drawImage(base, 0, 0);
+          // The skin warms nearest the face as the flame rises.
+          for (const spot of lantern.skin) {
+            pen.fillStyle = mix(spot.rgb, warm, spot.near * glow * .3);
+            pen.fillRect(spot.x, spot.y, cell - gap, cell - gap);
+          }
+          // The carved face, lit from inside, its light spilling out.
+          pen.shadowColor = `rgba(255, ${Math.round(140 + 60 * glow)}, 50, ${(.35 + .55 * glow).toFixed(3)})`;
+          pen.shadowBlur = cell * (1 + 1.6 * glow);
+          for (const spot of lantern.face) {
+            pen.fillStyle = mix(ember, flare, Math.min(1, glow * (.82 + .18 * spot.near)));
+            pen.fillRect(spot.x, spot.y, cell - gap, cell - gap);
+          }
+          pen.shadowBlur = 0;
+          pen.shadowColor = "transparent";
+        };
+        // About thirty frames a second is plenty for a candle.
+        let lit = 0;
+        const candle = time => {
+          if (time - lit >= 32) { lit = time; light(time); }
+          if (!calm.matches) requestAnimationFrame(candle);
         };
         let queued = false;
         const follow = () => {
@@ -535,6 +583,7 @@
         });
         draw();
         follow();
+        if (!calm.matches) requestAnimationFrame(candle);
       }
 
       // Bats, in the mark's pixels. They hang from the top of the screen and
