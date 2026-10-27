@@ -157,6 +157,10 @@
     .bats { display: none; }
     .has-js .bats { display: block; }
     .bats-page, .bats-screen { top: 0; left: 0; width: 0; height: 0; pointer-events: none; }
+    /* The villains walk along the bottom of the top of the site. */
+    .villains { position: fixed; top: 0; left: 0; z-index: 26; display: none; width: 0; height: 0; pointer-events: none; }
+    .has-js .villains { display: block; }
+    .villain { position: absolute; top: 0; left: 0; display: block; opacity: 0; will-change: transform; transform-origin: 50% 50%; }
     .bats-page { position: absolute; z-index: 21; }
     .bats-screen { position: fixed; z-index: 31; }
     .bat, .spirit { position: absolute; top: 0; left: 0; display: block; pointer-events: none; will-change: transform; }
@@ -180,7 +184,7 @@
     /* The page and its header are shaken by the thunder; kept on their own
        layers, the shaking moves them without painting them again. */
     @media (prefers-reduced-motion: no-preference) { .has-js main, .has-js .site-header, .has-js .top-shade { will-change: transform; } }
-    @media print { .float-mark, .bats, .webs, .storm { display: none; } }
+    @media print { .float-mark, .bats, .webs, .storm, .villains { display: none; } }
 
     /* Motion */
     .has-js [data-project-card] { opacity: 0; transform: translateY(10px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
@@ -227,6 +231,7 @@
   <div class="storm" aria-hidden="true" data-storm><canvas class="storm-bolt"></canvas><div class="storm-flash"></div></div>
   <div class="webs" aria-hidden="true" data-webs></div>
   <div class="bats" aria-hidden="true" data-bats><div class="bats-page"></div><div class="bats-screen"></div></div>
+  <div class="villains" aria-hidden="true" data-villains></div>
   <div class="top-shade" aria-hidden="true"></div>
   <header class="site-header wrap">
     <a class="wordmark" href="#top">Null’s Apps</a>
@@ -429,6 +434,8 @@
 
       // Where bats can hang from the mark; filled in once it is drawn.
       let markPerches = () => [];
+      // Where the pumpkin stands, its sides and the line it stands on.
+      let markBounds = () => null;
 
       // The floating mark: a jack-o'-lantern in the shape of the Apple logo,
       // its leaf growing from the stem, drawn as lit pixels with a hairline
@@ -481,6 +488,13 @@
             else if (key === "." && start >= 0) { runs.push((start + col - 1) / 2); start = -1; }
           });
           return runs.map(col => ({ x: box.left + pad + (col + .5) * unit, y: box.top + pad + rows * unit - 1 }));
+        };
+        markBounds = () => {
+          const box = canvas.getBoundingClientRect();
+          const ratio = Math.min(3, devicePixelRatio || 1);
+          const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 2.5;
+          const unit = Math.max(2, Math.round(pixel * ratio)) / ratio, pad = unit * margin;
+          return { left: box.left + pad, right: box.left + pad + columns * unit, floor: box.top + pad + rows * unit };
         };
         // A candle inside the jack-o'-lantern, low behind the grin. Its light
         // has a slow sway, a quicker flutter and now and then a gutter, never
@@ -1611,7 +1625,7 @@
           const timing = { duration: 700 + 500 * strength, delay, easing: "linear" };
           const shake = steps.map(([x, y]) => ({ transform: `translate(${x}px, ${y}px)` }));
           const nudge = steps.map(([x, y]) => ({ translate: `${x}px ${y}px` }));
-          const started = [...document.querySelectorAll(".top-shade, .site-header, main, .float-mark, .bats-page, .bats-screen")].map(part => part.animate(shake, timing));
+          const started = [...document.querySelectorAll(".top-shade, .site-header, main, .float-mark, .bats-page, .bats-screen, .villains")].map(part => part.animate(shake, timing));
           for (const part of document.querySelectorAll(".web, .spider")) part.animate(nudge, timing);
           // The web and its spiders feel it on the same frame the shaking
           // starts, timed from when the shaking itself began.
@@ -1644,8 +1658,8 @@
           // a cold white, kept within a safe change of brightness.
           flash.style.transform = `translateX(${((across - 1) * innerWidth).toFixed(1)}px)`;
           flash.animate(beats.map(([offset, light]) => ({ offset, opacity: light * strength })), { duration, easing: "linear" });
-          // The bats, black against it.
-          for (const bat of document.querySelectorAll(".bat")) {
+          // The bats, and whoever is walking the top, black against it.
+          for (const bat of document.querySelectorAll(".bat, .villain")) {
             bat.animate(beats.map(([offset, light]) => ({ offset, filter: `brightness(${(1 - .62 * light * strength).toFixed(3)})` })), { duration, easing: "linear" });
           }
           // Near, its bolt shows behind the page while the flash is brightest.
@@ -1667,6 +1681,169 @@
           if (!calm.matches && !document.hidden) strike();
           weather();
         }, 1600);
+      }
+
+      // Along the bottom of the top of the site, on the line the pumpkin
+      // stands on, the villains of Halloween take turns: one walks in from
+      // the edge of the screen to the pumpkin, shows what it came to show,
+      // turns and walks off again, and a little later the next comes in,
+      // mostly from the other side. All five come before any comes again,
+      // each at its own pace, Michael slow and steady, Chucky on quick little
+      // legs. They are drawn facing right and mirrored to face left. The
+      // lightning catches them as dark shapes and the thunder shakes them
+      // with everything else; with reduced motion, Michael just stands by
+      // the pumpkin.
+      const stage = document.querySelector("[data-villains]");
+      if (stage) {
+        const calm = matchMedia("(prefers-reduced-motion: reduce)");
+        const cast = {
+          jason: {
+            colors: { w: "#e6dfcc", k: "#2b2522", r: "#c8322e", j: "#56634b", J: "#3f4a37", h: "#b88b6c", p: "#3b3c44", b: "#2c2826", s: "#b9c0ca", S: "#eef2f7", n: "#5d4029" },
+            walk: [
+              ["....wwwww....", "...wrwwwrw...", "...wkwwwkw...", "...wwwwwww...", "...wrwkwrw...", "....wkwkw....", ".....www.....", "....JjjjJ....", "..jjjjjjjjj..", ".jjjjjjjjjjj.", ".jjjjJjJjjjj.", ".jj.jjjjj.jj.", ".jj.jjjjj.jj.", ".jj.jjjjj.jj.", ".hh.jjjjj.hhn", "....JJJJJ...s", "....ppppp...s", "...ppp.ppp..s", "..ppp...ppp.S", ".ppp.....pppS", ".bb.......bbb"],
+              ["....wwwww....", "...wrwwwrw...", "...wkwwwkw...", "...wwwwwww...", "...wrwkwrw...", "....wkwkw....", ".....www.....", "....JjjjJ....", "..jjjjjjjjj..", ".jjjjjjjjjjj.", ".jjjjJjJjjjj.", ".jj.jjjjj.jj.", ".jj.jjjjj.jj.", ".jj.jjjjj.jj.", ".hh.jjjjj.hhn", "....JJJJJ...s", "....ppppp...s", "....pp.pp...s", "....pp.pp...S", "....pp.pp...S", "....bb.bbb..."]
+            ],
+            pose: ["....wwwww...S", "...wrwwwrw..S", "...wkwwwkw.sS", "...wwwwwww.s.", "...wrwkwrwn..", "....wkwkwhh..", ".....www.jj..", "....Jjjjjj...", "..jjjjjjjjj..", ".jjjjjjjjjjj.", ".jjjjJjJjjjj.", ".jj.jjjjj....", ".jj.jjjjj....", ".jj.jjjjj....", ".hh.jjjjj....", "....JJJJJ....", "....ppppp....", "....pp.pp....", "....pp.pp....", "....pp.pp....", "....bb.bbb..."],
+            speed: 38, step: 240, hold: 1500
+          },
+          freddy: {
+            colors: { f: "#6e4c30", F: "#4a3220", c: "#b65a4b", C: "#8c3a32", e: "#e8c860", k: "#3a1c18", r: "#b8282e", g: "#2f6e3c", l: "#6e4c30", s: "#d4dae2", p: "#5b4a3a", b: "#2b2420" },
+            walk: [
+              ["...ffffff....", "...ffffff....", ".FFFFFFFFFF..", "...cCcccc....", "...cecceC....", "...ccCccc....", "...cckkcc....", "....cccc.....", "...rrrrrr....", "..gggggggg...", ".rrrrrrrrrr..", ".gg.gggg.gg..", ".rr.rrrr.rr..", ".gg.gggg.ggs.", ".cc.rrrr.llss", "....gggg..s.s", "....ppppp....", "...ppp.ppp...", "..ppp...ppp..", ".ppp.....ppp.", ".bb.......bbb"],
+              ["...ffffff....", "...ffffff....", ".FFFFFFFFFF..", "...cCcccc....", "...cecceC....", "...ccCccc....", "...cckkcc....", "....cccc.....", "...rrrrrr....", "..gggggggg...", ".rrrrrrrrrr..", ".gg.gggg.gg..", ".rr.rrrr.rr..", ".gg.gggg.ggs.", ".cc.rrrr.llss", "....gggg..s.s", "....ppppp....", "....pp.pp....", "....pp.pp....", "....pp.pp....", "....bb.bbb..."]
+            ],
+            pose: ["...ffffff....", "...ffffff....", ".FFFFFFFFFF..", "...cCcccc....", "...cecceC....", "...ccCccc....", "...cckkcc....", "....cccc.....", "...rrrrrr....", "..gggggggg.s.", ".rrrrrrrrrr..", ".gg.gggg.....", ".rr.rrrr..s.s", ".gg.gggg.ssss", ".cc.rrrr.lls.", "....gggg.ll..", "....ppppp....", "....pp.pp....", "....pp.pp....", "....pp.pp....", "....bb.bbb..."],
+            speed: 44, step: 200, hold: 1600
+          },
+          michael: {
+            colors: { a: "#3c2b1f", w: "#e8e5dd", k: "#2b2725", v: "#2f3a54", V: "#45526e", h: "#d9cdbf", p: "#2f3a54", b: "#222226", s: "#d6dbe2", S: "#f2f5f8", n: "#3a2a20" },
+            walk: [
+              ["....aaaaa....", "...aawwwaa...", "...awwwwwa...", "...wkwwwkw...", "...wwwwwww...", "...wwwkwww...", "....wwwww....", ".....www.....", "...vvvvvvv...", "..vvvvvvvvv..", ".vvvVvvvVvvv.", ".vv.vvvvv.vv.", ".vv.vvvvv.vv.", ".vv.vVvVv.vv.", ".hh.vvvvv.hhn", "....vvvvv...s", "....ppppp...S", "...ppp.ppp...", "..ppp...ppp..", ".ppp.....ppp.", ".bb.......bbb"],
+              ["....aaaaa....", "...aawwwaa...", "...awwwwwa...", "...wkwwwkw...", "...wwwwwww...", "...wwwkwww...", "....wwwww....", ".....www.....", "...vvvvvvv...", "..vvvvvvvvv..", ".vvvVvvvVvvv.", ".vv.vvvvv.vv.", ".vv.vvvvv.vv.", ".vv.vVvVv.vv.", ".hh.vvvvv.hhn", "....vvvvv...s", "....ppppp...S", "....pp.pp....", "....pp.pp....", "....pp.pp....", "....bb.bbb..."]
+            ],
+            pose: ["....aaaaa....", "....aawwwaa..", "....awwwwwa..", "....wkwwwkw..", "....wwwwwww..", "....wwwkwww..", ".....wwwww...", ".....www.....", "...vvvvvvv...", "..vvvvvvvvv..", ".vvvVvvvVvvv.", ".vv.vvvvv.vv.", ".vv.vvvvv.vv.", ".vv.vVvVv.vv.", ".hh.vvvvv.hhn", "....vvvvv...s", "....ppppp...S", "....pp.pp....", "....pp.pp....", "....pp.pp....", "....bb.bbb..."],
+            speed: 30, step: 300, hold: 2400
+          },
+          ghostface: {
+            colors: { o: "#2a2a31", O: "#45454f", w: "#f2f2ef", k: "#121215", s: "#d6dbe2", S: "#f2f5f8", p: "#2a2a31", b: "#18181c" },
+            walk: [
+              ["....ooooo....", "...ooOOOoo...", "..ooowwwooo..", "..oowwwwwoo..", "..oowkwkwoo..", "..oowkwkwoo..", "..oowwwwwoo..", "..ooowkwooo..", "..ooowkwooo..", ".ooooowoooooo", "ooooOoooOoooo", "oo.ooooooo.oo", "oo.ooooooo.oo", "oo.oooOooo.oo", "oo.ooooooo.os", "...ooooooo..s", "...oooooooo..", "..o.oo.oo.o..", "...pp...pp...", "..pp.....pp..", ".bb.......bbb"],
+              ["....ooooo....", "...ooOOOoo...", "..ooowwwooo..", "..oowwwwwoo..", "..oowkwkwoo..", "..oowkwkwoo..", "..oowwwwwoo..", "..ooowkwooo..", "..ooowkwooo..", ".ooooowoooooo", "ooooOoooOoooo", "oo.ooooooo.oo", "oo.ooooooo.oo", "oo.oooOooo.oo", "oo.ooooooo.os", "...ooooooo..s", "...oooooooo..", "..o.oo.oo.o..", "....pp.pp....", "....pp.pp....", "....bb.bbb..."]
+            ],
+            pose: ["....ooooo....", "...ooOOOoo...", "..ooowwwooo..", "..oowwwwwoo..", "..oowkwkwoo..", "..oowkwkwoo..", "..oowwwwwoo..", "..ooowkwooo.S", "..ooowkwooo.s", ".ooooowooooos", "ooooOoooOoooo", "oo.ooooooo.oo", "oo.ooooooo.oo", "oo.oooOooo.oo", "oo.ooooooo.oo", "...ooooooo..s", "...oooooooo..", "..o.oo.oo.o..", "....pp.pp....", "....pp.pp....", "....bb.bbb..."],
+            speed: 48, step: 180, hold: 1500
+          },
+          chucky: {
+            colors: { r: "#d4471f", c: "#f0c8a0", e: "#3d6fe0", f: "#c98a62", C: "#a2503a", k: "#7a2a22", w: "#e8e8e8", R: "#c33030", b: "#3a5ab0", d: "#5274b0", s: "#d6dbe2", S: "#f2f5f8", p: "#5274b0", q: "#ece8e0" },
+            walk: [
+              ["...rrrrr...", "..rrrrrrr..", "..rcccccr..", "..cecccec..", "..cfcccfc..", "..ccCkCcc..", "...ccccc...", "..wRbRbRw..", ".wddddddw..", ".bdddddd.b.", ".cdddddd.cs", "..dddddd..S", "..dd..dd...", ".dd....dd..", ".qq....qqq."],
+              ["...rrrrr...", "..rrrrrrr..", "..rcccccr..", "..cecccec..", "..cfcccfc..", "..ccCkCcc..", "...ccccc...", "..wRbRbRw..", ".wddddddw..", ".bdddddd.b.", ".cdddddd.cs", "..dddddd..S", "..dd.dd....", "..dd.dd....", "..qq.qqq..."]
+            ],
+            pose: ["...rrrrr...", "..rrrrrrr..", "..rcccccr..", "..cecccec..", "..cfcccfc..", "..ccCkCcc..", "...ccccc...", "..wRbRbRwS.", ".wddddddcs.", ".bdddddd....", ".cdddddd....", "..dddddd....", "..dd.dd....", "..dd.dd....", "..qq.qqq..."],
+            speed: 56, step: 120, hold: 1800
+          }
+        };
+        const el = document.createElement("canvas");
+        el.className = "villain";
+        stage.appendChild(el);
+        const pen = el.getContext("2d"), wide = 13, tall = 21;
+        let ratio = 1, cell = 4, unit = 2, shown = null, bag = [], side = Math.random() < .5 ? -1 : 1, walker = null, last = 0, running = false;
+        const measure = () => {
+          ratio = Math.min(3, devicePixelRatio || 1);
+          cell = Math.max(2, Math.round((innerWidth <= 600 ? 2 : 2.2) * ratio));
+          unit = cell / ratio;
+          el.width = wide * cell;
+          el.height = tall * cell;
+          el.style.width = wide * unit + "px";
+          el.style.height = tall * unit + "px";
+          shown = null;
+        };
+        // One frame, standing on the bottom of the canvas, centred in it.
+        const paint = (who, frame) => {
+          if (shown === frame) return;
+          shown = frame;
+          const gap = cell >= 4 ? 1 : 0, left = Math.floor((wide - frame[0].length) / 2), top = tall - frame.length;
+          pen.clearRect(0, 0, el.width, el.height);
+          frame.forEach((line, row) => {
+            for (let col = 0; col < line.length; col++) {
+              const key = line[col];
+              if (key === ".") continue;
+              pen.fillStyle = who.colors[key];
+              pen.fillRect((left + col) * cell, (top + row) * cell, cell - gap, cell - gap);
+            }
+          });
+        };
+        const place = (x, floor, facing, lift) => {
+          el.style.transform = `translate3d(${(x - wide / 2 * unit).toFixed(1)}px, ${(floor - tall * unit - lift).toFixed(1)}px, 0) scaleX(${facing})`;
+        };
+        // The next to come on: through all five in a shuffled order, and
+        // from the other side from the last, most of the time.
+        const enter = () => {
+          if (!bag.length) bag = Object.keys(cast).sort(() => Math.random() - .5);
+          const who = cast[bag.pop()];
+          if (Math.random() < .8) side = -side;
+          const off = wide / 2 * unit + 6;
+          walker = { who, from: side < 0 ? -off : innerWidth + off, facing: side < 0 ? 1 : -1, stage: "in", stepped: 0, frame: 0, since: 0 };
+          walker.x = walker.from;
+          el.style.opacity = "1";
+          if (!running) { running = true; last = 0; requestAnimationFrame(walk); }
+        };
+        const walk = time => {
+          const dt = last ? Math.min(.05, (time - last) / 1000) : 1 / 60;
+          last = time;
+          const box = markBounds();
+          if (!walker || !box) { running = false; return; }
+          const { who } = walker;
+          // Quicker across a wider screen, so the walk never drags.
+          const pace = Math.min(2.2, Math.max(1, innerWidth / 600));
+          // Up to the pumpkin, stopping a step short of it.
+          const stop = walker.from < 0 ? box.left - 8 - wide / 2 * unit : box.right + 8 + wide / 2 * unit;
+          let lift = 0;
+          if (walker.stage === "pose") {
+            walker.since += dt * 1000;
+            paint(who, who.pose);
+            // Chucky can't keep still; he hops as he laughs.
+            if (who === cast.chucky) lift = Math.abs(Math.sin(walker.since / 1000 * 9)) * unit * 1.5;
+            if (walker.since > who.hold) {
+              walker.stage = "out";
+              walker.facing = -walker.facing;
+            }
+          } else {
+            const target = walker.stage === "in" ? stop : walker.from;
+            const way = Math.sign(target - walker.x), move = who.speed * pace * dt;
+            walker.x = Math.abs(target - walker.x) <= move ? target : walker.x + way * move;
+            walker.stepped += dt * 1000 * pace;
+            if (walker.stepped > who.step) { walker.stepped = 0; walker.frame = 1 - walker.frame; }
+            paint(who, who.walk[walker.frame]);
+            // Up a little as the legs pass each other.
+            lift = walker.frame ? unit : 0;
+            if (walker.x === target) {
+              if (walker.stage === "in") { walker.stage = "pose"; walker.since = 0; walker.facing = walker.from < 0 ? 1 : -1; }
+              else {
+                // Gone at the edge of the screen; the next comes a little later.
+                el.style.opacity = "0";
+                walker = null;
+                running = false;
+                setTimeout(enter, 1200 + Math.random() * 2200);
+                return;
+              }
+            }
+          }
+          place(walker.x, box.floor, walker.facing, lift);
+          requestAnimationFrame(walk);
+        };
+        addEventListener("resize", () => { measure(); if (calm.matches) standStill(); }, { passive: true });
+        // With reduced motion, Michael waits by the pumpkin instead.
+        const standStill = () => {
+          const box = markBounds();
+          if (!box) return;
+          paint(cast.michael, cast.michael.walk[1]);
+          place(box.left - 8 - wide / 2 * unit, box.floor, 1, 0);
+          el.style.opacity = "1";
+        };
+        measure();
+        if (calm.matches) standStill();
+        else setTimeout(enter, 1500);
       }
 
       const appSourceURL = "https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json";
