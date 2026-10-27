@@ -1493,7 +1493,7 @@
         else requestAnimationFrame(tick);
       }
 
-      // A storm outside. Every six seconds or so, lightning lights up the
+      // A storm outside. Every three seconds or so, lightning lights up the
       // page from the sky beyond it: a faint flicker, the flash, a restrike
       // or two and the light dying away, nearer and brighter some times than
       // others and striking somewhere new each time. The bats are caught as
@@ -1602,17 +1602,17 @@
           }
           // The thunder after it, sooner and harder the nearer it was.
           if (near > .25) rumble(near, 250 + (1 - near) * 1700);
-          setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(prepare, { timeout: 2000 }) : prepare()), duration + 200);
+          setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(prepare, { timeout: 500 }) : prepare()), duration + 200);
         };
         const weather = () => setTimeout(() => {
           if (!calm.matches && !document.hidden && !document.querySelector("dialog[open]")) strike();
           weather();
-        }, 4800 + Math.random() * 3200);
-        setTimeout(prepare, 1200);
+        }, 2000 + Math.random() * 2600);
+        setTimeout(prepare, 500);
         setTimeout(() => {
           if (!calm.matches && !document.hidden) strike();
           weather();
-        }, 2600);
+        }, 1600);
       }
 
       const appSourceURL = "https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json";
