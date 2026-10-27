@@ -8,7 +8,15 @@
   <meta property="og:title" content="Null’s Apps">
   <meta property="og:description" content="Lineup, Aether and NullSign for iPhone and Apple TV.">
   <title>Null’s Apps</title>
+  <link rel="preload" href="fonts/dots.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/dots-thick.woff2" as="font" type="font/woff2" crossorigin>
   <style>
+    /* The site's own dot-matrix type, built by fonts/dots.py: Dots for
+       everything, and Dots Thick, its strokes three rows of dots across, for
+       the big text. Dots are spaced by the letters themselves, so text is
+       never tracked tighter. */
+    @font-face { font-family: "Null Dots"; src: url("fonts/dots.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+    @font-face { font-family: "Null Dots Thick"; src: url("fonts/dots-thick.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
     :root {
       color-scheme: dark;
       --bg: #0a0a0b;
@@ -18,12 +26,13 @@
       --line-strong: rgba(255,255,255,.13);
       --text: #ececee;
       --text-body: #d2d2d6;
-      --text-2: #a3a3a9;
-      --text-3: #808087;
+      --text-2: #b0b0b6;
+      --text-3: #95959c;
       --accent: #f42e55;
       --focus: rgba(255,255,255,.75);
-      --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      --mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+      --sans: "Null Dots", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      --mono: "Null Dots", ui-monospace, Menlo, Consolas, monospace;
+      --thick: "Null Dots Thick", "Null Dots", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
@@ -47,18 +56,18 @@
 
     /* Header */
     .site-header { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-    .wordmark { font-size: 15px; font-weight: 600; letter-spacing: -.01em; text-decoration: none; }
+    .wordmark { font-size: 15px; font-weight: 600; text-decoration: none; }
     .site-nav { display: flex; gap: 24px; font-size: 14px; }
     .site-nav a { color: var(--text-2); text-decoration: none; transition: color .15s ease; }
     .site-nav a:hover { color: var(--text); }
 
     /* Intro */
     .intro { padding: 116px 0 64px; }
-    .intro h1 { max-width: 640px; margin: 0; font-size: clamp(32px, 5.2vw, 46px); font-weight: 600; line-height: 1.08; letter-spacing: -.035em; }
+    .intro h1 { max-width: 760px; margin: 0; font-family: var(--thick); font-size: clamp(30px, 5.2vw, 46px); font-weight: 600; line-height: 1.18; }
     .lede { max-width: 580px; margin: 18px 0 0; color: var(--text-2); font-size: 17px; line-height: 1.6; }
     .source { display: flex; align-items: stretch; max-width: 700px; height: 44px; margin-top: 36px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); }
     .source-label { display: flex; align-items: center; padding: 0 14px; border-right: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
-    .source-url { flex: 1 1 auto; min-width: 0; align-self: center; padding: 0 14px; overflow: hidden; color: var(--text); font: 13px var(--mono); white-space: nowrap; text-overflow: ellipsis; }
+    .source-url { flex: 1 1 auto; min-width: 0; align-self: center; padding: 0 14px; overflow: hidden; color: var(--text); font: 14px var(--mono); white-space: nowrap; text-overflow: ellipsis; }
     .copy-repo { display: inline-flex; align-items: center; gap: 8px; min-width: 96px; padding: 0 16px; border: 0; border-left: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s ease; }
     .copy-repo:hover { background: var(--raised); }
     .copy-repo:focus-visible { outline-offset: -3px; border-radius: 0 9px 9px 0; }
@@ -76,7 +85,7 @@
     .app-icon::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255,255,255,.09); }
     .app-icon img { display: block; width: 100%; height: 100%; object-fit: cover; }
     .app-title { margin-top: 18px; }
-    .app-name { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -.02em; }
+    .app-name { margin: 0; font-family: var(--thick); font-size: 26px; font-weight: 600; line-height: 1.2; }
     .app-kind { margin: 4px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.45; }
     .notes-button { display: inline-flex; align-items: center; gap: 7px; height: 32px; margin-top: 20px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
     .notes-button:hover { border-color: rgba(255,255,255,.22); background: var(--raised); }
@@ -84,7 +93,7 @@
     .app-summary { max-width: 62ch; margin: 0; color: var(--text-body); font-size: 16px; line-height: 1.65; }
     .features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; margin-top: 36px; }
     .feature { padding: 18px 0 22px; border-top: 1px solid var(--line); }
-    .feature h3 { margin: 0 0 6px; font-size: 14px; font-weight: 600; letter-spacing: -.005em; }
+    .feature h3 { margin: 0 0 6px; font-size: 14px; font-weight: 600; }
     .feature p { margin: 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
     .builds { margin-top: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
     .build { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 16px 18px; }
@@ -92,7 +101,7 @@
     .build-info { min-width: 0; }
     .build h3 { margin: 0; font-size: 15px; font-weight: 600; }
     .build-meta { display: flex; flex-wrap: wrap; gap: 0 8px; margin: 3px 0 0; color: var(--text-3); font-size: 13px; font-variant-numeric: tabular-nums; }
-    .build-meta .build-number { color: var(--text-2); font-family: var(--mono); font-size: 12.5px; }
+    .build-meta .build-number { color: var(--text-2); font-family: var(--mono); font-size: 13px; }
     .build-meta .sep { color: rgba(255,255,255,.2); }
     .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 8px; color: #0a0a0b; background: #ececee; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
     .download:hover { background: #fff; }
@@ -105,7 +114,7 @@
     .dialog-body { max-height: min(85dvh, 760px); overflow: auto; padding: 26px 28px 30px; overscroll-behavior: contain; }
     .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
     .dialog-kicker { margin: 0 0 2px; color: var(--text-2); font-size: 13px; }
-    .dialog-head h2 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+    .dialog-head h2 { margin: 0; font-family: var(--thick); font-size: 24px; font-weight: 600; }
     .dialog-close { display: grid; width: 32px; height: 32px; flex: 0 0 auto; margin: -4px -8px 0 0; place-items: center; border: 0; border-radius: 8px; color: var(--text-2); background: transparent; cursor: pointer; transition: background .15s ease, color .15s ease; }
     .dialog-close:hover { color: var(--text); background: var(--raised); }
     .dialog-close svg { width: 16px; height: 16px; }
@@ -113,7 +122,7 @@
     .release-build { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
     .release-build-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
     .release-build-head h3 { margin: 0; font-size: 15px; font-weight: 600; }
-    .release-build-version { color: var(--text-2); font: 12.5px var(--mono); text-align: right; }
+    .release-build-version { color: var(--text-2); font: 13px var(--mono); text-align: right; }
     .release-build-info { margin: 3px 0 0; color: var(--text-3); font-size: 13px; line-height: 1.5; }
     .release-list { margin: 14px 0 0; padding: 0; list-style: none; }
     .release-list li { position: relative; padding-left: 18px; color: var(--text-body); font-size: 14px; line-height: 1.6; }
@@ -168,7 +177,7 @@
       .app-side { position: static; flex-direction: row; align-items: center; gap: 14px; margin-bottom: 24px; }
       .app-icon { width: 48px; height: 48px; border-radius: 11px; }
       .app-title { min-width: 0; margin: 0; }
-      .app-name { font-size: 20px; }
+      .app-name { font-size: 24px; }
       .app-kind { margin-top: 2px; font-size: 13px; }
       .notes-button { margin: 0 0 0 auto; }
     }
