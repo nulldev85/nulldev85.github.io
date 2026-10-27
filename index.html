@@ -136,8 +136,8 @@
     .float-mark:active .mark-orb { transform: scale(.94); transition-duration: .08s; }
     .mark-glow { position: absolute; inset: -30% -95%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,255,255,.075), rgba(255,255,255,.025) 55%, transparent); opacity: calc(1 - var(--glass)); transition: opacity .3s ease; pointer-events: none; }
     .mark-scene { position: absolute; top: calc(50% - 2px); left: 50%; display: block; transform: translate(-50%, -50%); filter: drop-shadow(0 3px 8px rgba(0,0,0,.7)) drop-shadow(0 0 2px rgba(0,0,0,.6)); }
-    /* Bats along the top of the page, hanging from its edge. */
-    .bats { position: absolute; top: 0; left: 0; right: 0; z-index: 25; display: none; width: 100%; height: 150px; pointer-events: none; }
+    /* Bats along the top of the screen and under the mark. */
+    .bats { position: fixed; top: 0; left: 0; right: 0; z-index: 31; display: none; width: 100%; height: 320px; pointer-events: none; }
     .has-js .bats { display: block; }
     @media print { .float-mark, .bats { display: none; } }
 
@@ -384,6 +384,9 @@
         cards.forEach(card => observer.observe(card));
       } else cards.forEach(card => card.classList.add("is-visible"));
 
+      // Where bats can hang from the mark; filled in once it is drawn.
+      let markPerches = () => [];
+
       // The floating mark: a pixel Apple logo with a jack-o'-lantern on one
       // side and a ghost on the other, drawn once as lit pixels with a
       // hairline between them, like a screen seen up close.
@@ -462,6 +465,25 @@
           { art: ghost, x: 32, bottom: 15 }
         ];
         const columns = 43, rows = 16;
+        // Under each of the three: the run of pixels nearest the middle of its
+        // bottom row, in screen points.
+        markPerches = () => {
+          const box = canvas.getBoundingClientRect();
+          const ratio = Math.min(3, devicePixelRatio || 1);
+          const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 1.9;
+          const unit = Math.max(2, Math.round(pixel * ratio)) / ratio, pad = unit * 3;
+          return parts.map(part => {
+            const bottom = part.art[part.art.length - 1], runs = [];
+            let start = -1;
+            [...bottom, "."].forEach((key, col) => {
+              if (key !== "." && start < 0) start = col;
+              else if (key === "." && start >= 0) { runs.push((start + col - 1) / 2); start = -1; }
+            });
+            const middle = (bottom.length - 1) / 2;
+            const col = runs.sort((a, b) => Math.abs(a - middle) - Math.abs(b - middle))[0] ?? middle;
+            return { x: box.left + pad + (part.x + col + .5) * unit, y: box.top + pad + part.bottom * unit - 1 };
+          });
+        };
         let drawn = "";
         const draw = () => {
           const ratio = Math.min(3, devicePixelRatio || 1);
@@ -507,9 +529,12 @@
         follow();
       }
 
-      // Bats roosting along the top of the page, in the mark's pixels. Every
-      // few seconds one lets go, flaps over to the other side and hangs
-      // there instead. Frames are drawn only while one is in the air.
+      // Bats, in the mark's pixels. They hang from the top of the screen and
+      // from the pumpkin, the logo and the ghost, and every few seconds one
+      // lets go and flaps over to another perch. When the page scrolls, the
+      // ones along the top are carried with it for a moment and flap after
+      // you, so wherever you stop they hang from the top of the screen there.
+      // Frames are drawn only while one is on the move.
       const roost = document.querySelector(".bats");
       if (roost) {
         const pen = roost.getContext("2d");
@@ -557,15 +582,26 @@
           "w.............w"
         ];
         const colors = { w: "#51476a", b: "#64587c", f: "#786c90", e: "#ff6a57" };
-        let width = 0, ratio = 1, cell = 3, frame = 0, nextFlight = 0, nextStretch = 0;
         const bats = [];
+        let width = 0, ratio = 1, cell = 3, frame = 0, lastFrame = 0, nextFlight = 0, nextStretch = 0;
+        let underMark = [], lastScroll = Math.max(0, scrollY);
+        const pick = list => list[Math.floor(Math.random() * list.length)];
         const measure = () => {
           ratio = Math.min(3, devicePixelRatio || 1);
           cell = Math.max(2, Math.round((innerWidth <= 600 ? 2 : 2.2) * ratio));
           width = roost.offsetWidth;
           roost.width = Math.round(width * ratio);
           roost.height = Math.round(roost.offsetHeight * ratio);
+          underMark = markPerches();
         };
+        // Where a perch is on the screen: along the top edge, or under one
+        // of the mark's three.
+        const point = perch => perch.kind === "mark"
+          ? underMark[perch.index] || { x: width / 2, y: 0 }
+          : { x: perch.x * width, y: 0 };
+        const taken = (perch, except) => bats.some(bat => bat !== except && bat.perch.kind === perch.kind
+          && (perch.kind === "mark" ? bat.perch.index === perch.index
+                                    : Math.abs(bat.perch.x - perch.x) * width < 44));
         const sprite = (art, centre, top) => {
           const gap = cell >= 4 ? 1 : 0;
           const left = Math.round(centre - art[0].length * cell / 2), y = Math.round(top);
@@ -582,84 +618,120 @@
             }
           });
         };
-        // Returns whether any bat is still in the air.
-        const draw = time => {
+        const flapping = (time, bat) => Math.floor(time / 90 + bat.seed * 7) % 2 ? wingsDown : wingsUp;
+        // Returns whether any bat is still on the move.
+        const draw = (time, dt) => {
           pen.clearRect(0, 0, roost.width, roost.height);
-          let flying = false;
+          let moving = false;
           for (const bat of bats) {
+            // Catching up after a scroll: quick at first, never faster than
+            // a bat can fly, settling as it arrives.
+            if (bat.drag) {
+              const step = bat.drag * (1 - Math.exp(-dt * 3.2)), limit = 760 * dt;
+              bat.drag -= Math.max(-limit, Math.min(limit, step));
+              if (Math.abs(bat.drag) < .4) bat.drag = 0;
+              else moving = true;
+            }
             const flight = bat.flight;
             if (flight) {
               const t = Math.min(1, (time - flight.start) / flight.duration);
-              if (t >= 1) {
-                bat.x = flight.to;
-                bat.flight = null;
-              } else {
-                flying = true;
+              if (t < 1) {
+                moving = true;
                 // Across in a swoop, with a flutter that fades in and out.
-                const along = .5 - .5 * Math.cos(Math.PI * t);
-                const x = (flight.from + (flight.to - flight.from) * along) * width;
-                const y = 6 + flight.dip * Math.sin(Math.PI * t) + 4 * Math.sin(Math.PI * 5 * t) * Math.sin(Math.PI * t);
-                sprite(Math.floor((time - flight.start) / 90) % 2 ? wingsDown : wingsUp, x * ratio, y * ratio);
+                const along = .5 - .5 * Math.cos(Math.PI * t), end = point(bat.perch);
+                const x = flight.from.x + (end.x - flight.from.x) * along;
+                const y = flight.from.y + (end.y - flight.from.y) * along + 6 + flight.dip * Math.sin(Math.PI * t)
+                  + 4 * Math.sin(Math.PI * 5 * t) * Math.sin(Math.PI * t);
+                sprite(flapping(time - flight.start, bat), x * ratio, y * ratio);
                 continue;
               }
+              bat.flight = null;
             }
-            sprite(time < bat.stretchUntil ? stretching : hanging, bat.x * width * ratio, 0);
+            const at = point(bat.perch);
+            if (Math.abs(bat.drag) > 1.5) {
+              const flutter = Math.sin(time / 140 + bat.seed * 6) * 3;
+              sprite(flapping(time, bat), (at.x + flutter) * ratio, (at.y + 6 + bat.drag) * ratio);
+            } else {
+              sprite(time < bat.stretchUntil ? stretching : hanging, at.x * ratio, at.y * ratio);
+            }
           }
-          return flying;
+          return moving;
         };
-        const fly = time => {
-          const flying = draw(time);
-          frame = flying ? requestAnimationFrame(fly) : 0;
-          if (!flying) schedule();
+        const tick = time => {
+          const dt = lastFrame ? Math.min(.05, (time - lastFrame) / 1000) : 1 / 60;
+          lastFrame = time;
+          frame = draw(time, dt) ? requestAnimationFrame(tick) : 0;
+          if (!frame) lastFrame = 0;
         };
-        const away = () => document.hidden || scrollY > roost.offsetHeight;
+        const wake = () => { if (!frame) frame = requestAnimationFrame(tick); };
+        const launch = () => {
+          schedule();
+          const resting = bats.filter(bat => !bat.flight && !bat.drag);
+          if (document.hidden || !resting.length) return;
+          const bat = pick(resting);
+          // To a free spot under the mark now and then; otherwise somewhere
+          // along the top on the other side, clear of the others.
+          const free = underMark.map((_, index) => ({ kind: "mark", index })).filter(perch => !taken(perch, bat));
+          let to = null;
+          if (bat.perch.kind === "edge" && free.length && Math.random() < .45) to = pick(free);
+          else {
+            const [low, high] = point(bat.perch).x / width < .5 ? [.55, .95] : [.05, .45];
+            for (let tries = 0; tries < 12 && !to; tries++) {
+              const perch = { kind: "edge", x: low + Math.random() * (high - low) };
+              if (!taken(perch, bat)) to = perch;
+            }
+          }
+          if (!to) return;
+          const from = point(bat.perch), end = point(to);
+          const distance = Math.hypot(end.x - from.x, end.y - from.y);
+          bat.perch = to;
+          bat.flight = { from, start: performance.now(), dip: 30 + Math.random() * 40,
+                         duration: Math.min(3400, Math.max(1300, distance / .28)) };
+          wake();
+        };
         const schedule = () => {
           clearTimeout(nextFlight);
           if (!still.matches) nextFlight = setTimeout(launch, 2200 + Math.random() * 3800);
-        };
-        const launch = () => {
-          const resting = bats.filter(bat => !bat.flight);
-          if (away() || !resting.length) return schedule();
-          const bat = resting[Math.floor(Math.random() * resting.length)];
-          // Somewhere on the other side, clear of the others.
-          const [low, high] = bat.x < .5 ? [.55, .95] : [.05, .45];
-          let to = null;
-          for (let tries = 0; tries < 12 && to === null; tries++) {
-            const pick = low + Math.random() * (high - low);
-            if (bats.every(other => other === bat
-                || Math.abs((other.flight ? other.flight.to : other.x) - pick) * width > 44)) to = pick;
-          }
-          if (to === null) return schedule();
-          const distance = Math.abs(to - bat.x) * width;
-          bat.flight = { from: bat.x, to, start: performance.now(), dip: 34 + Math.random() * 46,
-                         duration: Math.min(3400, Math.max(1500, distance / .28)) };
-          if (!frame) frame = requestAnimationFrame(fly);
         };
         // Now and then one stretches its wings where it hangs.
         const stretch = () => {
           clearTimeout(nextStretch);
           if (still.matches) return;
           nextStretch = setTimeout(() => {
-            const resting = bats.filter(bat => !bat.flight);
-            if (!away() && resting.length) {
-              const bat = resting[Math.floor(Math.random() * resting.length)];
-              bat.stretchUntil = performance.now() + 420;
+            const resting = bats.filter(bat => !bat.flight && !bat.drag);
+            if (!document.hidden && resting.length) {
+              pick(resting).stretchUntil = performance.now() + 420;
               if (!frame) {
-                draw(performance.now());
-                setTimeout(() => { if (!frame) draw(performance.now()); }, 440);
+                draw(performance.now(), 0);
+                setTimeout(() => { if (!frame) draw(performance.now(), 0); }, 440);
               }
             }
             stretch();
           }, 1600 + Math.random() * 3400);
         };
+        addEventListener("scroll", () => {
+          const y = Math.min(Math.max(0, scrollY), document.documentElement.scrollHeight - innerHeight);
+          const delta = y - lastScroll;
+          lastScroll = y;
+          if (!delta || still.matches) return;
+          // The ones along the top go with the page; those on the mark hold on.
+          for (const bat of bats) {
+            if (!bat.flight && bat.perch.kind === "edge") bat.drag = Math.max(-170, Math.min(240, bat.drag - delta));
+          }
+          wake();
+        }, { passive: true });
+        addEventListener("resize", () => { measure(); if (!frame) draw(performance.now(), 0); }, { passive: true });
+
         measure();
-        const count = width <= 600 ? 3 : 5;
-        for (let i = 0; i < count; i++) {
-          bats.push({ x: Math.min(.96, Math.max(.04, (i + .5) / count + (Math.random() - .5) * .1)),
-                      flight: null, stretchUntil: 0 });
+        // One under each of the mark's three, the rest spread along the top.
+        underMark.forEach((_, index) => bats.push({ perch: { kind: "mark", index } }));
+        const along = width <= 600 ? 2 : 3;
+        for (let i = 0; i < along; i++) {
+          const x = (i + .5) / along + (Math.random() - .5) * .12;
+          bats.push({ perch: { kind: "edge", x: Math.min(.95, Math.max(.05, x)) } });
         }
-        draw(performance.now());
-        addEventListener("resize", () => { measure(); if (!frame) draw(performance.now()); }, { passive: true });
+        bats.forEach(bat => Object.assign(bat, { flight: null, drag: 0, stretchUntil: 0, seed: Math.random() }));
+        draw(performance.now(), 0);
         schedule();
         stretch();
       }
