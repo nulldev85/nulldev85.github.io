@@ -160,7 +160,21 @@
     .has-js .webs { display: block; }
     .web, .spider { position: fixed; z-index: 24; display: block; pointer-events: none; }
     .web, .spider { top: 0; right: 0; transform: scaleX(-1); }
-    @media print { .float-mark, .bats, .webs { display: none; } }
+    /* The storm: the bolt behind the page, its light over it but under the
+       bats, the ghosts, the web and the mark. */
+    .storm { display: none; }
+    .has-js .storm { display: block; }
+    .storm-bolt, .storm-flash { position: fixed; top: 0; left: 0; display: block; height: 100%; pointer-events: none; opacity: 0; will-change: opacity; }
+    .storm-bolt { z-index: -1; width: 100%; }
+    /* Twice the screen's width, its light centred, so a strike anywhere is
+       the same layer moved along rather than painted again. */
+    .storm-flash { z-index: 23; width: 200%; will-change: opacity, transform;
+      background: radial-gradient(65% 95% at 50% -12%, rgba(206, 218, 255, .36), rgba(186, 202, 255, .17) 45%, rgba(170, 186, 245, .07) 80%, rgba(160, 176, 235, .04)); }
+    @media (prefers-reduced-motion: reduce) { .storm { display: none !important; } }
+    /* The page and its header are shaken by the thunder; kept on their own
+       layers, the shaking moves them without painting them again. */
+    @media (prefers-reduced-motion: no-preference) { .has-js main, .has-js .site-header { will-change: transform; } }
+    @media print { .float-mark, .bats, .webs, .storm { display: none; } }
 
     /* Motion */
     .has-js [data-project-card] { opacity: 0; transform: translateY(10px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
@@ -203,6 +217,7 @@
   </style>
 </head>
 <body>
+  <div class="storm" aria-hidden="true" data-storm><canvas class="storm-bolt"></canvas><div class="storm-flash"></div></div>
   <div class="webs" aria-hidden="true" data-webs></div>
   <div class="bats" aria-hidden="true" data-bats><div class="bats-page"></div><div class="bats-screen"></div></div>
   <header class="site-header wrap">
@@ -1476,6 +1491,120 @@
         for (const web of webs) spin(web, now);
         if (calm.matches) for (const spider of spiders) crawl(spider, now);
         else requestAnimationFrame(tick);
+      }
+
+      // A storm outside. Every six seconds or so, lightning lights up the
+      // page from the sky beyond it: a faint flicker, the flash, a restrike
+      // or two and the light dying away, nearer and brighter some times than
+      // others and striking somewhere new each time. The bats are caught as
+      // black shapes against it, a near strike shows its bolt behind the
+      // page, and the thunder that follows gives the page a small rumble,
+      // later and softer the further away it struck. The light never changes
+      // the page's brightness by as much as a hazardous flash would, and with
+      // reduced motion there is no storm. It all runs as Web Animations, off
+      // the main thread, so scrolling stays smooth through it.
+      const storm = document.querySelector("[data-storm]");
+      if (storm && storm.animate) {
+        const calm = matchMedia("(prefers-reduced-motion: reduce)");
+        const flash = storm.querySelector(".storm-flash"), bolt = storm.querySelector(".storm-bolt");
+        const pen = bolt.getContext("2d");
+        // A jagged channel down from the sky, forking now and then; each fork
+        // thinner and shorter than what it left.
+        const channel = (paths, x, y, angle, length, width, forks) => {
+          const points = [[x, y]];
+          let travelled = 0;
+          while (travelled < length) {
+            const step = 10 + Math.random() * 22;
+            angle += (Math.random() - .5) * .9;
+            angle += (Math.PI / 2 - angle) * .25;
+            x += Math.cos(angle) * step;
+            y += Math.sin(angle) * step;
+            travelled += step;
+            points.push([x, y]);
+            if (forks > 0 && Math.random() < .09) {
+              channel(paths, x, y, angle + (Math.random() < .5 ? -1 : 1) * (.4 + Math.random() * .5), (length - travelled) * (.3 + Math.random() * .3), width * .55, forks - 1);
+            }
+          }
+          paths.push({ points, width });
+          return paths;
+        };
+        // Drawn ahead of its strike, so the strike itself costs nothing: a
+        // wide faint glow, a closer one, and the white-hot channel.
+        const drawBolt = across => {
+          if (bolt.width !== innerWidth || bolt.height !== innerHeight) {
+            bolt.width = innerWidth;
+            bolt.height = innerHeight;
+          } else pen.clearRect(0, 0, bolt.width, bolt.height);
+          pen.lineCap = pen.lineJoin = "round";
+          const paths = channel([], innerWidth * across, -10, Math.PI / 2 + (Math.random() - .5) * .5, innerHeight * (.45 + Math.random() * .35), 2.4, 4);
+          for (const [spread, color] of [[7, "rgba(150, 180, 255, .07)"], [3, "rgba(185, 205, 255, .22)"], [1, "rgba(240, 245, 255, .95)"]]) {
+            pen.strokeStyle = color;
+            for (const { points, width } of paths) {
+              pen.lineWidth = width * spread;
+              pen.beginPath();
+              points.forEach(([px, py], i) => (i ? pen.lineTo(px, py) : pen.moveTo(px, py)));
+              pen.stroke();
+            }
+          }
+        };
+        // The thunder: the page shaken by a pixel or two, dying away.
+        const rumble = (strength, delay) => {
+          const shake = [], beats = 12;
+          for (let i = 0; i <= beats; i++) {
+            const size = i === beats ? 0 : Math.round((1 + 1.4 * strength) * (1 - i / beats) * (Math.random() < .5 ? -1 : 1));
+            shake.push({ transform: `translate(${size}px, ${Math.round(size * (Math.random() - .5))}px)` });
+          }
+          for (const part of document.querySelectorAll(".site-header, main")) {
+            part.animate(shake, { duration: 700 + 500 * strength, delay, easing: "linear" });
+          }
+        };
+        // Each strike is worked out, and its bolt drawn, while the last one's
+        // light is still fading, ready to go.
+        let coming = null;
+        const prepare = () => {
+          const near = Math.random(), strength = .45 + .55 * near, across = .12 + Math.random() * .76;
+          // A flicker first, sometimes; the flash; then a restrike or two,
+          // each weaker; then the light dies away.
+          const beats = [[0, 0]];
+          let at = 0;
+          if (Math.random() < .7) beats.push([at += .04, .3], [at += .04, .05]);
+          beats.push([at += .05, 1], [at += .09, .32]);
+          for (let again = Math.floor(Math.random() * 3), level = .75; again > 0; again--, level *= .7) {
+            beats.push([at += .05, level], [at += .08, level * .35]);
+          }
+          beats.push([Math.min(.8, at + .22), .1], [1, 0]);
+          if (near > .45) drawBolt(across);
+          coming = { near, strength, across, beats, duration: 1000 + 400 * near };
+        };
+        const strike = () => {
+          if (!coming) prepare();
+          const { near, strength, across, beats, duration } = coming;
+          coming = null;
+          // Light from the sky above where it struck, washing down the page:
+          // a cold white, kept within a safe change of brightness.
+          flash.style.transform = `translateX(${((across - 1) * innerWidth).toFixed(1)}px)`;
+          flash.animate(beats.map(([offset, light]) => ({ offset, opacity: light * strength })), { duration, easing: "linear" });
+          // The bats, black against it.
+          for (const bat of document.querySelectorAll(".bat")) {
+            bat.animate(beats.map(([offset, light]) => ({ offset, filter: `brightness(${(1 - .62 * light * strength).toFixed(3)})` })), { duration, easing: "linear" });
+          }
+          // Near, its bolt shows behind the page while the flash is brightest.
+          if (near > .45) {
+            bolt.animate(beats.map(([offset, light]) => ({ offset, opacity: light > .5 ? Math.min(1, light * 1.1) : light * .3 })), { duration, easing: "linear" });
+          }
+          // The thunder after it, sooner and harder the nearer it was.
+          if (near > .25) rumble(near, 250 + (1 - near) * 1700);
+          setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(prepare, { timeout: 2000 }) : prepare()), duration + 200);
+        };
+        const weather = () => setTimeout(() => {
+          if (!calm.matches && !document.hidden && !document.querySelector("dialog[open]")) strike();
+          weather();
+        }, 4800 + Math.random() * 3200);
+        setTimeout(prepare, 1200);
+        setTimeout(() => {
+          if (!calm.matches && !document.hidden) strike();
+          weather();
+        }, 2600);
       }
 
       const appSourceURL = "https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json";
