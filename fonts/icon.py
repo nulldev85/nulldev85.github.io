@@ -1,12 +1,13 @@
-"""Draws the Null's Apps icon: the site font's N, lit on a board of dots.
+"""Draws the Null's Apps icon: the site's name in its dot font, lit on a board
+of dots.
 
     pip install pillow fonttools
     python3 fonts/icon.py [more 1024-pixel copies...]
 
-The N is the font's own capital, five dots wide and seven tall, on a grid of
-unlit dots that carries on to the edges. The square is left unrounded, as
-iOS and the signing apps round it themselves; only the browser tab's copy
-gets its corners rounded here.
+"Null's" over "Apps", in the font's own letters, on a grid of unlit dots that
+carries on to the edges. The square is left unrounded, as iOS and the
+signing apps round it themselves; only the browser tab's copy gets its
+corners rounded here.
 
   assets/apple-touch-icon.png  180 pixels, for a phone's Home Screen
   assets/favicon.png            64 pixels, for the browser tab
@@ -27,35 +28,52 @@ SPEC = importlib.util.spec_from_file_location("dots", HERE / "dots.py")
 dots = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(dots)
 
+LINES = ["Null's", "Apps"]
+LINE_GAP = 2                     # empty rows between the lines
 BACKGROUND = (10, 10, 11)        # the site's --bg
 LIT = (236, 236, 238)            # the site's --text
 UNLIT = (255, 255, 255, 18)
 GLOW = (90, 90, 92)
 RADIUS = .36                     # of the distance from one dot to the next
-HEIGHT = .62                     # of the square, taken up by the N
+SPAN = .7                        # of the square, taken up by the longer side of the lettering
+
+
+def lettering(text):
+    """The lit points of a line, (row, column), from its top left."""
+    points, across = set(), 0
+    for letter in text:
+        lit, width = dots.points(letter)
+        points |= {(r, c + across) for r, c in lit}
+        across += width + 1
+    top = min(r for r, _ in points)
+    return {(r - top, c) for r, c in points}
 
 
 def draw(size, supersample=4):
-    lit, width = dots.points("N")
-    rows = [r for r, _ in lit]
-    tall = max(rows) - min(rows) + 1
+    lines = [lettering(text) for text in LINES]
+    widths = [max(c for _, c in line) + 1 for line in lines]
+    heights = [max(r for r, _ in line) + 1 for line in lines]
+    wide = max(widths)
+    tall = sum(heights) + LINE_GAP * (len(lines) - 1)
     side = size * supersample
-    pitch = side * HEIGHT / tall
-    left = (side - width * pitch) / 2 + pitch / 2
+    pitch = side * SPAN / max(wide, tall)
+    left = (side - wide * pitch) / 2 + pitch / 2
     top = (side - tall * pitch) / 2 + pitch / 2
-    centres = [(left + c * pitch, top + (r - min(rows)) * pitch) for r, c in lit]
+    centres, down = [], 0
+    for line, width, height in zip(lines, widths, heights):
+        shift = (wide - width) // 2   # whole columns, so each line stays on the grid
+        centres += [(left + (c + shift) * pitch, top + (r + down) * pitch) for r, c in line]
+        down += height + LINE_GAP
     radius = pitch * RADIUS
 
     image = Image.new("RGB", (side, side), BACKGROUND)
 
-    # The unlit dots share the N's grid, out to the edges.
+    # The unlit dots share the lettering's grid, out to the edges.
     board = Image.new("RGBA", (side, side), (0, 0, 0, 0))
     pen = ImageDraw.Draw(board)
-    first_x = left - math.floor(left / pitch) * pitch
-    first_y = top - math.floor(top / pitch) * pitch
-    y = first_y
+    y = top - math.floor(top / pitch) * pitch
     while y < side:
-        x = first_x
+        x = left - math.floor(left / pitch) * pitch
         while x < side:
             pen.ellipse((x - radius, y - radius, x + radius, y + radius), fill=UNLIT)
             x += pitch
