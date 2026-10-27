@@ -395,16 +395,22 @@
         const canvas = mark.querySelector(".mark-scene");
         const pen = canvas.getContext("2d");
         const pumpkin = [
-          ".......g.....",
-          "......gg.....",
-          "..odoodoodo..",
-          ".ohdoodoodoo.",
-          "ohooyodoyoooo",
-          "ohoyyydyyyooo",
-          "ooooooyoooooo",
-          "oooyyoyoyyooo",
-          ".oooyyyyyooo.",
-          "..odoodoodo.."
+          "........g......",
+          ".......gg......",
+          ".......g.ll....",
+          "....ooodooo....",
+          "..oodoodoodoo..",
+          ".ohodoodoodooo.",
+          "ohhodoodoodoooo",
+          "ohooyoodooyoooo",
+          "ohoyyyodoyyyooo",
+          "oooodooyoodoooo",
+          "oooodoodoodoooo",
+          "oooyyoyyyoyyooo",
+          "ooooyyyoyyyoooo",
+          ".ooodoyyyodooo.",
+          "..oodoodoodoo..",
+          "....ooodooo...."
         ];
         const ghost = [
           "...wwwww...",
@@ -420,7 +426,7 @@
           "wwwwwwwwwws",
           "ww.ww.ww.ws"
         ];
-        const colors = { o: "#f7841e", d: "#c65a10", h: "#ffb257", y: "#fff1a8", g: "#4f8f2a",
+        const colors = { o: "#f7841e", d: "#c65a10", h: "#ffb257", y: "#fff1a8", g: "#4f8f2a", l: "#6fb83a",
                          w: "#f3f5fa", s: "#c3c9d6", k: "#1d2027" };
         // The logo, sampled onto a grid 16 pixels tall: a pixel is lit when
         // the logo covers most of it.
@@ -458,13 +464,14 @@
             return `rgb(${from.map((value, index) => Math.round(value + (to[index] - value) * mix)).join(",")})`;
           };
         })();
-        // Side by side on one baseline, the ghost hovering a pixel above it.
+        // Side by side on one baseline, the pumpkin as tall as the logo and
+        // the ghost hovering a pixel above it.
         const parts = [
           { art: pumpkin, x: 0, bottom: 16 },
-          { art: logo, x: 16, bottom: 16, metal: true },
-          { art: ghost, x: 32, bottom: 15 }
+          { art: logo, x: 18, bottom: 16, metal: true },
+          { art: ghost, x: 34, bottom: 15 }
         ];
-        const columns = 43, rows = 16;
+        const columns = 45, rows = 16;
         // Under each of the three: the run of pixels nearest the middle of its
         // bottom row, in screen points.
         markPerches = () => {
@@ -497,6 +504,9 @@
           canvas.height = rows * cell + pad * 2;
           canvas.style.width = canvas.width / ratio + "px";
           canvas.style.height = canvas.height / ratio + "px";
+          // The logo stays centred on the mark, whatever sits either side.
+          const logoMiddle = parts[1].x + parts[1].art[0].length / 2;
+          canvas.style.marginLeft = (columns / 2 - logoMiddle) * cell / ratio + "px";
           for (const part of parts) {
             const top = part.bottom - part.art.length;
             part.art.forEach((line, row) => [...line].forEach((key, col) => {
