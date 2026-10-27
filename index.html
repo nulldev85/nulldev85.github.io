@@ -129,7 +129,7 @@
     /* Floating mark: a pixel Apple logo between a jack-o'-lantern and a
        ghost. It rests between the header and the headline and stays there
        as the page moves under it. */
-    .float-mark { --mark-size: 56px; --pixel: 1.9px; --glass: 0; position: fixed; top: 86px; left: 50%; z-index: 30; display: none; width: var(--mark-size); height: var(--mark-size); margin-left: calc(var(--mark-size) / -2); border-radius: 50%; color: inherit; -webkit-tap-highlight-color: transparent; }
+    .float-mark { --mark-size: 56px; --pixel: 2.4px; --glass: 0; position: fixed; top: 86px; left: 50%; z-index: 30; display: none; width: var(--mark-size); height: var(--mark-size); margin-left: calc(var(--mark-size) / -2); border-radius: 50%; color: inherit; -webkit-tap-highlight-color: transparent; }
     .has-js .float-mark { display: block; }
     .float-mark:focus-visible { outline: none; }
     .float-mark:focus-visible .mark-orb { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus); }
@@ -144,7 +144,8 @@
     .bats-page, .bats-screen { top: 0; left: 0; width: 0; height: 0; pointer-events: none; }
     .bats-page { position: absolute; z-index: 25; }
     .bats-screen { position: fixed; z-index: 31; }
-    .bat { position: absolute; top: 0; left: 0; display: block; pointer-events: none; will-change: transform; }
+    .bat, .spirit { position: absolute; top: 0; left: 0; display: block; pointer-events: none; will-change: transform; }
+    .spirit { opacity: 0; filter: drop-shadow(0 0 6px rgba(205, 220, 255, .45)); }
     @media print { .float-mark, .bats { display: none; } }
 
     /* Motion */
@@ -165,7 +166,7 @@
       .wrap { width: calc(100% - 32px); }
       .site-nav { gap: 18px; }
       .intro { padding: 84px 0 44px; }
-      .float-mark { --mark-size: 48px; --pixel: 1.7px; top: 74px; }
+      .float-mark { --mark-size: 48px; --pixel: 2.1px; top: 74px; }
       .lede { font-size: 16px; }
       .source-label { display: none; }
       .features { grid-template-columns: minmax(0, 1fr); margin-top: 28px; }
@@ -416,20 +417,6 @@
           "..oodoodoodoo..",
           "....ooodooo...."
         ];
-        const ghost = [
-          "...wwwww...",
-          "..wwwwwws..",
-          ".wwwwwwwws.",
-          "wwwwwwwwwws",
-          "wwkkwwwkkws",
-          "wwkkwwwkkws",
-          "wwwwwwwwwws",
-          "wwwwwkwwwws",
-          "wwwwwkwwwws",
-          "wwwwwwwwwws",
-          "wwwwwwwwwws",
-          "ww.ww.ww.ws"
-        ];
         const colors = { o: "#f7841e", d: "#c65a10", h: "#ffb257", y: "#fff1a8", g: "#4f8f2a", l: "#6fb83a",
                          w: "#f3f5fa", s: "#c3c9d6", k: "#1d2027" };
         // The logo, sampled onto a grid 16 pixels tall: a pixel is lit when
@@ -468,21 +455,21 @@
             return `rgb(${from.map((value, index) => Math.round(value + (to[index] - value) * mix)).join(",")})`;
           };
         })();
-        // Side by side on one baseline, the pumpkin as tall as the logo and
-        // the ghost hovering a pixel above it.
+        // Side by side on one baseline, the pumpkin as tall as the logo, the
+        // pair centred on the mark. The margin leaves room for the
+        // pumpkin's light to spill out.
         const parts = [
           { art: pumpkin, x: 0, bottom: 16 },
-          { art: logo, x: 18, bottom: 16, metal: true },
-          { art: ghost, x: 34, bottom: 15 }
+          { art: logo, x: 18, bottom: 16, metal: true }
         ];
-        const columns = 45, rows = 16;
-        // Under each of the three: the run of pixels nearest the middle of its
+        const columns = 31, rows = 16, margin = 6;
+        // Under each of the two: the run of pixels nearest the middle of its
         // bottom row, in screen points.
         markPerches = () => {
           const box = canvas.getBoundingClientRect();
           const ratio = Math.min(3, devicePixelRatio || 1);
-          const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 1.9;
-          const unit = Math.max(2, Math.round(pixel * ratio)) / ratio, pad = unit * 3;
+          const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 2.4;
+          const unit = Math.max(2, Math.round(pixel * ratio)) / ratio, pad = unit * margin;
           return parts.map(part => {
             const bottom = part.art[part.art.length - 1], runs = [];
             let start = -1;
@@ -507,28 +494,25 @@
         };
         const rgb = hex => [1, 3, 5].map(at => parseInt(hex.slice(at, at + 2), 16));
         const mix = (from, to, amount) => `rgb(${from.map((value, index) => Math.round(value + (to[index] - value) * amount)).join(",")})`;
-        const warm = [255, 214, 140], ember = [255, 150, 40], flare = [255, 246, 190];
+        const warm = [255, 214, 140], ember = [255, 192, 84], flare = [255, 248, 200];
         // The stem is drawn once, here. The pumpkin, the logo and the ghost
         // are drawn over it every frame: the candle breathing inside the
-        // pumpkin, a shine crossing the logo, the ghost drifting.
+        // pumpkin and a shine crossing the logo.
         const base = document.createElement("canvas"), basePen = base.getContext("2d");
         let drawn = "", scene = null;
         const draw = () => {
           const ratio = Math.min(3, devicePixelRatio || 1);
-          const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 1.9;
+          const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 2.4;
           const cell = Math.max(2, Math.round(pixel * ratio));
           const key = ratio + "|" + cell;
           if (key === drawn) return;
           drawn = key;
-          const gap = cell >= 4 ? 1 : 0, pad = cell * 3;
+          const gap = cell >= 4 ? 1 : 0, pad = cell * margin;
           canvas.width = base.width = columns * cell + pad * 2;
           canvas.height = base.height = rows * cell + pad * 2;
           canvas.style.width = canvas.width / ratio + "px";
           canvas.style.height = canvas.height / ratio + "px";
-          // The logo stays centred on the mark, whatever sits either side.
-          const logoMiddle = parts[1].x + parts[1].art[0].length / 2;
-          canvas.style.marginLeft = (columns / 2 - logoMiddle) * cell / ratio + "px";
-          scene = { cell, gap, ratio, skin: [], face: [], apple: [], ghost: [],
+          scene = { cell, gap, ratio, skin: [], face: [], apple: [],
                     middle: { x: pad + (parts[0].x + 7.5) * cell, y: pad + 10 * cell } };
           for (const part of parts) {
             const top = part.bottom - part.art.length;
@@ -542,8 +526,6 @@
               } else if (part.metal) {
                 scene.apple.push({ x, y, along: col + row * .6,
                                    rgb: metal(row / (part.art.length - 1)).match(/\d+/g).map(Number) });
-              } else if (part.art === ghost) {
-                scene.ghost.push({ x, y, col, row, fill: colors[key] });
               } else {
                 basePen.fillStyle = colors[key];
                 basePen.fillRect(x, y, cell - gap, cell - gap);
@@ -558,25 +540,27 @@
           const { cell, gap, ratio } = scene, size = cell - gap, t = time / 1000, moving = !calm.matches;
           const glow = moving ? flame(time) : .8;
           // The light inside swells and settles, slower than the flicker.
-          const breath = moving ? .7 + .3 * Math.sin(t * 2.2) * Math.sin(t * .7 + .4) + .1 * Math.sin(t * 1.3) : .85;
+          const breath = moving ? .35 + .65 * (.5 + .5 * (.6 * Math.sin(t * 1.9) + .4 * Math.sin(t * .83 + 1.2))) : .85;
           pen.clearRect(0, 0, canvas.width, canvas.height);
           // Light through the skin, spilling a little way out around it.
-          const aura = pen.createRadialGradient(scene.middle.x, scene.middle.y, cell, scene.middle.x, scene.middle.y, cell * 11);
-          aura.addColorStop(0, `rgba(255, 150, 50, ${(.26 * glow * breath).toFixed(3)})`);
-          aura.addColorStop(1, "rgba(255, 120, 40, 0)");
+          const reach = cell * 13, strength = .62 * glow * breath;
+          const aura = pen.createRadialGradient(scene.middle.x, scene.middle.y, cell, scene.middle.x, scene.middle.y, reach);
+          aura.addColorStop(0, `rgba(255, 160, 60, ${strength.toFixed(3)})`);
+          aura.addColorStop(.45, `rgba(255, 130, 40, ${(strength * .4).toFixed(3)})`);
+          aura.addColorStop(1, "rgba(255, 110, 30, 0)");
           pen.fillStyle = aura;
-          pen.fillRect(scene.middle.x - cell * 11, scene.middle.y - cell * 11, cell * 22, cell * 22);
+          pen.fillRect(scene.middle.x - reach, scene.middle.y - reach, reach * 2, reach * 2);
           pen.drawImage(base, 0, 0);
           // The skin warms nearest the face as the flame rises.
           for (const spot of scene.skin) {
-            pen.fillStyle = mix(spot.rgb, warm, spot.near * glow * (.18 + .24 * breath));
+            pen.fillStyle = mix(spot.rgb, warm, spot.near * spot.near * glow * (.1 + .26 * breath));
             pen.fillRect(spot.x, spot.y, size, size);
           }
           // The carved face, lit from inside, its light spilling out.
-          pen.shadowColor = `rgba(255, ${Math.round(140 + 60 * glow)}, 50, ${(.3 + .6 * glow * breath).toFixed(3)})`;
-          pen.shadowBlur = cell * (1 + 1.8 * glow * breath);
+          pen.shadowColor = `rgba(255, ${Math.round(140 + 60 * glow)}, 50, ${Math.min(1, .45 + .55 * glow * breath).toFixed(3)})`;
+          pen.shadowBlur = cell * (1 + 2.2 * glow * breath);
           for (const spot of scene.face) {
-            pen.fillStyle = mix(ember, flare, Math.min(1, glow * (.78 + .22 * spot.near) * (.85 + .15 * breath)));
+            pen.fillStyle = mix(ember, flare, Math.min(1, glow * (.7 + .3 * spot.near) * (.55 + .45 * breath)));
             pen.fillRect(spot.x, spot.y, size, size);
           }
           pen.shadowBlur = 0;
@@ -588,20 +572,6 @@
             pen.fillStyle = mix(spot.rgb, [255, 255, 255], shine);
             pen.fillRect(spot.x, spot.y, size, size);
           }
-          // The ghost drifts: it rises and sinks, sways, its hem ripples and
-          // it is never quite solid.
-          const rise = moving ? Math.sin(t * 1.6) * 1.4 * ratio : 0, sway = moving ? Math.sin(t * .8) * .8 * ratio : 0;
-          pen.globalAlpha = moving ? .88 + .08 * Math.sin(t * 2.4) : .94;
-          for (const spot of scene.ghost) {
-            // Below the face, each row of the hem sways a little more than
-            // the one above, like cloth; the tips at the bottom lift and drop.
-            const hem = moving && spot.row >= 9 ? (spot.row - 8) / 3 : 0;
-            const x = spot.x + sway + hem * Math.sin(t * 3.1 - spot.row * .9) * .55 * cell;
-            const y = spot.y + rise + (moving && spot.row === 11 ? Math.sin(t * 3.4 + spot.col * .9) * .3 * cell : 0);
-            pen.fillStyle = spot.fill;
-            pen.fillRect(Math.round(x), Math.round(y), size, size);
-          }
-          pen.globalAlpha = 1;
         };
         const candle = time => {
           light(time);
@@ -680,6 +650,18 @@
           "ww.ww.....ww.ww",
           "w.............w"
         ];
+        const wingsLevel = [
+          "...............",
+          ".....b...b.....",
+          "w....bbbbb....w",
+          "wwwwwbebebwwwww",
+          ".wwwwwbbbwwwww.",
+          "..ww..bbb..ww..",
+          "..............."
+        ];
+        // Up, level, down, level: each beat lifts the body a little on the
+        // downstroke.
+        const beats = [[wingsUp, .9], [wingsLevel, 0], [wingsDown, -1.1], [wingsLevel, 0]];
         const colors = { w: "#51476a", b: "#64587c", f: "#786c90", e: "#ff6a57" };
         const pick = list => list[Math.floor(Math.random() * list.length)];
         const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
@@ -843,11 +825,14 @@
               + midway * (2.4 * Math.sin(time / 83 + seed * 9) + 1.4 * Math.sin(time / 47 + seed * 3));
             const y = curve(a.y, b.y, c.y, d.y) + (d.x - a.x) / across * weave
               + midway * (2.8 * Math.sin(time / 71 + seed * 5) + 1.2 * Math.sin(time / 39 + seed * 11));
+            // Always beating, harder when climbing; a bat that glides here
+            // just looks as though it is falling.
             const rising = flight.now ? flight.now.y - y : 0;
-            flight.beat += dt * (rising > .5 ? 14 : rising < -.5 ? 6.5 : 10.5);
+            flight.beat += dt * (rising > .4 ? 4.6 : rising < -.4 ? 3.4 : 3.9);
+            const [wings, lift] = beats[Math.floor(flight.beat * 4) % 4];
             flight.now = { x, y };
-            paint(bat, Math.floor(flight.beat) % 2 ? wingsDown : wingsUp);
-            place(bat, x, y);
+            paint(bat, wings);
+            place(bat, x, y + lift * unit * midway);
           }
           frame = flying ? requestAnimationFrame(fly) : 0;
         };
@@ -866,8 +851,11 @@
             from, now: null, beat: Math.random() * 2, start: performance.now(),
             out: { x: side * swing + dx * .2, y: 26 + Math.random() * 30 },
             in: { x: -side * swing * .5 - dx * .1, y: 40 + Math.random() * 40 },
-            turns: 1 + Math.floor(distance / 200), weave: (Math.random() < .5 ? -1 : 1) * clamp(distance * .12, 12, 48),
-            duration: loop ? 1300 + Math.random() * 700 : clamp((distance + swing) / .14, 1500, 4800)
+            turns: 1 + Math.floor(distance / 150), weave: (Math.random() < .5 ? -1 : 1) * clamp(distance * .18, 16, 70),
+            // Unhurried, and slower still up or down the page, so every
+            // wingbeat shows.
+            duration: loop ? 1800 + Math.random() * 900
+              : clamp(Math.max((distance + swing) / .09, Math.abs(end.y - from.y) / .055), 2000, 7000)
           };
           place(bat, from.x, from.y);
           if (!frame) frame = requestAnimationFrame(fly);
@@ -947,7 +935,7 @@
           bats.push({ el, pen: el.getContext("2d"), perch: null, flight: null, art: null, want: hanging, seed: Math.random() });
         }
         measure();
-        // They arrive from above: three to the mark, the rest to words.
+        // They arrive from above: two to the mark, the rest to words.
         bats.forEach((bat, index) => {
           const to = (index < underMark.length && { kind: "mark", index }) || freeWord(bat) || top();
           bat.perch = to;
@@ -958,6 +946,148 @@
         });
         schedule();
         stretch();
+      }
+
+      // Ghosts, in the same pixels: pale, see-through things that drift
+      // about the screen on slow, wandering paths, bobbing as they go, their
+      // hems rippling and their eyes turned the way they are heading. Now and
+      // then one fades away and comes back somewhere else, and when the page
+      // scrolls they are left behind a little and float back.
+      const haunt = document.querySelector("[data-bats] .bats-screen");
+      if (haunt) {
+        const calm = matchMedia("(prefers-reduced-motion: reduce)");
+        const shape = [
+          "...wwwww...",
+          "..wwwwwws..",
+          ".wwwwwwwws.",
+          "wwwwwwwwwws",
+          "wwkkwwwkkws",
+          "wwkkwwwkkws",
+          "wwwwwwwwwws",
+          "wwwwwkwwwws",
+          "wwwwwkwwwws",
+          "wwwwwwwwwws",
+          "wwwwwwwwwws",
+          "ww.ww.ww.ws"
+        ];
+        const colors = { w: "#eef1f8", s: "#b9c0cf", k: "#1d2027" };
+        const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
+        const ghosts = [];
+        let ratio = 1, cell = 3, unit = 1.5, last = 0, lastScroll = scrollY;
+        const measure = () => {
+          ratio = Math.min(3, devicePixelRatio || 1);
+          cell = Math.max(2, Math.round((innerWidth <= 600 ? 2.3 : 2.6) * ratio));
+          unit = cell / ratio;
+          for (const ghost of ghosts) {
+            ghost.el.width = 15 * cell;
+            ghost.el.height = 16 * cell;
+            ghost.el.style.width = 15 * unit + "px";
+            ghost.el.style.height = 16 * unit + "px";
+          }
+        };
+        const somewhere = () => ({ x: 30 + Math.random() * (innerWidth - 60), y: 40 + Math.random() * (innerHeight - 110) });
+        // One frame of a ghost: its hem rippling row by row like cloth, the
+        // tips lifting and dropping, its eyes looking where it goes.
+        const paint = (ghost, time) => {
+          const { pen } = ghost, t = time / 1000 + ghost.seed * 20, gap = cell >= 4 ? 1 : 0, still = calm.matches;
+          pen.clearRect(0, 0, ghost.el.width, ghost.el.height);
+          shape.forEach((line, row) => {
+            const hem = !still && row >= 8 ? (row - 7) / 4 : 0;
+            const shift = Math.round(hem * Math.sin(t * 2.6 - row * .9) * .6 * cell);
+            for (let col = 0; col < line.length; col++) {
+              let key = line[col];
+              if (key === ".") continue;
+              if (key === "k") key = "w";
+              const tip = !still && row === shape.length - 1 ? Math.round(Math.sin(t * 3 + col * .9) * .35 * cell) : 0;
+              pen.fillStyle = colors[key];
+              pen.fillRect(2 * cell + col * cell + shift, 2 * cell + row * cell + tip, cell - gap, cell - gap);
+            }
+          });
+          // The eyes and mouth, drawn over, turned toward where it drifts.
+          const look = clamp(Math.round(ghost.vx / 14), -1, 1);
+          pen.fillStyle = colors.k;
+          shape.forEach((line, row) => {
+            for (let col = 0; col < line.length; col++) {
+              if (line[col] !== "k") continue;
+              const turn = row < 6 ? look : 0;
+              pen.fillRect(2 * cell + (col + turn) * cell, 2 * cell + row * cell, cell - gap, cell - gap);
+            }
+          });
+        };
+        const place = (ghost, x, y) => {
+          ghost.el.style.transform = `translate3d(${(x - 7.5 * unit).toFixed(1)}px, ${(y - 8 * unit).toFixed(1)}px, 0)`;
+        };
+        const float = time => {
+          const dt = last ? Math.min(.05, (time - last) / 1000) : 1 / 60;
+          last = time;
+          for (const ghost of ghosts) {
+            const t = time / 1000 + ghost.seed * 20;
+            // Drifting after somewhere new, slowing as it gets there.
+            const dx = ghost.target.x - ghost.x, dy = ghost.target.y - ghost.y, far = Math.hypot(dx, dy);
+            if (far < 24) ghost.target = somewhere();
+            const speed = ghost.speed * Math.min(1, far / 120);
+            const ease = 1 - Math.exp(-dt * .7);
+            ghost.vx += ((far ? dx / far : 0) * speed - ghost.vx) * ease;
+            ghost.vy += ((far ? dy / far : 0) * speed - ghost.vy) * ease;
+            ghost.x += ghost.vx * dt;
+            ghost.y += ghost.vy * dt;
+            ghost.lag *= Math.exp(-dt * 1.1);
+            // Fading away, moving while unseen, and coming back.
+            if (time > ghost.nextFade && !ghost.fade) ghost.fade = { start: time, out: 1400, back: 1900 };
+            let seen = 1;
+            if (ghost.fade) {
+              const into = time - ghost.fade.start;
+              if (into < ghost.fade.out) seen = 1 - into / ghost.fade.out;
+              else {
+                if (!ghost.fade.moved) {
+                  Object.assign(ghost, somewhere());
+                  ghost.target = somewhere();
+                  ghost.vx = ghost.vy = 0;
+                  ghost.fade.moved = true;
+                }
+                seen = Math.min(1, (into - ghost.fade.out) / ghost.fade.back);
+                if (seen >= 1) { ghost.fade = null; ghost.nextFade = time + 9000 + Math.random() * 9000; }
+              }
+            }
+            const arrive = Math.min(1, (time - ghost.born) / 2200);
+            ghost.el.style.opacity = ((.62 + .22 * Math.sin(t * .9)) * seen * arrive).toFixed(3);
+            paint(ghost, time);
+            place(ghost, ghost.x + 4 * Math.sin(t * .7), ghost.y + 6 * Math.sin(t * 1.3) + ghost.lag);
+          }
+          if (!calm.matches) requestAnimationFrame(float);
+        };
+        addEventListener("scroll", () => {
+          const delta = scrollY - lastScroll;
+          lastScroll = scrollY;
+          if (calm.matches) return;
+          for (const ghost of ghosts) ghost.lag = clamp(ghost.lag - delta * .4, -160, 160);
+        }, { passive: true });
+        addEventListener("resize", () => {
+          measure();
+          for (const ghost of ghosts) {
+            ghost.x = clamp(ghost.x, 30, innerWidth - 30);
+            ghost.y = clamp(ghost.y, 40, innerHeight - 70);
+            ghost.target = somewhere();
+          }
+        }, { passive: true });
+
+        const count = innerWidth <= 600 ? 3 : 4, now = performance.now();
+        for (let i = 0; i < count; i++) {
+          const el = document.createElement("canvas");
+          el.className = "spirit";
+          haunt.appendChild(el);
+          ghosts.push({ el, pen: el.getContext("2d"), ...somewhere(), target: somewhere(), vx: 0, vy: 0, lag: 0,
+                        speed: 22 + Math.random() * 18, seed: Math.random(), born: now + i * 900,
+                        nextFade: now + 7000 + Math.random() * 9000, fade: null });
+        }
+        measure();
+        if (calm.matches) {
+          for (const ghost of ghosts) {
+            ghost.el.style.opacity = ".55";
+            paint(ghost, now);
+            place(ghost, ghost.x, ghost.y);
+          }
+        } else requestAnimationFrame(float);
       }
 
       const appSourceURL = "https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json";
