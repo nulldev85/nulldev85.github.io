@@ -508,10 +508,11 @@
         const rgb = hex => [1, 3, 5].map(at => parseInt(hex.slice(at, at + 2), 16));
         const mix = (from, to, amount) => `rgb(${from.map((value, index) => Math.round(value + (to[index] - value) * amount)).join(",")})`;
         const warm = [255, 214, 140], ember = [255, 150, 40], flare = [255, 246, 190];
-        // Everything but the pumpkin's lit pixels is drawn once, here; the
-        // pumpkin is drawn over it as the candle moves.
+        // The stem is drawn once, here. The pumpkin, the logo and the ghost
+        // are drawn over it every frame: the candle breathing inside the
+        // pumpkin, a shine crossing the logo, the ghost drifting.
         const base = document.createElement("canvas"), basePen = base.getContext("2d");
-        let drawn = "", lantern = null;
+        let drawn = "", scene = null;
         const draw = () => {
           const ratio = Math.min(3, devicePixelRatio || 1);
           const pixel = parseFloat(getComputedStyle(mark).getPropertyValue("--pixel")) || 1.9;
@@ -527,7 +528,8 @@
           // The logo stays centred on the mark, whatever sits either side.
           const logoMiddle = parts[1].x + parts[1].art[0].length / 2;
           canvas.style.marginLeft = (columns / 2 - logoMiddle) * cell / ratio + "px";
-          lantern = { cell, gap, skin: [], face: [] };
+          scene = { cell, gap, ratio, skin: [], face: [], apple: [], ghost: [],
+                    middle: { x: pad + (parts[0].x + 7.5) * cell, y: pad + 10 * cell } };
           for (const part of parts) {
             const top = part.bottom - part.art.length;
             part.art.forEach((line, row) => [...line].forEach((key, col) => {
@@ -535,41 +537,74 @@
               const x = pad + (part.x + col) * cell, y = pad + (top + row) * cell;
               if (part.art === pumpkin && "odhy".includes(key)) {
                 // How close to the candle, which sits low behind the face.
-                const near = Math.exp(-((col - 7) ** 2 + (row - 10.5) ** 2) / 20);
-                if (key === "y") lantern.face.push({ x, y, near: Math.exp(-((col - 7) ** 2 + (row - 12) ** 2) / 14) });
-                else lantern.skin.push({ x, y, near, rgb: rgb(colors[key]) });
-                return;
+                if (key === "y") scene.face.push({ x, y, near: Math.exp(-((col - 7) ** 2 + (row - 12) ** 2) / 14) });
+                else scene.skin.push({ x, y, near: Math.exp(-((col - 7) ** 2 + (row - 10.5) ** 2) / 20), rgb: rgb(colors[key]) });
+              } else if (part.metal) {
+                scene.apple.push({ x, y, along: col + row * .6,
+                                   rgb: metal(row / (part.art.length - 1)).match(/\d+/g).map(Number) });
+              } else if (part.art === ghost) {
+                scene.ghost.push({ x, y, col, row, fill: colors[key] });
+              } else {
+                basePen.fillStyle = colors[key];
+                basePen.fillRect(x, y, cell - gap, cell - gap);
               }
-              basePen.fillStyle = part.metal ? metal(row / (part.art.length - 1)) : colors[key];
-              basePen.fillRect(x, y, cell - gap, cell - gap);
             }));
           }
+          scene.width = parts[1].art[0].length + parts[1].art.length * .6;
           light(performance.now());
         };
         const light = time => {
-          if (!lantern) return;
-          const glow = calm.matches ? .8 : flame(time), { cell, gap } = lantern;
+          if (!scene) return;
+          const { cell, gap, ratio } = scene, size = cell - gap, t = time / 1000, moving = !calm.matches;
+          const glow = moving ? flame(time) : .8;
+          // The light inside swells and settles, slower than the flicker.
+          const breath = moving ? .7 + .3 * Math.sin(t * 2.2) * Math.sin(t * .7 + .4) + .1 * Math.sin(t * 1.3) : .85;
           pen.clearRect(0, 0, canvas.width, canvas.height);
+          // Light through the skin, spilling a little way out around it.
+          const aura = pen.createRadialGradient(scene.middle.x, scene.middle.y, cell, scene.middle.x, scene.middle.y, cell * 11);
+          aura.addColorStop(0, `rgba(255, 150, 50, ${(.26 * glow * breath).toFixed(3)})`);
+          aura.addColorStop(1, "rgba(255, 120, 40, 0)");
+          pen.fillStyle = aura;
+          pen.fillRect(scene.middle.x - cell * 11, scene.middle.y - cell * 11, cell * 22, cell * 22);
           pen.drawImage(base, 0, 0);
           // The skin warms nearest the face as the flame rises.
-          for (const spot of lantern.skin) {
-            pen.fillStyle = mix(spot.rgb, warm, spot.near * glow * .3);
-            pen.fillRect(spot.x, spot.y, cell - gap, cell - gap);
+          for (const spot of scene.skin) {
+            pen.fillStyle = mix(spot.rgb, warm, spot.near * glow * (.18 + .24 * breath));
+            pen.fillRect(spot.x, spot.y, size, size);
           }
           // The carved face, lit from inside, its light spilling out.
-          pen.shadowColor = `rgba(255, ${Math.round(140 + 60 * glow)}, 50, ${(.35 + .55 * glow).toFixed(3)})`;
-          pen.shadowBlur = cell * (1 + 1.6 * glow);
-          for (const spot of lantern.face) {
-            pen.fillStyle = mix(ember, flare, Math.min(1, glow * (.82 + .18 * spot.near)));
-            pen.fillRect(spot.x, spot.y, cell - gap, cell - gap);
+          pen.shadowColor = `rgba(255, ${Math.round(140 + 60 * glow)}, 50, ${(.3 + .6 * glow * breath).toFixed(3)})`;
+          pen.shadowBlur = cell * (1 + 1.8 * glow * breath);
+          for (const spot of scene.face) {
+            pen.fillStyle = mix(ember, flare, Math.min(1, glow * (.78 + .22 * spot.near) * (.85 + .15 * breath)));
+            pen.fillRect(spot.x, spot.y, size, size);
           }
           pen.shadowBlur = 0;
           pen.shadowColor = "transparent";
+          // A soft shine crosses the logo every few seconds.
+          const sweep = (time % 4600) / 1100, band = -3 + sweep * (scene.width + 6);
+          for (const spot of scene.apple) {
+            const shine = moving && sweep < 1 ? .5 * Math.exp(-((spot.along - band) ** 2) / 3) : 0;
+            pen.fillStyle = mix(spot.rgb, [255, 255, 255], shine);
+            pen.fillRect(spot.x, spot.y, size, size);
+          }
+          // The ghost drifts: it rises and sinks, sways, its hem ripples and
+          // it is never quite solid.
+          const rise = moving ? Math.sin(t * 1.6) * 1.4 * ratio : 0, sway = moving ? Math.sin(t * .8) * .8 * ratio : 0;
+          pen.globalAlpha = moving ? .88 + .08 * Math.sin(t * 2.4) : .94;
+          for (const spot of scene.ghost) {
+            // Below the face, each row of the hem sways a little more than
+            // the one above, like cloth; the tips at the bottom lift and drop.
+            const hem = moving && spot.row >= 9 ? (spot.row - 8) / 3 : 0;
+            const x = spot.x + sway + hem * Math.sin(t * 3.1 - spot.row * .9) * .55 * cell;
+            const y = spot.y + rise + (moving && spot.row === 11 ? Math.sin(t * 3.4 + spot.col * .9) * .3 * cell : 0);
+            pen.fillStyle = spot.fill;
+            pen.fillRect(Math.round(x), Math.round(y), size, size);
+          }
+          pen.globalAlpha = 1;
         };
-        // About thirty frames a second is plenty for a candle.
-        let lit = 0;
         const candle = time => {
-          if (time - lit >= 32) { lit = time; light(time); }
+          light(time);
           if (!calm.matches) requestAnimationFrame(candle);
         };
         let queued = false;
