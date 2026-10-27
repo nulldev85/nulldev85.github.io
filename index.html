@@ -1698,9 +1698,10 @@
       // tilts his, wipes his knife and lunges, and Chucky stabs twice and
       // throws his head back laughing; the candle gutters at every blow.
       //
-      // Each is rigged rather than drawn frame by frame: a head and a body
-      // drawn in pixels, and arms and legs posed by angle and drawn into the
-      // same pixels every frame, so they walk and move smoothly. They face
+      // Each is rigged rather than drawn frame by frame: a big head and a
+      // short body drawn in bold pixels, so every face reads even small, and
+      // arms and legs posed by angle and drawn into the same pixels every
+      // frame, so they walk and move smoothly. They face
       // right and are mirrored, about the hips, to face left. The lightning
       // catches them as dark shapes and the thunder shakes them with
       // everything else; with reduced motion, Michael just stands by the
@@ -1709,7 +1710,7 @@
       if (stage) {
         const calm = matchMedia("(prefers-reduced-motion: reduce)");
         // Angles are in degrees: 0 straight down, 90 forward, 180 straight up.
-        const W = 36, H = 46, HIP_X = 12;
+        const W = 34, H = 40, HIP_X = 13;
         const rad = d => d * Math.PI / 180;
         const smooth = t => t * t * (3 - 2 * t);
         const dir = (angle, length) => [Math.sin(rad(angle)) * length, Math.cos(rad(angle)) * length];
@@ -1833,248 +1834,238 @@
           }
         };
 
-        const rest = { nearLeg: [5, 4], farLeg: [-5, 4], nearArm: [6, 12], farArm: [3, 10], lean: 0, tilt: 0 };
-        const cast = {   // Jason: the hockey mask, the bald scarred head behind it, an olive work
-        // jacket, a machete.
-        jason: {
-          colors: { w: "#e7e0cd", W: "#c9c1ab", m: "#8a7a6c", r: "#cc3530", k: "#2b2522", J: "#46523d", j: "#5d6b51", h: "#71806a", z: "#3a4332", b: "#2e2924",
-                    sleeve: "#5d6b51", hand: "#b88b6c", pants: "#4a4c57", shoe: "#3a2e26", handle: "#6a4a2e", steel: "#9fa8b4", edge: "#f0f4f8" },
-          head: { neck: [5.5, 9.6], art: [
-            "...mmmm...",
-            "..mmwwww..",
-            ".mmwwwwwww",
-            ".mmwrwwwrw",
-            ".mwkkwwwkk",
-            ".mwwWwwwWw",
-            ".mwwrwkwrw",
-            "..mwwkwkww",
-            "...wwwwwW.",
-            "....wwww..",
+        const rest = { nearLeg: [5, 4], farLeg: [-5, 4], nearArm: [8, 14], farArm: [4, 10], lean: 0, tilt: 0 };
+        // Small and bold: big heads that carry each face, short bodies and limbs.
+        const adult = { thigh: 3.6, shin: 3.4, upper: 3, fore: 2.8, legWidth: 2.8, armWidth: 2.5, hand: 2, foot: [3, 1.6] };
+        const cast = {   jason: {
+          colors: { w: "#ece5d2", m: "#5c5048", r: "#d2342e", k: "#1e1a18", J: "#3e4936", j: "#56644a", z: "#2f372a", b: "#29241f",
+                    sleeve: "#56644a", hand: "#b88b6c", pants: "#4b4d58", shoe: "#3a2e26", handle: "#6a4a2e", steel: "#a4adb9", edge: "#f4f7fa" },
+          head: { neck: [6.5, 12.6], art: [
+            "....mmmmm....",
+            "..mmwwwwwmm..",
+            ".mwwwwwwwwwm.",
+            ".mwrrwwwwrrm.",
+            "mwwwrwwwrwwwm",
+            "mwkkkwwwkkkwm",
+            "mwkkkwwwkkkwm",
+            "mwwwwwkwwwwwm",
+            "mwrwwwwwwwrwm",
+            ".mwrwkwkwrwm.",
+            ".mwwwwkwwwwm.",
+            "..mwwkwkwwm..",
+            "....mwwwm....",
           ] },
-          torso: { hips: [6.5, 10.5], neck: [6.8, .3], near: [10.6, 1.8], far: [2.6, 1.8], art: [
-            "...JJjjjjJ...",
-            "..JJjjjjjjjj.",
-            ".JJjjjjhjjjjj",
-            ".JJjjjzjhjjjj",
-            ".JJjjjzjjhjjj",
-            ".JJjjjzjjjjj.",
-            ".JJjjjzjjjjj.",
-            "..JJjjzjjjjj.",
-            "..JJjjzjjjjJ.",
-            "..JJjjjjjjjJ.",
-            "..bbbbbbbbbb.",
+          torso: { hips: [5, 7.6], neck: [5.2, .3], near: [8.6, 1.4], far: [1.6, 1.4], art: [
+            "..JJjjjjJ..",
+            ".JJjjjjjjjj",
+            "JJjjjjzjjjj",
+            "JJjjjjzjjjj",
+            "JJjjjjzjjjj",
+            ".JJjjjzjjj.",
+            ".JJjjjjjjj.",
+            ".bbbbbbbbb.",
           ] },
-          limbs: { thigh: 7, shin: 6.6, upper: 4.8, fore: 4.4, legWidth: 3, armWidth: 2.5, hand: 2, foot: [3.4, 1.6] },
-          prop: blade(8, 2, 2), grip: 8,
-          speed: 36, walk: { stride: 23, knee: 38, swing: 14, armRest: 6, elbow: 12, elbowSwing: 10, lean: 4 },
+          limbs: adult,
+          prop: blade(7, 2, 1.8), grip: 8,
+          speed: 36, walk: { stride: 26, knee: 44, swing: 18, armRest: 8, elbow: 14, elbowSwing: 12, lean: 3 },
           act: [
             { at: 0, pose: {} },
-            { at: 750, pose: { nearArm: [168, 35], prop: 205, lean: -5, farArm: [25, 30] } },
+            { at: 700, pose: { nearArm: [105, 62], prop: 188, lean: -7, farArm: [25, 30] } },
             { at: 1250, pose: { glint: .2 } },
             { at: 1500, pose: { glint: 1 } },
-            { at: 1620, pose: { nearArm: [62, 6], prop: 80, lean: 10, farArm: [-12, 20], glint: 0 }, hit: true },
+            { at: 1620, pose: { nearArm: [78, 0], prop: 92, lean: 10, farArm: [-12, 20], glint: 0 }, hit: true },
             { at: 2400, pose: {} },
             { at: 3200, pose: { nearArm: rest.nearArm, prop: undefined, lean: 0, farArm: rest.farArm } },
           ],
         },
-        // Freddy: the brown fedora, the burned face, the red and green sweater,
-        // the glove of four blades.
         freddy: {
-          colors: { f: "#b85b49", F: "#8a3a30", e: "#f0d060", k: "#3a1a16", t: "#e8dcc0", h: "#6e4c30", H: "#3e2a1a",
-                    r: "#bd2a30", R: "#8e1f24", g: "#2f7a40", G: "#235c30", P: "#5b4a3a",
-                    sleeve: ["#bd2a30", "#2f7a40"], hand: "#b85b49", nearHand: "#6e4c30", pants: "#5e4c3a", shoe: "#2e2520", steel: "#d4dae2" },
-          head: { neck: [4.5, 8.4], art: [
-            "..ffff...",
-            ".fFffff..",
-            ".ffFffFf.",
-            ".fffefffe",
-            ".fFffFfff",
-            ".fffkkkkf",
-            ".fffktktf",
-            "..fffkkf.",
+          colors: { f: "#c45f4c", F: "#8e3a30", y: "#f2d35a", k: "#2e1210", t: "#efe2c4", h: "#74502f", H: "#3b2716",
+                    r: "#c42a31", R: "#8f1f25", g: "#2f8044", G: "#225e31", P: "#5e4c3a",
+                    sleeve: ["#c42a31", "#2f8044"], hand: "#c45f4c", nearHand: "#74502f", pants: "#5e4c3a", shoe: "#2e2520", steel: "#e2e7ee" },
+          head: { neck: [6, 9.6], art: [
+            "..ffffffff..",
+            ".fFfffffFff.",
+            "ffffFfffffFf",
+            "fyyfffffyyff",
+            "fFffffFffffF",
+            "ffffFffffFff",
+            "ffkkkkkkkfff",
+            "fftktktktfff",
+            ".ffkkkkkfff.",
+            "..ffffffff..",
           ] },
-          hat: { neck: [6, 10.4], art: [
-            "....hhhh....",
-            "...hhhhhh...",
-            "...hhhhhhh..",
-            "...HHHHHHH..",
-            "hhhhhhhhhhhh",
+          hat: { neck: [7.5, 15.4], art: [
+            ".....hhhhh.....",
+            "....hhhhhhh....",
+            "....hhhhhhh....",
+            "....HHHHHHH....",
+            "hhhhhhhhhhhhhhh",
+            ".hhhhhhhhhhhhh.",
           ] },
-          torso: { hips: [6.5, 10.5], neck: [6.5, .3], near: [10.4, 1.8], far: [2.6, 1.8], art: [
-            "...RRrrrrr...",
-            "..GGgggggggg.",
-            ".RRrrrrrrrrrr",
-            ".GGgggggggggg",
-            ".RRrrrrrrrrr.",
-            ".GGggggggggg.",
-            "..RRrrrrrrrr.",
-            "..GGgggggggg.",
-            "..RRrrrrrrrr.",
-            "..GGgggggggg.",
-            "..PPPPPPPPPP.",
+          torso: { hips: [5, 7.6], neck: [5, .3], near: [8.6, 1.4], far: [1.6, 1.4], art: [
+            "..RRrrrrr..",
+            ".RRrrrrrrrr",
+            "GGgggggggg.",
+            "GGgggggggg.",
+            "RRrrrrrrrrr",
+            ".RRrrrrrrr.",
+            ".GGgggggggg",
+            ".PPPPPPPPP.",
           ] },
-          limbs: { thigh: 7, shin: 6.6, upper: 4.6, fore: 4.2, legWidth: 2.8, armWidth: 2.3, hand: 1.9, foot: [3.2, 1.5] },
+          limbs: adult,
           prop: claws,
-          speed: 42, walk: { stride: 26, knee: 44, swing: 20, armRest: 8, elbow: 20, elbowSwing: 14, lean: 2 },
+          speed: 42, walk: { stride: 28, knee: 46, swing: 24, armRest: 10, elbow: 22, elbowSwing: 16, lean: 2 },
           act: [
             { at: 0, pose: {} },
             { at: 500, pose: { nearArm: [60, 85], prop: 150, spread: .3 } },
-            { at: 700, pose: { spread: 1.4 } },
+            { at: 700, pose: { spread: 1.5 } },
             { at: 880, pose: { spread: .2 } },
-            { at: 1060, pose: { spread: 1.4 } },
+            { at: 1060, pose: { spread: 1.5 } },
             { at: 1240, pose: { spread: .2 } },
             { at: 1600, pose: { nearArm: [150, 30], prop: 175, spread: .9, lean: -3 } },
-            { at: 1800, pose: { nearArm: [70, 5], prop: 80, lean: 8, sparks: 1 }, hit: true },
+            { at: 1800, pose: { nearArm: [75, 5], prop: 84, lean: 8, sparks: 1 }, hit: true },
             { at: 2050, pose: { nearArm: [30, 10], prop: 40, sparks: 0 } },
-            { at: 2400, pose: { farArm: [168, 95], lean: 0 } },
-            { at: 2650, pose: { hat: 2.6, hatTip: -14 } },
+            { at: 2400, pose: { farArm: [170, 60], lean: 0 } },
+            { at: 2650, pose: { hat: 3, hatTip: -16 } },
             { at: 2950, pose: { hat: 0, hatTip: 0 } },
             { at: 3300, pose: { farArm: rest.farArm, nearArm: rest.nearArm, prop: undefined, spread: .4 } },
           ],
         },
-        // Michael: the pale blank mask and dark hair, navy coveralls, a kitchen knife.
         michael: {
-          colors: { a: "#3e2c1f", A: "#5a4030", w: "#ece9e2", g: "#bdb8ae", k: "#26221f", v: "#33405c", V: "#252f45", z: "#5d6a86",
-                    sleeve: "#33405c", hand: "#dcd0c2", pants: "#33405c", shoe: "#1f1f24", handle: "#2a2420", steel: "#c3c9d2", edge: "#f4f6f9" },
-          head: { neck: [5, 9.6], art: [
-            "..aaAaa...",
-            ".aaaaAaaa.",
-            "aaaaawwwa.",
-            "aaagwwwwww",
-            "aagkkwwkkw",
-            "aagkkwwkkw",
-            ".agwwwwgww",
-            ".aagwwwwww",
-            "..agwkkww.",
-            "...gwwww..",
+          colors: { a: "#4a3424", A: "#6b4b33", w: "#f2efe8", g: "#c4bfb5", k: "#141110", v: "#33405c", V: "#232c40", z: "#5d6a86",
+                    sleeve: "#33405c", hand: "#dcd0c2", pants: "#33405c", shoe: "#1a1a1e", handle: "#2a2420", steel: "#cfd4dc", edge: "#f6f8fa" },
+          head: { neck: [6.5, 12.6], art: [
+            "...aaAaaaa...",
+            "..aaaaaAaaa..",
+            ".aaaaawwwaaa.",
+            ".aaawwwwwwwaa",
+            "aaawwwwwwwwwa",
+            "aawkkkwwwkkka",
+            "aawkkkwwwkkka",
+            "aawwwwwwwwwwa",
+            "aaawwwwgwwwwa",
+            ".aawwwwwwwwa.",
+            ".aaawwkkkwwa.",
+            "..aawwwwwwa..",
+            "....awwwwa...",
           ] },
-          torso: { hips: [6.5, 10.5], neck: [6.5, .3], near: [10.4, 1.8], far: [2.6, 1.8], art: [
-            "...VVvvvvV...",
-            "..VVvvvvvvvv.",
-            ".VVvvvvvvvvvv",
-            ".VVvvvvzvvvvv",
-            ".VVvvvvzvvvvv",
-            ".VVvvvvzvvvv.",
-            ".VVvvvvzvvvv.",
-            "..VVvvvzvvvv.",
-            "..VVvvvzvvvv.",
-            "..VVvvvvvvvv.",
-            "..VVvvvvvvvv.",
+          torso: { hips: [5, 7.6], neck: [5, .3], near: [8.6, 1.4], far: [1.6, 1.4], art: [
+            "..VVvvvvV..",
+            ".VVvvvvvvvv",
+            "VVvvvvzvvvv",
+            "VVvvvvzvvvv",
+            "VVvvvvzvvvv",
+            ".VVvvvzvvv.",
+            ".VVvvvvvvv.",
+            ".VVvvvvvvv.",
           ] },
-          limbs: { thigh: 7.2, shin: 6.8, upper: 4.8, fore: 4.4, legWidth: 2.8, armWidth: 2.3, hand: 1.9, foot: [3.2, 1.5] },
-          prop: blade(4.8, 1.6, 2), grip: 0,
-          speed: 30, walk: { stride: 19, knee: 28, swing: 4, armRest: 4, elbow: 6, elbowSwing: 2, lean: 0 },
+          limbs: adult,
+          prop: blade(4.6, 1.8, 1.8), grip: 0,
+          speed: 30, walk: { stride: 20, knee: 30, swing: 4, armRest: 5, elbow: 8, elbowSwing: 2, lean: 0 },
           act: [
             { at: 0, pose: {} },
             { at: 400, pose: {} },
-            { at: 1300, pose: { tilt: 17 } },
+            { at: 1300, pose: { tilt: 18 } },
             { at: 1900, pose: {} },
-            { at: 2500, pose: { nearArm: [172, 28], prop: 25, tilt: 9, farArm: [10, 14] } },
+            { at: 2500, pose: { nearArm: [105, 62], prop: 18, tilt: 10, lean: -5, farArm: [10, 14] } },
             { at: 2850, pose: {} },
-            { at: 3000, pose: { nearArm: [58, 8], prop: 72, lean: 8 }, hit: true },
+            { at: 3000, pose: { nearArm: [66, 4], prop: 80, lean: 8 }, hit: true },
             { at: 3500, pose: {} },
             { at: 4200, pose: { nearArm: rest.nearArm, prop: undefined, lean: 0, tilt: 0, farArm: rest.farArm } },
           ],
         },
-        // Ghostface: the black hood and long robe with wide sleeves, the long
-        // white mask, a hunting knife.
         ghostface: {
-          colors: { o: "#2b2b33", O: "#4a4a57", q: "#1d1d23", w: "#f2f2ef", k: "#141418",
-                    sleeve: "#2b2b33", hand: "#1d1d23", pants: "#24242b", shoe: "#16161a", handle: "#2a2420", steel: "#c3c9d2", edge: "#f4f6f9" },
-          head: { neck: [5, 11.4], art: [
-            "...ooooo..",
-            "..oowwwoo.",
-            ".oowwwwwwo",
-            ".owwwwwwww",
-            ".owkkwwkkw",
-            ".owkkwwkkw",
-            ".owwkwwkww",
-            ".oowwwwwwo",
-            ".oowwkkwwo",
-            "..oowkkwo.",
-            "..oowkkwo.",
-            "...oowwo..",
+          colors: { o: "#25252c", O: "#4c4c59", q: "#18181d", w: "#f4f4f1", k: "#0e0e11",
+                    sleeve: "#25252c", hand: "#18181d", pants: "#1f1f25", shoe: "#121215", handle: "#2a2420", steel: "#cfd4dc", edge: "#f6f8fa" },
+          head: { neck: [6.5, 14.6], art: [
+            "....ooooo....",
+            "...oooooooo..",
+            "..oooowwwooO.",
+            "..oowwwwwwwoO",
+            ".oowwwwwwwwwO",
+            ".oowkkwwwkkwO",
+            ".oowkkkwkkkwO",
+            ".oowwkkwkkwwO",
+            ".oowwwwwwwwwO",
+            ".oowwwkkkwwwO",
+            ".ooowwkkkwwoO",
+            "..oowwkkkwwO.",
+            "..ooowkkkwoO.",
+            "...oowwwwoO..",
+            "....oowwoO...",
           ] },
-          torso: { hips: [6.5, 10.5], neck: [6.5, .3], near: [10.6, 1.8], far: [2.4, 1.8], art: [
-            "...qqooooO...",
-            "..qqoOOooooO.",
-            ".qqoooooooooO",
-            ".qqooooooooooO",
-            ".qqoooOoooooO",
-            ".qqooooooooooO",
-            ".qqoooooooooO.",
-            "..qqoooOooooO.",
-            "..qqoooooooO.",
-            "..qqooooooooO",
-            ".qqooooooooooO",
-            ".qqoooooooooooO",
-            "qqoooooOooooooO",
-            "qqoooooooooooO.",
-            "qoo.ooo.oo.ooO.",
-            "o...o....o..O..",
+          torso: { hips: [5.5, 7.6], neck: [5.5, .3], near: [9, 1.4], far: [1.6, 1.4], art: [
+            "..qqoooooO..",
+            ".qqoooooooO.",
+            "qqooooOooooO",
+            "qqoooooooooO",
+            "qqoooooooooO",
+            ".qqooooOoooO",
+            ".qqoooooooO.",
+            ".qqooooooooO",
+            "qqoooooooooO",
+            "qqooooooooooO",
+            "qoooooooooooO",
+            "o.oo.ooo.oO..",
           ] },
-          limbs: { thigh: 7, shin: 6.6, upper: 4.6, fore: 4.4, legWidth: 2.6, armWidth: 3.2, hand: 1.9, foot: [3, 1.5] },
-          prop: blade(5, 1.6, 2), grip: 0,
-          speed: 46, walk: { stride: 24, knee: 40, swing: 16, armRest: 8, elbow: 18, elbowSwing: 10, lean: 6 },
+          limbs: { ...adult, armWidth: 3.4 },
+          prop: blade(5, 1.8, 1.8), grip: 0,
+          speed: 46, walk: { stride: 24, knee: 40, swing: 18, armRest: 10, elbow: 20, elbowSwing: 10, lean: 6 },
           act: [
             { at: 0, pose: {} },
-            { at: 600, pose: { tilt: -16, lean: 4 } },
+            { at: 600, pose: { tilt: -18, lean: 4 } },
             { at: 1100, pose: { nearArm: [62, 88], prop: 178, farArm: [55, 62] } },
             { at: 1450, pose: { farArm: [85, 38] } },
             { at: 1750, pose: { farArm: [55, 62] } },
             { at: 2050, pose: { farArm: [85, 38] } },
             { at: 2400, pose: { farArm: [20, 20], tilt: 0 } },
-            { at: 2750, pose: { lean: 14, nearArm: [96, 0], prop: 96, nearLeg: [26, 8], farLeg: [-20, 4], shift: 1.5 }, hit: true },
+            { at: 2750, pose: { lean: 14, nearArm: [96, 0], prop: 96, nearLeg: [28, 8], farLeg: [-22, 4], shift: 1.5 }, hit: true },
             { at: 3200, pose: {} },
             { at: 3700, pose: { lean: 0, nearArm: rest.nearArm, prop: undefined, nearLeg: rest.nearLeg, farLeg: rest.farLeg, shift: 0 } },
           ],
         },
-        // Chucky: the doll. Wild orange hair, freckles, a scar, wide blue eyes and
-        // a nasty grin; the striped Good Guys shirt, denim overalls, white sneakers
-        // with red soles, and a knife nearly as long as his arm.
         chucky: {
-          colors: { r: "#e0521e", R: "#a8380f", s: "#f2c9a2", S: "#d9a87e", f: "#c9855a", c: "#a5463a", b: "#2f6be0", B: "#ffffff", e: "#5a2a12",
-                    k: "#7a1f1f", t: "#f4efe6", d: "#4f73b4", D: "#3c5a90", p: "#6b8fd0", x: "#c33030", y: "#e8c840", u: "#2f8a4a", n: "#3a5ab0",
-                    sleeve: ["#c33030", "#3a5ab0", "#e8c840", "#2f8a4a"], hand: "#f2c9a2", pants: "#4f73b4", shoe: "#ece8e0", handle: "#2a2420", steel: "#c3c9d2", edge: "#f4f6f9" },
-          head: { neck: [5.5, 10.4], art: [
-            "..r.rR.r...",
-            ".rrrrrrrrr.",
-            "rrRrrrrrrrr",
-            "rrrrrrRrrrr",
-            "rrsssssssrr",
-            "rseesssseer",
-            "rsbBsssbBsr",
-            ".sfsssSsfss",
-            ".ssscsSsss.",
-            ".sktttttks.",
-            "..skkkkks..",
-            "...ssss....",
+          colors: { r: "#ec5a1c", R: "#b03c0c", s: "#f6cfa6", S: "#dcab80", f: "#c27a4e", c: "#9e3d33", e: "#5a2a12", b: "#2f6be0", B: "#ffffff",
+                    k: "#6e1717", t: "#fbf6ec", d: "#5079c0", D: "#3c5c96", p: "#7096d6", x: "#d23232", y: "#efcc3c", u: "#2f9a4e", n: "#3a5ab8",
+                    sleeve: ["#d23232", "#3a5ab8", "#efcc3c", "#2f9a4e"], hand: "#f6cfa6", pants: "#5079c0", shoe: "#f4f0e8", handle: "#2a2420", steel: "#cfd4dc", edge: "#f6f8fa" },
+          head: { neck: [6.5, 12.6], art: [
+            ".r..r.rr..r..",
+            "rr.rrrrrr.rr.",
+            "rrrrRrrrrRrrr",
+            "rrrrrrrrrrrrr",
+            "rrsssssssssrr",
+            "rseeesssseeer",
+            "rsbbBsssbbBsr",
+            ".sfsssssssfs.",
+            ".ssfsssSsfss.",
+            ".sktttttttks.",
+            "..skkkkkkks..",
+            "...sssssss...",
+            "....sssss....",
           ] },
-          torso: { hips: [4.5, 7.5], neck: [4.6, .3], near: [7.4, 1.4], far: [1.8, 1.4], art: [
-            "..xnyuxn..",
-            ".xDdddddx.",
-            ".nDdpppdn.",
-            ".DDdpppdd.",
-            ".DDdddddd.",
-            ".DDdddddd.",
-            ".DDdddddd.",
-            ".DDdddddd.",
+          torso: { hips: [4, 5.6], neck: [4, .3], near: [6.6, 1], far: [1.4, 1], art: [
+            ".xnyuxny.",
+            "xDdddddDx",
+            "nDdpppddn",
+            ".DdpppdD.",
+            ".DDddddD.",
+            ".DDddddD.",
           ] },
-          limbs: { thigh: 3.6, shin: 3.4, upper: 3, fore: 2.8, legWidth: 2.2, armWidth: 2.2, hand: 1.6, foot: [2.6, 1.4], band: .9 },
-          prop: blade(4.4, 1.5, 1.6), grip: 0,
-          speed: 40, walk: { stride: 30, knee: 55, swing: 32, armRest: 10, elbow: 28, elbowSwing: 18, lean: 6 },
+          limbs: { thigh: 2.6, shin: 2.4, upper: 2.2, fore: 2.1, legWidth: 2.2, armWidth: 2.2, hand: 1.7, foot: [2.6, 1.5], band: .8 },
+          prop: blade(4.6, 1.6, 1.6), grip: 0,
+          speed: 40, walk: { stride: 32, knee: 58, swing: 34, armRest: 12, elbow: 30, elbowSwing: 18, lean: 6 },
           act: [
             { at: 0, pose: {} },
-            { at: 320, pose: { nearArm: [172, 20], prop: 15, lean: -4 } },
-            { at: 460, pose: { nearArm: [55, 4], prop: 62, lean: 10 }, hit: true },
-            { at: 680, pose: { nearArm: [172, 20], prop: 15, lean: -4 } },
-            { at: 820, pose: { nearArm: [55, 4], prop: 62, lean: 10 }, hit: true },
-            { at: 1150, pose: { tilt: -22, lean: -8, nearArm: [25, 50], farArm: [35, 95], hop: 0 } },
-            { at: 1300, pose: { hop: 1.6 } },
+            { at: 320, pose: { nearArm: [108, 60], prop: 192, lean: -7 } },
+            { at: 460, pose: { nearArm: [66, 0], prop: 74, lean: 10 }, hit: true },
+            { at: 680, pose: { nearArm: [108, 60], prop: 192, lean: -7 } },
+            { at: 820, pose: { nearArm: [66, 0], prop: 74, lean: 10 }, hit: true },
+            { at: 1150, pose: { tilt: -24, lean: -8, nearArm: [25, 50], farArm: [35, 95], hop: 0 } },
+            { at: 1300, pose: { hop: 2 } },
             { at: 1450, pose: { hop: 0 } },
-            { at: 1600, pose: { hop: 1.6 } },
+            { at: 1600, pose: { hop: 2 } },
             { at: 1750, pose: { hop: 0 } },
-            { at: 1900, pose: { hop: 1.6 } },
+            { at: 1900, pose: { hop: 2 } },
             { at: 2050, pose: { hop: 0 } },
             { at: 2600, pose: { tilt: 0, lean: 0, nearArm: rest.nearArm, farArm: rest.farArm, prop: undefined } },
           ],
@@ -2113,7 +2104,7 @@
         let ratio = 1, cell = 4, unit = 2, bag = [], side = Math.random() < .5 ? -1 : 1, walker = null, last = 0, running = false;
         const measure = () => {
           ratio = Math.min(3, devicePixelRatio || 1);
-          cell = Math.max(2, Math.round((innerWidth <= 600 ? 1.45 : 1.6) * ratio));
+          cell = Math.max(2, Math.round((innerWidth <= 600 ? 2 : 2.2) * ratio));
           unit = cell / ratio;
           el.width = W * cell;
           el.height = H * cell;
@@ -2155,7 +2146,7 @@
           // Quicker across a wider screen, so the walk never drags.
           const pace = Math.min(2.2, Math.max(1, innerWidth / 600));
           // Up to the pumpkin, stopping a step short of it.
-          const gap = 7 * unit + 4, stop = walker.from < 0 ? box.left - gap : box.right + gap;
+          const gap = 8 * unit + 4, stop = walker.from < 0 ? box.left - gap : box.right + gap;
           let pose;
           if (walker.stage === "act") {
             walker.since += dt * 1000;
@@ -2193,7 +2184,7 @@
           const box = markBounds();
           if (!box) return;
           paint(draw(cast.michael, { ...rest, grip: cast.michael.grip }));
-          place(box.left - 7 * unit - 4, box.floor, 1);
+          place(box.left - 8 * unit - 4, box.floor, 1);
           el.style.opacity = "1";
         };
         addEventListener("resize", () => { measure(); if (calm.matches) standStill(); }, { passive: true });
