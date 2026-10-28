@@ -169,8 +169,9 @@
     .bats { display: none; }
     .has-js .bats { display: block; }
     .bats-page, .bats-screen { top: 0; left: 0; width: 0; height: 0; pointer-events: none; }
-    /* The villains walk along the bottom of the top of the site. */
-    .villains { position: fixed; top: 0; left: 0; z-index: 26; display: none; width: 0; height: 0; pointer-events: none; }
+    /* The villains walk along the bottom of the top of the site, in front of
+       its shade but behind the header's words, the web and the pumpkin. */
+    .villains { position: fixed; top: 0; left: 0; z-index: 22; display: none; width: 0; height: 0; pointer-events: none; }
     .has-js .villains { display: block; }
     .villain { position: absolute; top: 0; left: 0; display: block; opacity: 0; will-change: transform; transform-origin: 50% 50%; }
     .bats-page { position: absolute; z-index: 21; }
@@ -257,8 +258,8 @@
   <div class="storm" aria-hidden="true" data-storm><canvas class="storm-bolt"></canvas><div class="storm-flash"></div></div>
   <div class="webs" aria-hidden="true" data-webs></div>
   <div class="bats" aria-hidden="true" data-bats><div class="bats-page"></div><div class="bats-screen"></div></div>
-  <div class="villains" aria-hidden="true" data-villains></div>
   <div class="top-shade" aria-hidden="true"></div>
+  <div class="villains" aria-hidden="true" data-villains></div>
   <header class="site-header wrap">
     <a class="wordmark" href="#top">Null’s Apps</a>
     <nav class="site-nav" aria-label="Apps">
@@ -1767,176 +1768,386 @@
       // tilts his, wipes his knife and lunges, and Chucky stabs twice and
       // throws his head back laughing; the candle gutters at every blow.
       //
-      // Each is rigged rather than drawn frame by frame: a big head and a
-      // short body drawn in bold pixels, so every face reads even small, and
-      // arms and legs posed by angle and drawn into the same pixels every
-      // frame, so they walk and move smoothly. They face
-      // right and are mirrored, about the hips, to face left. The lightning
-      // catches them as dark shapes and the thunder shakes them with
-      // everything else; with reduced motion, Michael just stands by the
-      // pumpkin.
+      // Each is painted rather than built from pixels: a skeleton posed by
+      // angle, its limbs tapered and shaded round, with clothes, faces and
+      // blades drawn over it at the screen's full sharpness. The moon lights
+      // them from above and behind, the candle from the side, warmer the
+      // closer they come and guttering with it, and a soft shadow pools at
+      // their feet. They face right and are mirrored, about the hips, to face
+      // left. The lightning catches them as dark shapes and the thunder shakes
+      // them with everything else; with reduced motion, Michael just stands
+      // by the pumpkin.
       const stage = document.querySelector("[data-villains]");
       if (stage) {
         const calm = matchMedia("(prefers-reduced-motion: reduce)");
+        // The canvas, in units of about a screen point: feet on FLOOR, hips
+        // at HIP_X, room ahead for a reaching arm and its blade.
+        const W = 124, H = 160, FLOOR = 152, HIP_X = 42;
         // Angles are in degrees: 0 straight down, 90 forward, 180 straight up.
-        const W = 34, H = 40, HIP_X = 13;
         const rad = d => d * Math.PI / 180;
         const smooth = t => t * t * (3 - 2 * t);
+        const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
         const dir = (angle, length) => [Math.sin(rad(angle)) * length, Math.cos(rad(angle)) * length];
-        const shade = (hex, by) => "#" + [1, 3, 5].map(i => Math.round(parseInt(hex.slice(i, i + 2), 16) * by).toString(16).padStart(2, "0")).join("");
-
-        const frame = () => new Map();
-        const dot = (cells, x, y, color) => {
-          x = Math.floor(x); y = Math.floor(y);
-          if (x >= 0 && y >= 0 && x < W && y < H) cells.set(y * W + x, color);
-        };
-        // A limb or a blade: every cell whose middle is within half the width of the line.
-        const line = (cells, [x1, y1], [x2, y2], width, color) => {
-          const r = width / 2, dx = x2 - x1, dy = y2 - y1, span = dx * dx + dy * dy || 1;
-          for (let y = Math.floor(Math.min(y1, y2) - r); y <= Math.max(y1, y2) + r; y++) {
-            for (let x = Math.floor(Math.min(x1, x2) - r); x <= Math.max(x1, x2) + r; x++) {
-              const px = x + .5, py = y + .5, t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / span));
-              if (Math.hypot(px - x1 - dx * t, py - y1 - dy * t) <= r) dot(cells, x, y, color);
-            }
-          }
-        };
-        // A drawn part, placed so its anchor lands on (ax, ay), turned by `turn`
-        // about that anchor (looked up backwards, so turning leaves no holes).
-        const stamp = (cells, art, colors, [cx, cy], [ax, ay], turn = 0) => {
-          const c = Math.cos(rad(turn)), s = Math.sin(rad(turn)), wide = Math.max(...art.map(r => r.length)), reach = Math.hypot(wide, art.length) + 1;
-          for (let y = Math.floor(ay - reach); y <= ay + reach; y++) {
-            for (let x = Math.floor(ax - reach); x <= ax + reach; x++) {
-              // From this cell back into the art.
-              const dx = x + .5 - ax, dy = y + .5 - ay;
-              const u = Math.floor(cx + dx * c + dy * s), v = Math.floor(cy - dx * s + dy * c);
-              const key = art[v]?.[u];
-              if (key && key !== ".") dot(cells, x, y, colors[key]);
-            }
-          }
-        };
-        // Where a point of the body ends up when the body leans about the hips.
-        const lean = ([x, y], [hx, hy], angle) => {
-          const c = Math.cos(rad(angle)), s = Math.sin(rad(angle)), dx = x - hx, dy = y - hy;
-          return [hx + dx * c - dy * s, hy + dx * s + dy * c];
+        const add = (a, b) => [a[0] + b[0], a[1] + b[1]];
+        // The turn of the canvas that points along an angle.
+        const along = angle => rad(90 - angle);
+        const channels = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+        const toHex = c => "#" + c.map(v => clamp(Math.round(v), 0, 255).toString(16).padStart(2, "0")).join("");
+        const shade = (hex, by) => toHex(channels(hex).map(v => v * by));
+        const mix = (a, b, t) => { const x = channels(a), y = channels(b); return toHex(x.map((v, i) => v + (y[i] - v) * t)); };
+        const rgba = (hex, a) => `rgba(${channels(hex).join(",")},${a})`;
+        // A fixed scatter, the same every frame: grime, burns, freckles.
+        const scatter = (seed, count) => {
+          let s = seed;
+          const next = () => (s = s * 16807 % 2147483647) / 2147483647;
+          return Array.from({ length: count }, () => [next(), next(), next()]);
         };
 
-        // One villain in one pose.
-        const draw = (who, pose) => {
-          const cells = frame(), L = who.limbs, k = who.colors;
-          // Legs from the hips: thigh, knee, shin, and a foot pointing forward.
-          const leg = ([thigh, knee]) => {
-            const [tx, ty] = dir(thigh, L.thigh), [sx, sy] = dir(thigh - knee, L.shin);
-            return { knee: [tx, ty], ankle: [tx + sx, ty + sy] };
-          };
-          const near = leg(pose.nearLeg), far = leg(pose.farLeg);
-          // The hips sit where the lower foot just touches the ground.
-          const hy = H - L.foot[1] - Math.max(near.ankle[1], far.ankle[1]) - (pose.crouch || 0) - (pose.hop || 0);
-          const hip = [HIP_X + (pose.shift || 0), hy];
-          const at = ([x, y]) => [hip[0] + x, hip[1] + y];
-          const drawLeg = (l, angle, color, shoe) => {
-            line(cells, hip, at(l.knee), L.legWidth, color);
-            line(cells, at(l.knee), at(l.ankle), L.legWidth * .9, color);
-            const [ax, ay] = at(l.ankle), toe = Math.max(-25, Math.min(25, (angle[0] - angle[1]) * .4));
-            line(cells, [ax - .4, ay + .2], [ax + Math.cos(rad(toe)) * L.foot[0], ay + .2 + Math.sin(rad(toe)) * .3], L.foot[1], shoe);
-          };
-          // Arms from the shoulders: upper arm, elbow, forearm, hand.
-          const torsoAt = p => lean(at([p[0] - who.torso.hips[0], p[1] - who.torso.hips[1]]), hip, pose.lean || 0);
-          const arm = (shoulder, [upper, elbow]) => {
-            const s = torsoAt(shoulder), [ex, ey] = dir(upper + (pose.lean || 0), L.upper), e = [s[0] + ex, s[1] + ey];
-            const [wx, wy] = dir(upper + elbow + (pose.lean || 0), L.fore), w = [e[0] + wx, e[1] + wy];
-            return { s, e, w, fore: upper + elbow + (pose.lean || 0) };
-          };
-          const farArm = arm(who.torso.far, pose.farArm), nearArm = arm(who.torso.near, pose.nearArm);
-          // A sleeve of one colour, or of stripes running round the arm.
-          const sleeveLine = (from, to, width, sleeve) => {
-            if (!Array.isArray(sleeve)) return line(cells, from, to, width, sleeve);
-            const length = Math.hypot(to[0] - from[0], to[1] - from[1]), bands = Math.max(1, Math.round(length / (L.band || 1.3)));
-            for (let i = 0; i < bands; i++) {
-              const p = t => [from[0] + (to[0] - from[0]) * t, from[1] + (to[1] - from[1]) * t];
-              line(cells, p(i / bands), p((i + 1) / bands), width, sleeve[i % sleeve.length]);
-            }
-          };
-          const drawArm = (a, sleeve, hand, offset = 0) => {
-            sleeveLine(a.s, a.e, L.armWidth, Array.isArray(sleeve) ? [...sleeve.slice(offset), ...sleeve.slice(0, offset)] : sleeve);
-            sleeveLine(a.e, a.w, L.armWidth * .9, Array.isArray(sleeve) ? [...sleeve.slice(offset + 1), ...sleeve.slice(0, offset + 1)] : sleeve);
-            line(cells, a.w, a.w, L.hand, hand);
-          };
-          const dark = by => Object.fromEntries(Object.entries(k).map(([key, hex]) => [key, Array.isArray(hex) ? hex.map(h => shade(h, by)) : shade(hex, by)]));
-          const farColors = dark(.76);
-          // Behind: the far arm and its hand, the far leg.
-          drawArm(farArm, farColors.sleeve, farColors.hand);
-          if (who.farProp) who.farProp(cells, farArm, pose, farColors);
-          drawLeg(far, pose.farLeg, farColors.pants, farColors.shoe);
-          drawLeg(near, pose.nearLeg, k.pants, k.shoe);
-          // The body, leaning about the hips, and the head on it.
-          stamp(cells, who.torso.art, k, who.torso.hips, hip, pose.lean || 0);
-          const neck = torsoAt(who.torso.neck);
-          stamp(cells, who.head.art, k, who.head.neck, neck, (pose.lean || 0) + (pose.tilt || 0));
-          if (who.hat) {
-            const [hx, hy] = dir((pose.lean || 0) + (pose.tilt || 0) + 180, pose.hat || 0);
-            stamp(cells, who.hat.art, k, who.hat.neck, [neck[0] + hx, neck[1] + hy], (pose.lean || 0) + (pose.tilt || 0) + (pose.hatTip || 0));
+        // Drawing, in the canvas being painted.
+        let pen = null;
+        const gradient = (made, stops) => { stops.forEach(([at, color]) => made.addColorStop(at, color)); return made; };
+        const linear = (x1, y1, x2, y2, stops, ctx = pen) => gradient(ctx.createLinearGradient(x1, y1, x2, y2), stops);
+        const radial = (x, y, r, stops, ctx = pen) => gradient(ctx.createRadialGradient(x, y, 0, x, y, r), stops);
+        const fill = style => { pen.fillStyle = style; pen.fill(); };
+        // A closed shape through these points, rounded between them.
+        const outline = points => {
+          const n = points.length, mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+          pen.beginPath();
+          pen.moveTo(...mid(points[n - 1], points[0]));
+          points.forEach((p, i) => { const m = mid(p, points[(i + 1) % n]); pen.quadraticCurveTo(p[0], p[1], m[0], m[1]); });
+          pen.closePath();
+        };
+        // A shape with corners, for blades and ragged hems.
+        const sharp = points => { pen.beginPath(); points.forEach((p, i) => i ? pen.lineTo(...p) : pen.moveTo(...p)); pen.closePath(); };
+        // A line drawn smoothly through these points.
+        const stroke = (points, color, width) => {
+          pen.beginPath();
+          pen.moveTo(...points[0]);
+          for (let i = 1; i < points.length - 1; i++) {
+            const p = points[i], q = points[i + 1];
+            pen.quadraticCurveTo(p[0], p[1], (p[0] + q[0]) / 2, (p[1] + q[1]) / 2);
           }
-          // In front: the near arm, and what it holds.
-          drawArm(nearArm, k.sleeve, k.nearHand || k.hand);
-          if (who.prop) who.prop(cells, nearArm, pose, k);
-          return cells;
+          pen.lineTo(...points[points.length - 1]);
+          pen.strokeStyle = color;
+          pen.lineWidth = width;
+          pen.lineCap = pen.lineJoin = "round";
+          pen.stroke();
+        };
+        const oval = (x, y, rx, ry, turn = 0) => { pen.beginPath(); pen.ellipse(x, y, rx, ry, turn, 0, Math.PI * 2); };
+        // A soft patch of light or shadow, within whatever is clipped.
+        const spot = (x, y, r, color, alpha) => {
+          pen.fillStyle = radial(x, y, r, [[0, rgba(color, alpha)], [1, rgba(color, 0)]]);
+          pen.fillRect(x - r, y - r, r * 2, r * 2);
+        };
+        // A limb from a to b, wa wide at a and wb at b, rounded at both ends.
+        const limb = (a, b, wa, wb) => {
+          const angle = Math.atan2(b[1] - a[1], b[0] - a[0]);
+          pen.beginPath();
+          pen.arc(a[0], a[1], wa / 2, angle + Math.PI / 2, angle - Math.PI / 2);
+          pen.arc(b[0], b[1], wb / 2, angle - Math.PI / 2, angle + Math.PI / 2);
+          pen.closePath();
+        };
+        // Shading across a part running from a to b, w wide: lit on the side
+        // toward the moon, above and a little ahead, dark on the other.
+        const MOON = [.38, -.92];
+        const round = (a, b, w, depth = 1) => {
+          let nx = a[1] - b[1], ny = b[0] - a[0];
+          const size = Math.hypot(nx, ny) || 1;
+          nx /= size; ny /= size;
+          if (nx * MOON[0] + ny * MOON[1] < 0) { nx = -nx; ny = -ny; }
+          const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, r = w / 2;
+          return linear(mx + nx * r, my + ny * r, mx - nx * r, my - ny * r,
+            [[0, `rgba(255,255,255,${.24 * depth})`], [.3, "rgba(255,255,255,0)"], [.56, "rgba(0,0,0,0)"], [1, `rgba(0,0,0,${.62 * depth})`]]);
+        };
+        // A limb from a to b, shaped along its length: its profile gives, at
+        // points along it, how far it reaches behind its line and ahead,
+        // so a calf swells below the knee and a forearm below the elbow.
+        const shaped = (a, b, profile, size) => {
+          const length = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, ux = (b[0] - a[0]) / length, uy = (b[1] - a[1]) / length;
+          const point = (t, w) => [a[0] + ux * length * t - uy * w * size, a[1] + uy * length * t + ux * w * size];
+          const [, endBack, endFront] = profile[profile.length - 1], [, startBack, startFront] = profile[0];
+          outline([...profile.map(([t, back]) => point(t, back)),
+                   point(1 + (endBack + endFront) * size * .42 / length, (endBack - endFront) / 2),
+                   ...profile.slice().reverse().map(([t, , front]) => point(t, -front)),
+                   point(-(startBack + startFront) * size * .42 / length, (startBack - startFront) / 2)]);
+          return Math.max(...profile.map(([, back, front]) => back + front)) * size;
+        };
+        // A limb's cloth or skin: one colour, or bands running round it.
+        const part = (a, b, profile, size, cloth, band = 3.2) => {
+          const w = shaped(a, b, profile, size);
+          if (Array.isArray(cloth)) {
+            pen.save();
+            pen.clip();
+            const length = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, ux = (b[0] - a[0]) / length, uy = (b[1] - a[1]) / length;
+            for (let i = 0, from = -w; from + i * band < length + w; i++) {
+              const p = from + i * band, q = p + band + .05;
+              sharp([[a[0] + ux * p - uy * w, a[1] + uy * p + ux * w], [a[0] + ux * q - uy * w, a[1] + uy * q + ux * w],
+                     [a[0] + ux * q + uy * w, a[1] + uy * q - ux * w], [a[0] + ux * p + uy * w, a[1] + uy * p - ux * w]]);
+              fill(cloth[i % cloth.length]);
+            }
+            pen.restore();
+            shaped(a, b, profile, size);
+          } else fill(cloth);
+          fill(round(a, b, w));
+        };
+        // The shapes of limbs, in half-widths behind and ahead of the bone:
+        // thigh, shin with its calf, upper arm, forearm.
+        const THIGH = [[0, 6.6, 6], [.35, 6.3, 5.8], [.75, 4.9, 4.8], [1, 4, 3.9]];
+        const SHIN = [[0, 3.9, 3.8], [.26, 4.6, 3.6], [.65, 3.2, 3], [1, 2.5, 2.4]];
+        const UPPER = [[0, 4, 4.1], [.4, 3.7, 3.9], [1, 2.9, 2.9]];
+        const FORE = [[0, 2.9, 2.9], [.3, 3.2, 3], [1, 2.2, 2.2]];
+        // The body from the hips to the neck, L long, f as deep as a man's:
+        // seat, small of the back, shoulder blades, neck, chest and belly.
+        const trunk = (L, f) => {
+          const u = L / 33;
+          return [[-6.4 * f, 4 * u], [-8.2 * f, -2 * u], [-6.6 * f, -L * .36], [-7.8 * f, -L * .7], [-6 * f, -L * .9],
+                  [-2.6 * u, -L], [2.2 * u, -L], [6 * f, -L * .9], [7.6 * f, -L * .7], [6.4 * f, -L * .44],
+                  [6.6 * f, -L * .16], [6.2 * f, 3 * u], [0, 5.4 * u]];
+        };
+        // Its roundness: lit at the chest, falling into shadow down the back.
+        const bulk = (L, f) => linear(8 * f, -L * .8, -8 * f, -L * .3,
+          [[0, "rgba(255,255,255,.2)"], [.34, "rgba(255,255,255,0)"], [.6, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,.58)"]]);
+        // A face's light, from the front of it to the back of the head.
+        const facing = (front, back, color) => linear(front, 0, back, 0, [[0, mix(color, "#ffffff", .32)], [.42, color], [1, shade(color, .6)]]);
+
+        // A leg posed from the hip: thigh, knee and shin, and the foot under
+        // it, its toe raised as it reaches forward and its heel lifted behind.
+        const legOf = (B, [thigh, knee]) => {
+          const shin = thigh - knee, kneeAt = dir(thigh, B.thigh), ankle = add(kneeAt, dir(shin, B.shin));
+          const pitch = rad(clamp(-.5 * shin, -22, 30)), c = Math.cos(pitch), s = Math.sin(pitch);
+          const foot = ([x, y]) => [ankle[0] + x * c - y * s, ankle[1] + x * s + y * c];
+          return { knee: kneeAt, ankle, foot, low: Math.max(foot([-B.heel, B.ankle])[1], foot([B.toe, B.ankle])[1]) };
+        };
+        // An arm from the shoulder: upper arm, elbow, forearm, and the hand.
+        const armOf = (B, shoulder, [upper, elbow], lean) => {
+          const elbowAt = add(shoulder, dir(upper + lean, B.upper)), fore = upper + elbow + lean;
+          return { s: shoulder, e: elbowAt, w: add(elbowAt, dir(fore, B.fore)), fore };
+        };
+        // Boots with a shaft over the ankle, or low shoes: x forward, as a
+        // share of the heel behind the ankle and the toe ahead of it; y up
+        // from the sole, as a share of the ankle's height above it.
+        const BOOT = [[-1, -2.2], [-1.13, -.35], [-.9, 0], [.85, 0], [1.03, -.33], [.8, -.82], [.27, -1.05], [.25, -2.2]];
+        const SHOE = [[-1, -1.35], [-1.1, -.25], [-.9, 0], [.85, 0], [1.02, -.3], [.8, -.68], [.21, -.95], [.13, -1.4]];
+        const shoeAt = (B, kind) => kind.map(([x, y]) => [x < 0 ? x * B.heel : x * B.toe, B.ankle + y * B.ankle]);
+
+        // One villain in one pose; returns how far its feet reach, for its shadow.
+        const figure = (who, pose) => {
+          const B = who.body, k = who.colors, d = who.dim, lean = pose.lean || 0, L = B.torso;
+          const nearLeg = legOf(B, pose.nearLeg), farLeg = legOf(B, pose.farLeg);
+          const hip = [HIP_X + (pose.shift || 0), FLOOR - Math.max(nearLeg.low, farLeg.low) - (pose.crouch || 0) - (pose.hop || 0)];
+          const at = p => add(hip, p);
+          const c = Math.cos(rad(lean)), s = Math.sin(rad(lean));
+          const body = ([x, y]) => [hip[0] + x * c - y * s, hip[1] + x * s + y * c];
+          const nearArm = armOf(B, body([1.4, -L * .86]), pose.nearArm, lean), farArm = armOf(B, body([-2.2, -L * .88]), pose.farArm, lean);
+
+          const drawLeg = (leg, k) => {
+            const knee = at(leg.knee), ankle = at(leg.ankle);
+            part(hip, knee, THIGH, B.legs, k.pants);
+            part(knee, ankle, SHIN, B.legs, k.pants);
+            // A crease behind the bent knee.
+            stroke([add(knee, dir(leg.knee[0] > 0 ? 200 : 160, 1.5)), knee], "rgba(0,0,0,.3)", .5 * B.legs);
+            const toe = at(leg.foot([B.toe * .8, B.ankle * .62])), heel = at(leg.foot([-B.heel, B.ankle * .62]));
+            outline(shoeAt(B, who.boots ? BOOT : SHOE).map(p => at(leg.foot(p))));
+            fill(k.shoe);
+            fill(linear(0, ankle[1] - 3, 0, ankle[1] + B.ankle, [[0, "rgba(255,255,255,.2)"], [.55, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,.45)"]]));
+            if (k.trim) stroke([heel, toe], k.trim, B.ankle * .22);
+            stroke([at(leg.foot([-B.heel + .3, B.ankle - .3])), at(leg.foot([B.toe - .6, B.ankle - .3]))], k.sole || shade(k.shoe, .45), B.ankle * .2);
+          };
+          const drawArm = (arm, k) => {
+            part(arm.s, arm.e, who.sleeves?.[0] || UPPER, B.arms, k.sleeve);
+            part(arm.e, arm.w, who.sleeves?.[1] || FORE, B.arms, k.sleeve);
+            who.cuff?.(arm, k, B);
+          };
+          // A hand closed round its grip: the fist, and the thumb over it.
+          const drawHand = (arm, color) => {
+            pen.save();
+            pen.translate(...arm.w);
+            pen.rotate(along(arm.fore));
+            pen.scale(B.hand / 6, B.hand / 6);
+            outline([[-.6, -2], [2.2, -2.5], [4.2, -1.8], [4.8, .2], [4, 2.1], [1.6, 2.4], [-.6, 1.8]]);
+            fill(color);
+            fill(linear(0, -2.5, 0, 2.4, [[0, "rgba(255,255,255,.2)"], [.45, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,.5)"]]));
+            outline([[1, -2.6], [3.4, -2.9], [4.2, -2.2], [2.4, -1.6]]);
+            fill(shade(color, .82));
+            stroke([[2.6, -1.4], [2.8, 1.6]], "rgba(0,0,0,.25)", .35);
+            pen.restore();
+          };
+
+          // Behind: the far arm and hand, the far leg; then the near leg.
+          drawArm(farArm, d);
+          drawHand(farArm, d.hand);
+          drawLeg(farLeg, d);
+          drawLeg(nearLeg, k);
+          // The body, leaning about the hips, what hangs from it, and the head.
+          pen.save();
+          pen.translate(hip[0], hip[1]);
+          pen.rotate(rad(lean));
+          who.torso(k, B);
+          pen.restore();
+          who.skirt?.(k, B, hip, [at(nearLeg.knee), at(farLeg.knee), at(nearLeg.ankle), at(farLeg.ankle)], body);
+          const neck = body([.6 * L / 33, -L]);
+          pen.save();
+          pen.translate(neck[0], neck[1]);
+          pen.rotate(rad(lean + (pose.tilt || 0)));
+          pen.scale(who.headSize || 1, who.headSize || 1);
+          who.head(k, pose);
+          pen.restore();
+          // In front: the near arm, what it holds, and the hand round it.
+          drawArm(nearArm, k);
+          if (who.prop) {
+            const angle = pose.prop ?? nearArm.fore + (pose.grip ?? who.grip ?? 0), middle = add(nearArm.w, dir(nearArm.fore, B.hand * .36));
+            pen.save();
+            pen.translate(middle[0], middle[1]);
+            pen.rotate(along(angle));
+            who.prop(k, pose);
+            pen.restore();
+          }
+          drawHand(nearArm, k.nearHand || k.hand);
+          const feet = [nearLeg, farLeg].flatMap(leg => [at(leg.foot([-B.heel, 0]))[0], at(leg.foot([B.toe, 0]))[0]]);
+          return [Math.min(...feet), Math.max(...feet)];
         };
 
-        // What they hold.
-        const blade = (length, width, handle) => (cells, hand, pose, k) => {
-          const angle = pose.prop ?? hand.fore + (pose.grip ?? 0);
-          const [dx, dy] = dir(angle, 1), w = hand.w;
-          const grip = [w[0] - dx * handle * .5, w[1] - dy * handle * .5], hilt = [w[0] + dx * handle * .5, w[1] + dy * handle * .5];
-          line(cells, grip, hilt, 1.2, k.handle);
-          const tip = [hilt[0] + dx * length, hilt[1] + dy * length];
-          line(cells, hilt, tip, width, k.steel);
-          // The edge catches the light along its length.
-          line(cells, [hilt[0] + dx, hilt[1] + dy], tip, .9, k.edge);
-          if (pose.glint) dot(cells, hilt[0] + dx * length * pose.glint, hilt[1] + dy * length * pose.glint, "#ffffff");
+        // What they hold, drawn from the middle of the grip along the blade:
+        // the handle through the fist, then the steel.
+        const steel = (top, bottom, k) => linear(0, top, 0, bottom, [[0, mix(k.steel, "#ffffff", .55)], [.4, k.steel], [1, shade(k.steel, .5)]]);
+        const glint = (x, size) => {
+          pen.fillStyle = radial(x, 0, size, [[0, "rgba(255,255,255,1)"], [.3, "rgba(255,255,255,.55)"], [1, "rgba(255,255,255,0)"]]);
+          pen.fillRect(x - size, -size, size * 2, size * 2);
+          stroke([[x - size * 1.5, 0], [x + size * 1.5, 0]], "rgba(255,255,255,.9)", .3);
+          stroke([[x, -size * 1.5], [x, size * 1.5]], "rgba(255,255,255,.9)", .3);
         };
-        const claws = (cells, hand, pose, k) => {
-          const angle = pose.prop ?? hand.fore, spread = pose.spread ?? .4, w = hand.w;
+        const grip = (handle, width, k) => {
+          limb([-handle / 2, 0], [handle / 2, 0], width, width * 1.1);
+          fill(k.handle);
+          fill(round([-handle / 2, 0], [handle / 2, 0], width * 1.1));
+        };
+        // A knife: straight along its back, its edge curving up to the point,
+        // or clipped near the point like a hunting knife's, with a guard.
+        const knife = ({ length, width, handle, clip = false }) => (k, pose) => {
+          const h = handle / 2;
+          grip(handle, width * .62, k);
+          if (clip) { sharp([[h - .5, -width * .78], [h + .5, -width * .78], [h + .5, width * .78], [h - .5, width * .78]]); fill(k.guard); }
+          pen.beginPath();
+          pen.moveTo(h, -width * .42);
+          if (clip) {
+            pen.lineTo(h + length * .66, -width * .42);
+            pen.quadraticCurveTo(h + length * .86, -width * .36, h + length, -width * .02);
+          } else {
+            pen.lineTo(h + length * .9, -width * .36);
+            pen.lineTo(h + length, -width * .2);
+          }
+          pen.quadraticCurveTo(h + length * .78, width * .56, h + length * .3, width * .58);
+          pen.lineTo(h, width * .56);
+          pen.closePath();
+          fill(steel(-width * .42, width * .58, k));
+          stroke([[h + .6, width * .5], [h + length * .7, width * .44], [h + length - .5, 0]], rgba(k.edge, .8), .3);
+          if (pose.glint) glint(h + length * pose.glint, width * 1.3);
+        };
+        // A machete: long, broadening toward a rounded end, rust along it.
+        const machete = ({ length, width, handle }) => (k, pose) => {
+          const h = handle / 2;
+          grip(handle, width * .48, k);
+          outline([[h - .4, -width * .3], [h + length * .5, -width * .42], [h + length * .9, -width * .5], [h + length * 1.02, -width * .2],
+                   [h + length * .98, width * .42], [h + length * .8, width * .55], [h + length * .3, width * .46], [h - .4, width * .34]]);
+          fill(steel(-width * .5, width * .55, k));
+          pen.save();
+          pen.clip();
+          for (const [u, v, r] of k.rust) spot(h + length * (.12 + u * .84), (v - .5) * width, .6 + r * 1.3, "#5c3a1e", .55);
+          pen.restore();
+          stroke([[h + .6, width * .42], [h + length * .8, width * .5], [h + length * .97, width * .3]], rgba(k.edge, .75), .35);
+          if (pose.glint) glint(h + length * pose.glint, width);
+        };
+        // Freddy's glove: four long blades from the fingers, fanned by `spread`.
+        const claws = (k, pose) => {
+          const spread = pose.spread ?? .4;
           for (const fan of [-1.5, -.5, .5, 1.5]) {
-            const [dx, dy] = dir(angle + fan * 9 * spread, 1);
-            line(cells, [w[0] + dx * .8, w[1] + dy * .8], [w[0] + dx * 5.4, w[1] + dy * 5.4], .9, k.steel);
-            if (pose.sparks) dot(cells, w[0] + dx * 5.4 + (Math.random() - .5) * 2, w[1] + dy * 5.4 + (Math.random() - .5) * 2, Math.random() < .5 ? "#ffe9a0" : "#ffffff");
+            pen.save();
+            pen.rotate(rad(fan * 9 * spread));
+            pen.translate(0, fan * .8);
+            sharp([[1.4, -.5], [9, -.6], [15.4, .5], [9, .4], [1.4, .5]]);
+            fill(steel(-.6, .5, k));
+            pen.restore();
+          }
+          // Scraped along the ground, they throw sparks.
+          if (pose.sparks) {
+            for (let i = 0; i < 9; i++) {
+              const from = [14 + Math.random() * 2, (Math.random() - .5) * 3], to = add(from, dir(40 + Math.random() * 120, 2 + Math.random() * 4));
+              stroke([from, to], Math.random() < .5 ? "rgba(255,226,140,.95)" : "rgba(255,255,255,.95)", .35);
+            }
           }
         };
 
+        // Proportions in units: a grown man about 108 tall.
+        const man = { thigh: 26, shin: 25, ankle: 4, heel: 3, toe: 9.5, upper: 19, fore: 16.5, hand: 6, torso: 33, chest: 1.25, legs: 1, arms: 1 };
         const rest = { nearLeg: [5, 4], farLeg: [-5, 4], nearArm: [8, 14], farArm: [4, 10], lean: 0, tilt: 0 };
-        // Small and bold: big heads that carry each face, short bodies and limbs.
-        const adult = { thigh: 3.6, shin: 3.4, upper: 3, fore: 2.8, legWidth: 2.8, armWidth: 2.5, hand: 2, foot: [3, 1.6] };
-        const cast = {   jason: {
-          colors: { w: "#ece5d2", m: "#5c5048", r: "#d2342e", k: "#1e1a18", J: "#3e4936", j: "#56644a", z: "#2f372a", b: "#29241f",
-                    sleeve: "#56644a", hand: "#b88b6c", pants: "#4b4d58", shoe: "#3a2e26", handle: "#6a4a2e", steel: "#a4adb9", edge: "#f4f7fa" },
-          head: { neck: [6.5, 12.6], art: [
-            "....mmmmm....",
-            "..mmwwwwwmm..",
-            ".mwwwwwwwwwm.",
-            ".mwrrwwwwrrm.",
-            "mwwwrwwwrwwwm",
-            "mwkkkwwwkkkwm",
-            "mwkkkwwwkkkwm",
-            "mwwwwwkwwwwwm",
-            "mwrwwwwwwwrwm",
-            ".mwrwkwkwrwm.",
-            ".mwwwwkwwwwm.",
-            "..mwwkwkwwm..",
-            "....mwwwm....",
-          ] },
-          torso: { hips: [5, 7.6], neck: [5.2, .3], near: [8.6, 1.4], far: [1.6, 1.4], art: [
-            "..JJjjjjJ..",
-            ".JJjjjjjjjj",
-            "JJjjjjzjjjj",
-            "JJjjjjzjjjj",
-            "JJjjjjzjjjj",
-            ".JJjjjzjjj.",
-            ".JJjjjjjjj.",
-            ".bbbbbbbbb.",
-          ] },
-          limbs: adult,
-          prop: blade(7, 2, 1.8), grip: 8,
-          speed: 36, walk: { stride: 26, knee: 44, swing: 18, armRest: 8, elbow: 14, elbowSwing: 12, lean: 3 },
+        const cast = {
+        jason: {
+          body: { ...man, thigh: 28, shin: 27, ankle: 4.2, torso: 36, upper: 21, fore: 18, hand: 6.8, chest: 1.5, legs: 1.18, arms: 1.25 },
+          boots: true, reach: 44,
+          colors: { jacket: "#4c5139", shirt: "#2b2823", sleeve: "#4c5139", pants: "#3a3d45", shoe: "#2a221d", hand: "#8a8268", skin: "#8b846b",
+                    mask: "#e6dfca", red: "#b52b26", strap: "#1c1a17", handle: "#4a3321", steel: "#959ca3", edge: "#e8ecf0",
+                    rust: scatter(7, 10), grime: scatter(11, 14) },
+          torso: (k, B) => {
+            const L = B.torso, f = B.chest, shape = trunk(L, f);
+            outline(shape);
+            fill(k.jacket);
+            pen.save();
+            pen.clip();
+            // The shirt where the jacket hangs open, the jacket's hem, its
+            // grime and its tears.
+            outline([[3.2 * f, -L * 1.02], [8 * f, -L * .84], [8.4 * f, -L * .2], [7 * f, 3], [4.6 * f, 2], [5 * f, -L * .5], [3.8 * f, -L * .82]]);
+            fill(k.shirt);
+            stroke([[3.4 * f, -L * .98], [5.1 * f, -L * .55], [4.6 * f, 2]], "rgba(0,0,0,.5)", .8);
+            stroke([[-8 * f, 1.6], [0, 2.4], [5 * f, 1.8]], "rgba(0,0,0,.4)", 1);
+            for (const [u, v, r] of k.grime) spot(-7.5 * f + u * 13 * f, -L * (.08 + v * .84), 1 + r * 1.6, "#17140f", .4);
+            stroke([[-6.4 * f, -L * .52], [-3.8 * f, -L * .47], [-4.6 * f, -L * .41]], "rgba(200,190,150,.35)", .45);
+            stroke([[-2 * f, -L * .22], [.6 * f, -L * .25]], "rgba(200,190,150,.3)", .4);
+            pen.restore();
+            outline(shape);
+            fill(bulk(L, f));
+          },
+          head: k => {
+            limb([.4, 3], [.7, -4], 6.8, 6.2);
+            fill(shade(k.skin, .82));
+            // Bald and misshapen behind the mask, held on by its straps.
+            outline([[-6.8, -4], [-8.2, -9.6], [-7, -15.2], [-2.8, -18.6], [2.6, -18.2], [5.6, -14.6], [4, -8], [1, -3]]);
+            fill(radial(-2.6, -13, 10, [[0, mix(k.skin, "#ffffff", .12)], [1, shade(k.skin, .5)]]));
+            pen.save();
+            pen.clip();
+            spot(-4.8, -13.6, 2.2, "#2a2418", .45);
+            spot(-6.2, -8.8, 1.8, "#2a2418", .4);
+            spot(-3.2, -16.4, 1.6, "#d8d2b0", .3);
+            spot(-2, -6.4, 1.6, "#2a2418", .35);
+            pen.restore();
+            stroke([[-3, -15.8], [-6, -12.6], [-6.8, -8.6]], k.strap, .7);
+            stroke([[-3.6, -7.6], [-6.2, -6.6]], k.strap, .7);
+            // The hockey mask, scuffed white.
+            const mask = [[-3.6, -14.4], [0, -16.8], [4.2, -16.4], [6.6, -13.4], [6.9, -9.8], [6.7, -6.4], [5.3, -3.4], [2.9, -2], [.2, -2.8], [-2.4, -5.2], [-3.9, -9.4]];
+            outline(mask);
+            fill(facing(6.9, -3.9, k.mask));
+            pen.save();
+            pen.clip();
+            stroke([[3.5, -16.4], [3.8, -10.4], [3.5, -2.4]], "rgba(255,255,255,.4)", .5);
+            stroke([[2.9, -16.2], [3.2, -10.4], [2.9, -2.6]], "rgba(60,50,40,.25)", .5);
+            for (const [u, v, r] of k.grime.slice(0, 6)) spot(-2 + u * 8, -15 + v * 12, .6 + r, "#6b5a40", .22);
+            // The red chevrons: down the forehead and over each eye, and
+            // pointing up on each cheek.
+            sharp([[2.4, -15.2], [4.6, -15.3], [3.6, -13.3]]); fill(k.red);
+            sharp([[4.6, -12.6], [6.4, -13], [6.5, -12.2], [4.8, -11.7]]); fill(k.red);
+            sharp([[.4, -12.5], [2, -12.4], [2, -11.7], [.6, -11.8]]); fill(shade(k.red, .8));
+            sharp([[4.3, -5.6], [5.4, -7.8], [6.4, -5.7], [5.7, -5.7], [5.4, -6.6], [5, -5.6]]); fill(k.red);
+            sharp([[.4, -5.7], [1.2, -7.6], [2, -5.8], [1.5, -5.8], [1.2, -6.5], [.9, -5.7]]); fill(shade(k.red, .8));
+            // Eye holes, and the rows of holes to breathe through.
+            oval(4.5, -9.9, 1.35, .95, rad(-10)); fill("#0a0908");
+            oval(1.3, -10, 1, .9); fill("#0a0908");
+            for (const [x, y] of [[2.6, -7.2], [3.6, -7.4], [2.2, -6], [3.2, -6.2], [4.2, -6.4], [2.6, -4.8], [3.6, -5], [4.6, -5.2],
+                                  [3.2, -3.8], [4.2, -4], [5.6, -8.6], [6.3, -8.8], [.2, -8.4], [-.6, -7.6], [6.2, -4.4], [-.8, -5.6]]) {
+              oval(x, y, .3, .3); fill("rgba(24,19,15,.9)");
+            }
+            pen.restore();
+          },
+          prop: machete({ length: 30, width: 5, handle: 7 }), grip: 8,
+          speed: 74, walk: { stride: 23, knee: 46, swing: 16, armRest: 8, elbow: 14, elbowSwing: 12, lean: 4 },
           act: [
             { at: 0, pose: {} },
             { at: 700, pose: { nearArm: [105, 62], prop: 188, lean: -7, farArm: [25, 30] } },
@@ -1948,42 +2159,80 @@
           ],
         },
         freddy: {
-          colors: { f: "#c45f4c", F: "#8e3a30", y: "#f2d35a", k: "#2e1210", t: "#efe2c4", h: "#74502f", H: "#3b2716",
-                    r: "#c42a31", R: "#8f1f25", g: "#2f8044", G: "#225e31", P: "#5e4c3a",
-                    sleeve: ["#c42a31", "#2f8044"], hand: "#c45f4c", nearHand: "#74502f", pants: "#5e4c3a", shoe: "#2e2520", steel: "#e2e7ee" },
-          head: { neck: [6, 9.6], art: [
-            "..ffffffff..",
-            ".fFfffffFff.",
-            "ffffFfffffFf",
-            "fyyfffffyyff",
-            "fFffffFffffF",
-            "ffffFffffFff",
-            "ffkkkkkkkfff",
-            "fftktktktfff",
-            ".ffkkkkkfff.",
-            "..ffffffff..",
-          ] },
-          hat: { neck: [7.5, 15.4], art: [
-            ".....hhhhh.....",
-            "....hhhhhhh....",
-            "....hhhhhhh....",
-            "....HHHHHHH....",
-            "hhhhhhhhhhhhhhh",
-            ".hhhhhhhhhhhhh.",
-          ] },
-          torso: { hips: [5, 7.6], neck: [5, .3], near: [8.6, 1.4], far: [1.6, 1.4], art: [
-            "..RRrrrrr..",
-            ".RRrrrrrrrr",
-            "GGgggggggg.",
-            "GGgggggggg.",
-            "RRrrrrrrrrr",
-            ".RRrrrrrrr.",
-            ".GGgggggggg",
-            ".PPPPPPPPP.",
-          ] },
-          limbs: adult,
+          body: { ...man, ankle: 3.6, torso: 32, chest: 1.16, legs: .92, arms: .92 },
+          boots: false, reach: 38,
+          colors: { stripes: ["#a8242a", "#28683a"], sleeve: ["#a8242a", "#28683a"], pants: "#4d3a2a", shoe: "#2a201a", hand: "#a65846", nearHand: "#5e4027",
+                    skin: "#b45d4a", burn: "#6e2620", raw: "#dc937a", hat: "#5f4329", band: "#2a1c11", steel: "#d9dee5", edge: "#ffffff",
+                    burns: scatter(23, 16) },
+          torso: (k, B) => {
+            const L = B.torso, f = B.chest, shape = trunk(L, f);
+            outline(shape);
+            pen.save();
+            pen.clip();
+            // The sweater's stripes, curving a little round the body.
+            for (let y = -L - 3, i = 0; y < 8; y += 3.4, i++) {
+              pen.beginPath();
+              pen.moveTo(-10, y);
+              pen.quadraticCurveTo(0, y + 1.2, 10, y);
+              pen.lineTo(10, y + 3.5);
+              pen.quadraticCurveTo(0, y + 4.7, -10, y + 3.5);
+              pen.closePath();
+              fill(k.stripes[i % 2]);
+            }
+            stroke([[-8, 2.6], [0, 3.6], [8, 2.6]], "rgba(0,0,0,.35)", 1.2);
+            stroke([[-4.6 * f, -L * .5], [-1.4 * f, -L * .44]], "rgba(0,0,0,.3)", .5);
+            pen.restore();
+            outline(shape);
+            fill(bulk(L, f));
+          },
+          head: (k, pose) => {
+            limb([.2, 3], [.8, -4], 5.2, 4.8);
+            fill(k.skin);
+            fill(round([.2, 3], [.8, -4], 5.2));
+            // His burned face.
+            const face = [[-5.2, -5], [-6.2, -9.6], [-5.4, -14], [-1.6, -16.4], [3, -16], [5.8, -13], [6.2, -10.6], [7.3, -8.4], [6.2, -7.4],
+                          [6.3, -5.6], [5.2, -3.4], [2.6, -2.4], [-.4, -2.8], [-3.2, -3.8]];
+            outline(face);
+            fill(facing(7.3, -6.2, k.skin));
+            pen.save();
+            pen.clip();
+            for (const [u, v, r] of k.burns) spot(-5 + u * 12, -16 + v * 13, .7 + r * 1.5, r < .5 ? k.burn : k.raw, .6);
+            spot(-3.4, -9, 2, "#3a1410", .4);
+            spot(4.2, -9.6, 2.4, "#2a0e0a", .55);
+            spot(1.3, -9.7, 2, "#2a0e0a", .5);
+            oval(-3.4, -9.2, 1.1, 1.8);
+            fill(shade(k.skin, .72));
+            // Yellowed eyes in deep sockets, and a grin of bad teeth.
+            oval(4.3, -9.6, .95, .55); fill("#e2d29a");
+            oval(4.55, -9.6, .42, .46); fill("#160c08");
+            oval(1.3, -9.7, .7, .5); fill("#cdbd88");
+            oval(1.5, -9.7, .34, .4); fill("#160c08");
+            stroke([[5.3, -8.8], [6.6, -7.6], [5.9, -7.2]], "rgba(60,20,14,.6)", .45);
+            pen.beginPath();
+            pen.moveTo(2.4, -5.6);
+            pen.quadraticCurveTo(4.4, -4.4, 6, -5.8);
+            pen.quadraticCurveTo(4.4, -3.4, 2.4, -5.6);
+            fill("#2a0d09");
+            stroke([[2.9, -5.2], [4.4, -4.6], [5.6, -5.4]], "rgba(235,220,170,.85)", .4);
+            pen.restore();
+            // His hat, which he lifts and tips.
+            pen.save();
+            pen.translate(.4, -14.2 - (pose.hat || 0));
+            pen.rotate(rad(pose.hatTip || 0));
+            pen.beginPath();
+            pen.ellipse(.4, 0, 10.4, 2.2, rad(-3), Math.PI, Math.PI * 2);
+            fill(shade(k.hat, .55));
+            outline([[-5.8, -.4], [-5.4, -5.8], [-2.6, -8], [.6, -7], [3.6, -7.8], [6.1, -5.4], [6.5, -.4]]);
+            fill(facing(6.5, -5.8, k.hat));
+            sharp([[-5.75, -2], [6.4, -2], [6.45, -.4], [-5.8, -.4]]);
+            fill(k.band);
+            pen.beginPath();
+            pen.ellipse(.4, 0, 10.4, 2.2, rad(-3), 0, Math.PI);
+            fill(linear(0, -1, 0, 2.4, [[0, mix(k.hat, "#ffffff", .12)], [1, shade(k.hat, .5)]]));
+            pen.restore();
+          },
           prop: claws,
-          speed: 42, walk: { stride: 28, knee: 46, swing: 24, armRest: 10, elbow: 22, elbowSwing: 16, lean: 2 },
+          speed: 84, walk: { stride: 25, knee: 50, swing: 22, armRest: 10, elbow: 20, elbowSwing: 16, lean: 2 },
           act: [
             { at: 0, pose: {} },
             { at: 500, pose: { nearArm: [60, 85], prop: 150, spread: .3 } },
@@ -1995,42 +2244,76 @@
             { at: 1800, pose: { nearArm: [75, 5], prop: 84, lean: 8, sparks: 1 }, hit: true },
             { at: 2050, pose: { nearArm: [30, 10], prop: 40, sparks: 0 } },
             { at: 2400, pose: { farArm: [170, 60], lean: 0 } },
-            { at: 2650, pose: { hat: 3, hatTip: -16 } },
+            { at: 2650, pose: { hat: 5, hatTip: -16 } },
             { at: 2950, pose: { hat: 0, hatTip: 0 } },
             { at: 3300, pose: { farArm: rest.farArm, nearArm: rest.nearArm, prop: undefined, spread: .4 } },
           ],
         },
         michael: {
-          colors: { a: "#4a3424", A: "#6b4b33", w: "#f2efe8", g: "#c4bfb5", k: "#141110", v: "#33405c", V: "#232c40", z: "#5d6a86",
-                    sleeve: "#33405c", hand: "#dcd0c2", pants: "#33405c", shoe: "#1a1a1e", handle: "#2a2420", steel: "#cfd4dc", edge: "#f6f8fa" },
-          head: { neck: [6.5, 12.6], art: [
-            "...aaAaaaa...",
-            "..aaaaaAaaa..",
-            ".aaaaawwwaaa.",
-            ".aaawwwwwwwaa",
-            "aaawwwwwwwwwa",
-            "aawkkkwwwkkka",
-            "aawkkkwwwkkka",
-            "aawwwwwwwwwwa",
-            "aaawwwwgwwwwa",
-            ".aawwwwwwwwa.",
-            ".aaawwkkkwwa.",
-            "..aawwwwwwa..",
-            "....awwwwa...",
-          ] },
-          torso: { hips: [5, 7.6], neck: [5, .3], near: [8.6, 1.4], far: [1.6, 1.4], art: [
-            "..VVvvvvV..",
-            ".VVvvvvvvvv",
-            "VVvvvvzvvvv",
-            "VVvvvvzvvvv",
-            "VVvvvvzvvvv",
-            ".VVvvvzvvv.",
-            ".VVvvvvvvv.",
-            ".VVvvvvvvv.",
-          ] },
-          limbs: adult,
-          prop: blade(4.6, 1.8, 1.8), grip: 0,
-          speed: 30, walk: { stride: 20, knee: 30, swing: 4, armRest: 5, elbow: 8, elbowSwing: 2, lean: 0 },
+          body: { ...man, thigh: 27, shin: 26, torso: 34, upper: 20, fore: 17, chest: 1.3, legs: 1.06, arms: 1.06 },
+          boots: true, reach: 34,
+          colors: { suit: "#2c3950", sleeve: "#2c3950", pants: "#2c3950", mask: "#e6e2d9", hair: "#3f2b1e", hand: "#d2c7b9", shoe: "#151518",
+                    handle: "#2a201a", steel: "#c3c9d1", edge: "#f4f6f9" },
+          torso: (k, B) => {
+            const L = B.torso, f = B.chest, shape = trunk(L, f);
+            outline(shape);
+            fill(k.suit);
+            pen.save();
+            pen.clip();
+            // His coveralls: the zip down the front, a chest pocket, creases
+            // at the waist, and the collar open at the neck.
+            stroke([[4.4 * f, -L * .97], [5.4 * f, -L * .62], [5.2 * f, -L * .3], [4.3 * f, 2]], "rgba(0,0,0,.4)", .7);
+            stroke([[4.75 * f, -L * .96], [5.75 * f, -L * .62], [5.55 * f, -L * .3], [4.65 * f, 2]], "rgba(160,176,206,.28)", .3);
+            sharp([[-.4, -L * .8], [3.8, -L * .8], [3.6, -L * .66], [-.2, -L * .66]]);
+            pen.strokeStyle = "rgba(0,0,0,.35)";
+            pen.lineWidth = .45;
+            pen.stroke();
+            stroke([[-5, -L * .42], [-1, -L * .36], [3, -L * .4]], "rgba(0,0,0,.28)", .5);
+            stroke([[-4, -L * .3], [0, -L * .26]], "rgba(0,0,0,.22)", .4);
+            stroke([[-6, -L * .62], [-3.6, -L * .56]], "rgba(0,0,0,.22)", .4);
+            pen.restore();
+            outline([[-3.4, -L - .8], [-.6, -L + 2.4], [2.6, -L + 3.8], [4.9, -L + 1], [2.4, -L - .8]]);
+            fill(shade(k.suit, 1.18));
+            outline(shape);
+            fill(bulk(L, f));
+          },
+          head: k => {
+            limb([.2, 3], [.8, -4], 4.6, 4.2);
+            fill(shade(k.mask, .78));
+            // Lank, dark hair at the back and over the crown.
+            outline([[-5.6, -2.4], [-6.6, -4.6], [-7.6, -4], [-7.8, -8.6], [-7.2, -13.6], [-4.2, -17.6], [.4, -18.6], [4.6, -17.4], [6.6, -14.4],
+                     [6.6, -12.6], [4.4, -14.2], [0, -14.6], [-3, -12.4], [-4, -8], [-4, -4.6], [-4.8, -3.4]]);
+            fill(linear(0, -18.4, 0, -3, [[0, mix(k.hair, "#ffffff", .14)], [1, shade(k.hair, .55)]]));
+            for (const [x, y, x2, y2] of [[-6.8, -12, -7.2, -5.6], [-5.6, -15.4, -6.4, -9], [-3, -17.2, -5.2, -13.4], [-7.4, -8, -6.6, -3.4]]) {
+              stroke([[x, y], [x2, y2]], rgba(mix(k.hair, "#ffffff", .22), .45), .35);
+            }
+            // The mask: pale and blank, turned three quarters toward us.
+            const face = [[-4, -13.4], [-.4, -15.6], [4, -15], [6.2, -12.2], [6.2, -10.4], [7.4, -8.2], [6.3, -7.2], [6.4, -5.8], [5.6, -3.6],
+                          [3.2, -2.4], [.2, -2.8], [-2.8, -5.4], [-4.4, -9.4]];
+            outline(face);
+            fill(facing(7.4, -4.4, k.mask));
+            pen.save();
+            pen.clip();
+            // Hollows under the brow and in the cheek, the eye holes black.
+            spot(4, -9.6, 3.2, "#281e19", .5);
+            spot(1, -9.7, 2.6, "#281e19", .45);
+            spot(3, -6.2, 2.6, "#281e19", .2);
+            spot(-2.6, -8, 3, "#281e19", .25);
+            oval(4.1, -9.6, 1.3, .62, rad(-6)); fill("#060505");
+            oval(1, -9.7, .95, .55, rad(-4)); fill("#060505");
+            // The ridge of the nose catching the light, the slit of a mouth.
+            stroke([[4.8, -9.4], [5.9, -7.6], [6.4, -7]], "rgba(255,255,255,.55)", .5);
+            stroke([[5.2, -6.8], [6.1, -6.75]], "rgba(30,20,15,.55)", .45);
+            stroke([[3.2, -5.1], [4.6, -4.95], [5.9, -5.1]], "rgba(25,18,14,.8)", .45);
+            pen.restore();
+            // Hair falling over the forehead.
+            outline([[-4.6, -11], [-4.2, -15.2], [-.2, -17.6], [4.4, -16.8], [6.4, -14.2], [5.4, -13.2], [4.6, -14], [3.6, -12.6], [2.6, -14],
+                     [1.2, -12.8], [0, -14.2], [-1.4, -12.4], [-2.8, -13.6], [-3.6, -11]]);
+            fill(linear(0, -17.6, 0, -11, [[0, mix(k.hair, "#ffffff", .18)], [1, shade(k.hair, .75)]]));
+            stroke([[-5.6, -5], [-6.4, -8.8], [-5.8, -12.6]], rgba(mix(k.hair, "#ffffff", .25), .5), .4);
+          },
+          prop: knife({ length: 15, width: 3.4, handle: 6 }), grip: 0,
+          speed: 62, walk: { stride: 19, knee: 34, swing: 4, armRest: 4, elbow: 8, elbowSwing: 2, lean: 1 },
           act: [
             { at: 0, pose: {} },
             { at: 400, pose: {} },
@@ -2044,42 +2327,83 @@
           ],
         },
         ghostface: {
-          colors: { o: "#25252c", O: "#4c4c59", q: "#18181d", w: "#f4f4f1", k: "#0e0e11",
-                    sleeve: "#25252c", hand: "#18181d", pants: "#1f1f25", shoe: "#121215", handle: "#2a2420", steel: "#cfd4dc", edge: "#f6f8fa" },
-          head: { neck: [6.5, 14.6], art: [
-            "....ooooo....",
-            "...oooooooo..",
-            "..oooowwwooO.",
-            "..oowwwwwwwoO",
-            ".oowwwwwwwwwO",
-            ".oowkkwwwkkwO",
-            ".oowkkkwkkkwO",
-            ".oowwkkwkkwwO",
-            ".oowwwwwwwwwO",
-            ".oowwwkkkwwwO",
-            ".ooowwkkkwwoO",
-            "..oowwkkkwwO.",
-            "..ooowkkkwoO.",
-            "...oowwwwoO..",
-            "....oowwoO...",
-          ] },
-          torso: { hips: [5.5, 7.6], neck: [5.5, .3], near: [9, 1.4], far: [1.6, 1.4], art: [
-            "..qqoooooO..",
-            ".qqoooooooO.",
-            "qqooooOooooO",
-            "qqoooooooooO",
-            "qqoooooooooO",
-            ".qqooooOoooO",
-            ".qqoooooooO.",
-            ".qqooooooooO",
-            "qqoooooooooO",
-            "qqooooooooooO",
-            "qoooooooooooO",
-            "o.oo.ooo.oO..",
-          ] },
-          limbs: { ...adult, armWidth: 3.4 },
-          prop: blade(5, 1.8, 1.8), grip: 0,
-          speed: 46, walk: { stride: 24, knee: 40, swing: 18, armRest: 10, elbow: 20, elbowSwing: 10, lean: 6 },
+          body: { ...man, chest: 1.36, legs: .94, arms: 1 },
+          sleeves: [[[0, 4.8, 5], [1, 4.6, 4.8]], [[0, 4.6, 4.8], [1, 5.2, 5.6]]],
+          boots: true, reach: 46,
+          colors: { robe: "#16161a", sheen: "#3c3c48", sleeve: "#16161a", pants: "#131316", shoe: "#0d0d10", hand: "#0f0f12", mask: "#efeee9",
+                    hole: "#050506", handle: "#141210", guard: "#b08d4a", steel: "#cfd5dd", edge: "#f6f8fa" },
+          torso: (k, B) => {
+            const L = B.torso, f = B.chest, shape = trunk(L, f);
+            outline(shape);
+            fill(k.robe);
+            pen.save();
+            pen.clip();
+            // Folds of the robe catching what light there is.
+            stroke([[3 * f, -L * .9], [4 * f, -L * .5], [3 * f, 0]], rgba(k.sheen, .7), 1);
+            stroke([[-3 * f, -L * .8], [-2 * f, -L * .4], [-3.4 * f, 0]], rgba(k.sheen, .45), .8);
+            pen.restore();
+            outline(shape);
+            fill(bulk(L, f));
+          },
+          // The robe hangs to the shins and swings with the legs, its hem ragged.
+          skirt: (k, B, hip, joints, body) => {
+            const xs = joints.slice(0, 2).map(p => p[0]), front = Math.max(Math.max(...xs) + 6.4, hip[0] + 9), back = Math.min(Math.min(...xs) - 7.4, hip[0] - 10);
+            const hem = hip[1] + B.thigh * .92 + B.shin * .42, points = [body([-7.4, -3]), body([6.8, -3]), [front, hip[1] + B.thigh * .55]];
+            for (let i = 0; i <= 6; i++) {
+              const t = i / 6;
+              points.push([front + (back - front) * t + (i % 2 ? .8 : 0), hem + (i % 2 ? 1.8 : -.4) + Math.sin(t * 3.1) * .8]);
+            }
+            points.push([back + .4, hip[1] + B.thigh * .4]);
+            sharp(points);
+            fill(k.robe);
+            pen.save();
+            pen.clip();
+            for (const x of [front - 3, (front + back) / 2 + 1, back + 3]) stroke([[x - 1, hip[1]], [x, hem + 2]], rgba(k.sheen, .55), .9);
+            pen.restore();
+            sharp(points);
+            fill(linear(front, 0, back, 0, [[0, "rgba(255,255,255,.12)"], [.4, "rgba(255,255,255,0)"], [1, "rgba(0,0,0,.5)"]]));
+          },
+          // Wide sleeves, ragged at the wrist.
+          cuff: (arm, k, B) => {
+            pen.save();
+            pen.translate(...arm.w);
+            pen.rotate(along(arm.fore));
+            sharp([[-3, -5.4], [1.4, -6.6], [.2, -2.4], [1.6, 0], [.2, 2.4], [1.4, 6.4], [-3, 5.6]]);
+            fill(k.sleeve);
+            pen.restore();
+          },
+          head: k => {
+            // The hood, falling over the shoulders, dark inside.
+            outline([[-9.6, 4.8], [-8.6, -6], [-7.8, -13.8], [-3.6, -19.2], [2.6, -19.6], [7, -15.4], [8.6, -9.4], [7.8, -3], [8.8, 4], [0, 6.2]]);
+            fill(linear(7, -18, -6, 2, [[0, k.sheen], [.45, k.robe], [1, shade(k.robe, .55)]]));
+            outline([[-2.4, -3.2], [-3.6, -10.6], [-1.4, -16.6], [3.2, -17.2], [6.8, -13.6], [7.4, -7.4], [6.2, -2.4], [2.2, -1.2]]);
+            fill("#040405");
+            // The mask: long, white and drooping, eyes and mouth black.
+            outline([[-1.6, -11.2], [.4, -15.8], [3.8, -16.4], [6.2, -13.8], [6.8, -9.4], [6.4, -5], [5, -1.4], [3.4, -.4], [1.8, -1.6], [-.4, -6]]);
+            fill(facing(6.8, -1.6, k.mask));
+            pen.beginPath();
+            pen.moveTo(3.4, -12.6);
+            pen.quadraticCurveTo(5.8, -12.9, 5.5, -10.6);
+            pen.quadraticCurveTo(5.3, -8.4, 4.3, -8.2);
+            pen.quadraticCurveTo(3, -9.8, 3.4, -12.6);
+            fill(k.hole);
+            pen.beginPath();
+            pen.moveTo(1.1, -12.1);
+            pen.quadraticCurveTo(2.7, -12.5, 2.5, -10.4);
+            pen.quadraticCurveTo(2.3, -8.5, 1.7, -8.5);
+            pen.quadraticCurveTo(.8, -10, 1.1, -12.1);
+            fill(k.hole);
+            pen.beginPath();
+            pen.moveTo(3.5, -6.8);
+            pen.quadraticCurveTo(5, -7, 4.8, -4.6);
+            pen.quadraticCurveTo(4.6, -2.2, 3.7, -2);
+            pen.quadraticCurveTo(2.6, -3.1, 2.8, -4.8);
+            pen.quadraticCurveTo(2.9, -6.6, 3.5, -6.8);
+            fill(k.hole);
+            oval(5.1, -7.5, .22, .22); fill("rgba(5,5,6,.7)");
+          },
+          prop: knife({ length: 13, width: 3.2, handle: 6, clip: true }), grip: 0,
+          speed: 90, walk: { stride: 23, knee: 44, swing: 18, armRest: 10, elbow: 20, elbowSwing: 10, lean: 6 },
           act: [
             { at: 0, pose: {} },
             { at: 600, pose: { tilt: -18, lean: 4 } },
@@ -2088,41 +2412,81 @@
             { at: 1750, pose: { farArm: [55, 62] } },
             { at: 2050, pose: { farArm: [85, 38] } },
             { at: 2400, pose: { farArm: [20, 20], tilt: 0 } },
-            { at: 2750, pose: { lean: 14, nearArm: [96, 0], prop: 96, nearLeg: [28, 8], farLeg: [-22, 4], shift: 1.5 }, hit: true },
+            { at: 2750, pose: { lean: 14, nearArm: [96, 0], prop: 96, nearLeg: [28, 8], farLeg: [-22, 4], shift: 9 }, hit: true },
             { at: 3200, pose: {} },
             { at: 3700, pose: { lean: 0, nearArm: rest.nearArm, prop: undefined, nearLeg: rest.nearLeg, farLeg: rest.farLeg, shift: 0 } },
           ],
         },
         chucky: {
-          colors: { r: "#ec5a1c", R: "#b03c0c", s: "#f6cfa6", S: "#dcab80", f: "#c27a4e", c: "#9e3d33", e: "#5a2a12", b: "#2f6be0", B: "#ffffff",
-                    k: "#6e1717", t: "#fbf6ec", d: "#5079c0", D: "#3c5c96", p: "#7096d6", x: "#d23232", y: "#efcc3c", u: "#2f9a4e", n: "#3a5ab8",
-                    sleeve: ["#d23232", "#3a5ab8", "#efcc3c", "#2f9a4e"], hand: "#f6cfa6", pants: "#5079c0", shoe: "#f4f0e8", handle: "#2a2420", steel: "#cfd4dc", edge: "#f6f8fa" },
-          head: { neck: [6.5, 12.6], art: [
-            ".r..r.rr..r..",
-            "rr.rrrrrr.rr.",
-            "rrrrRrrrrRrrr",
-            "rrrrrrrrrrrrr",
-            "rrsssssssssrr",
-            "rseeesssseeer",
-            "rsbbBsssbbBsr",
-            ".sfsssssssfs.",
-            ".ssfsssSsfss.",
-            ".sktttttttks.",
-            "..skkkkkkks..",
-            "...sssssss...",
-            "....sssss....",
-          ] },
-          torso: { hips: [4, 5.6], neck: [4, .3], near: [6.6, 1], far: [1.4, 1], art: [
-            ".xnyuxny.",
-            "xDdddddDx",
-            "nDdpppddn",
-            ".DdpppdD.",
-            ".DDddddD.",
-            ".DDddddD.",
-          ] },
-          limbs: { thigh: 2.6, shin: 2.4, upper: 2.2, fore: 2.1, legWidth: 2.2, armWidth: 2.2, hand: 1.7, foot: [2.6, 1.5], band: .8 },
-          prop: blade(4.6, 1.6, 1.6), grip: 0,
-          speed: 40, walk: { stride: 32, knee: 58, swing: 34, armRest: 12, elbow: 30, elbowSwing: 18, lean: 6 },
+          body: { thigh: 10.5, shin: 10, ankle: 2.4, heel: 1.8, toe: 5.4, upper: 8.6, fore: 7.6, hand: 3.2, torso: 15.5, chest: .8, legs: .56, arms: .58 },
+          boots: false, reach: 20, headSize: .78,
+          colors: { stripes: ["#c9302c", "#3456b0", "#e5bf2e", "#2e8c48"], sleeve: ["#c9302c", "#3456b0", "#e5bf2e", "#2e8c48"], pants: "#4570b4",
+                    denim: "#4570b4", skin: "#f0c49b", hand: "#f0c49b", hair: "#d8521c", eye: "#2f66d8", scar: "#7e2a22", shoe: "#ece8e0",
+                    trim: "#c9302c", sole: "#9a948a", handle: "#2a201a", steel: "#c9ced6", edge: "#f4f6f9", freckles: scatter(31, 9) },
+          torso: (k, B) => {
+            const L = B.torso, f = B.chest, shape = trunk(L, f);
+            outline(shape);
+            pen.save();
+            pen.clip();
+            // His Good Guys shirt, and the overalls over it: the bib, its
+            // straps and buttons.
+            for (let y = -L - 2, i = 0; y < 4; y += 1.7, i++) { sharp([[-8, y], [8, y], [8, y + 1.75], [-8, y + 1.75]]); fill(k.stripes[i % 4]); }
+            sharp([[-8, -L * .34], [8, -L * .34], [8, 6], [-8, 6]]);
+            fill(k.denim);
+            outline([[.6, -L * .74], [4.6 * f + .4, -L * .76], [4.4 * f, -L * .3], [.6, -L * .3]]);
+            fill(mix(k.denim, "#ffffff", .08));
+            stroke([[-4.8 * f, -L * .95], [-1, -L * .7], [1.6, -L * .72]], shade(k.denim, .9), 1.1);
+            oval(1.4, -L * .7, .45, .45); fill("#e8c64a");
+            pen.restore();
+            outline(shape);
+            fill(bulk(L, f));
+          },
+          head: k => {
+            limb([.2, 1.6], [.5, -2.4], 3.2, 3);
+            fill(shade(k.skin, .85));
+            // A shock of orange hair.
+            outline([[-6.4, -4.6], [-7.6, -7], [-8, -9.6], [-7.2, -12.6], [-8.4, -14.2], [-5.8, -15.6], [-5.2, -17.6], [-2.6, -16.4], [-1, -18.4],
+                     [.8, -16.6], [3, -18], [4, -15.8], [6.4, -16], [6.4, -13.4], [7.4, -12], [5, -11.8], [-1, -12], [-4.4, -8]]);
+            fill(linear(0, -18, 0, -4.6, [[0, mix(k.hair, "#ffffff", .2)], [1, shade(k.hair, .62)]]));
+            // His doll's face: round, freckled, scarred and grinning.
+            const face = [[-3.2, -12], [1, -13.4], [5.2, -12.4], [6.6, -9.4], [7, -7], [6.4, -4.6], [4.6, -2.4], [1.8, -1.6], [-.8, -2.4], [-2.8, -4.6], [-3.6, -8.4]];
+            outline(face);
+            fill(facing(7, -3.6, k.skin));
+            pen.save();
+            pen.clip();
+            spot(5, -5.6, 1.8, "#e0786a", .35);
+            spot(.8, -5.4, 1.4, "#e0786a", .3);
+            spot(-2.4, -8, 2.6, "#5a3020", .25);
+            for (const [u, v] of k.freckles) { oval(.4 + u * 5.6, -7.4 + v * 2, .2, .2); fill("rgba(150,80,40,.6)"); }
+            // Big glass eyes, blue, under scowling brows.
+            oval(4.3, -8.6, 1.3, 1); fill("#f6f2ea");
+            oval(4.65, -8.6, .78, .78); fill(k.eye);
+            oval(4.7, -8.6, .36, .36); fill("#0c0c12");
+            oval(4.95, -8.95, .2, .2); fill("#ffffff");
+            oval(1.3, -8.7, .95, .9); fill("#ece6dc");
+            oval(1.55, -8.7, .6, .66); fill(shade(k.eye, .85));
+            oval(1.6, -8.7, .28, .3); fill("#0c0c12");
+            stroke([[3, -10.6], [4.6, -10.2], [6, -10.8]], shade(k.hair, .6), .55);
+            stroke([[.2, -10.4], [1.4, -10], [2.4, -10.2]], shade(k.hair, .6), .5);
+            // The scars and their stitches.
+            stroke([[1.6, -12.2], [3.4, -11.4], [5.4, -11.2]], k.scar, .35);
+            for (const x of [2.2, 3.2, 4.2, 5]) stroke([[x, -11.9], [x + .2, -10.9]], k.scar, .22);
+            stroke([[-.6, -6.4], [.8, -5], [2, -3.8]], k.scar, .32);
+            for (const t of [.2, .5, .8]) { const x = -.6 + 2.6 * t, y = -6.4 + 2.6 * t; stroke([[x - .45, y + .35], [x + .45, y - .35]], k.scar, .2); }
+            // A wicked grin.
+            pen.beginPath();
+            pen.moveTo(2.2, -5);
+            pen.quadraticCurveTo(4.4, -3.2, 6.2, -5.2);
+            pen.quadraticCurveTo(4.4, -2, 2.2, -5);
+            fill("#4a1410");
+            stroke([[2.7, -4.6], [4.4, -3.7], [5.8, -4.8]], "rgba(250,244,230,.9)", .38);
+            pen.restore();
+            // His fringe.
+            outline([[-3.6, -9.6], [-3.4, -13], [0, -14.6], [4, -14], [6, -12.4], [5, -11.6], [4, -12.6], [3, -11.4], [2, -12.6], [.6, -11.6], [-.6, -12.8], [-2, -11]]);
+            fill(linear(0, -14.6, 0, -9.6, [[0, mix(k.hair, "#ffffff", .25)], [1, shade(k.hair, .8)]]));
+          },
+          prop: knife({ length: 9.5, width: 2.4, handle: 3.6 }), grip: 0,
+          speed: 64, walk: { stride: 30, knee: 58, swing: 30, armRest: 12, elbow: 28, elbowSwing: 18, lean: 6 },
           act: [
             { at: 0, pose: {} },
             { at: 320, pose: { nearArm: [108, 60], prop: 192, lean: -7 } },
@@ -2130,16 +2494,19 @@
             { at: 680, pose: { nearArm: [108, 60], prop: 192, lean: -7 } },
             { at: 820, pose: { nearArm: [66, 0], prop: 74, lean: 10 }, hit: true },
             { at: 1150, pose: { tilt: -24, lean: -8, nearArm: [25, 50], farArm: [35, 95], hop: 0 } },
-            { at: 1300, pose: { hop: 2 } },
+            { at: 1300, pose: { hop: 3.5 } },
             { at: 1450, pose: { hop: 0 } },
-            { at: 1600, pose: { hop: 2 } },
+            { at: 1600, pose: { hop: 3.5 } },
             { at: 1750, pose: { hop: 0 } },
-            { at: 1900, pose: { hop: 2 } },
+            { at: 1900, pose: { hop: 3.5 } },
             { at: 2050, pose: { hop: 0 } },
             { at: 2600, pose: { tilt: 0, lean: 0, nearArm: rest.nearArm, farArm: rest.farArm, prop: undefined } },
           ],
         },
         };
+        // The far arm and leg, a step back from the light, are darker.
+        const darker = value => Array.isArray(value) ? value.map(darker) : typeof value === "string" && value[0] === "#" ? shade(value, .6) : value;
+        for (const who of Object.values(cast)) who.dim = Object.fromEntries(Object.entries(who.colors).map(([key, value]) => [key, darker(value)]));
 
         // Walking: legs and arms swinging opposite ways, the knee of the
         // leg coming through bending to lift its foot.
@@ -2169,30 +2536,78 @@
         const el = document.createElement("canvas");
         el.className = "villain";
         stage.appendChild(el);
-        const pen = el.getContext("2d");
-        let ratio = 1, cell = 4, unit = 2, bag = [], side = Math.random() < .5 ? -1 : 1, walker = null, last = 0, running = false;
+        // The figure is painted on a sheet of its own, then laid over its
+        // shadow and its rims of light.
+        const sheet = document.createElement("canvas"), glow = document.createElement("canvas");
+        const screen = el.getContext("2d"), paper = sheet.getContext("2d"), tint = glow.getContext("2d");
+        let ratio = 1, unit = 1, scale = 1, bag = [], side = Math.random() < .5 ? -1 : 1, walker = null, last = 0, running = false, frightAt = -1e9;
+        addEventListener("fright", () => { frightAt = performance.now(); });
         const measure = () => {
           ratio = Math.min(3, devicePixelRatio || 1);
-          cell = Math.max(2, Math.round((innerWidth <= 600 ? 2 : 2.2) * ratio));
-          unit = cell / ratio;
-          el.width = W * cell;
-          el.height = H * cell;
+          unit = innerWidth <= 600 ? .74 : .88;
+          scale = unit * ratio;
+          for (const canvas of [el, sheet, glow]) { canvas.width = Math.ceil(W * scale); canvas.height = Math.ceil(H * scale); }
           el.style.width = W * unit + "px";
           el.style.height = H * unit + "px";
           // Mirrored about the hips, so turning round doesn't move them.
           el.style.transformOrigin = `${HIP_X * unit}px 50%`;
         };
-        const paint = cells => {
-          const gap = cell >= 4 ? 1 : 0;
-          pen.clearRect(0, 0, el.width, el.height);
-          for (const [at, color] of cells) {
-            pen.fillStyle = color;
-            pen.fillRect((at % W) * cell, Math.floor(at / W) * cell, cell - gap, cell - gap);
+        // The candle's light where the figure stands: where it comes from,
+        // and how strong, flickering, guttering at a blow, fading with distance.
+        const lightAt = (x, facing, now) => {
+          const box = markBounds();
+          if (!box) return { x: W, y: FLOOR - 20, strength: 0 };
+          const cx = (box.left + box.right) / 2, cy = box.floor - (box.right - box.left) * .45, t = now / 1000;
+          const flame = .8 + Math.sin(t * 2.1) * .1 + Math.sin(t * 7.3 + 1.1) * .06 + Math.sin(t * 13.9) * .04 - Math.max(0, 1 - (now - frightAt) / 500) * .45;
+          return { x: HIP_X + (cx - x) * facing / unit, y: FLOOR - (box.floor - cy) / unit,
+                   strength: clamp(flame, .25, 1) * clamp(1 - Math.abs(cx - x) / unit / 260, 0, 1) ** 1.4 };
+        };
+        const paint = (who, pose, light) => {
+          pen = paper;
+          paper.setTransform(1, 0, 0, 1, 0, 0);
+          paper.clearRect(0, 0, sheet.width, sheet.height);
+          paper.setTransform(scale, 0, 0, scale, 0, 0);
+          const feet = figure(who, pose);
+          // Lit where it stands: warm toward the candle, cold from the sky,
+          // darker toward the ground.
+          paper.globalCompositeOperation = "source-atop";
+          if (light.strength > .01) {
+            paper.fillStyle = radial(light.x, light.y, 130, [[0, `rgba(255,150,64,${.34 * light.strength})`], [.45, `rgba(255,124,48,${.12 * light.strength})`], [1, "rgba(255,110,40,0)"]]);
+            paper.fillRect(0, 0, W, H);
           }
+          paper.fillStyle = linear(0, 0, 0, FLOOR, [[0, "rgba(180,196,255,.1)"], [.5, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,.35)"]]);
+          paper.fillRect(0, 0, W, H);
+          paper.globalCompositeOperation = "source-over";
+          screen.setTransform(1, 0, 0, 1, 0, 0);
+          screen.globalAlpha = 1;
+          screen.clearRect(0, 0, el.width, el.height);
+          // The shadow at its feet, cast away from the candle.
+          const toward = Math.sign(light.x - HIP_X) || 1, wide = (feet[1] - feet[0]) / 2 + 9;
+          screen.setTransform(scale, 0, 0, scale * .2, ((feet[0] + feet[1]) / 2 - toward * 4 * light.strength) * scale, (FLOOR + .3) * scale);
+          screen.fillStyle = radial(0, 0, wide, [[0, "rgba(0,0,0,.62)"], [.55, "rgba(0,0,0,.3)"], [1, "rgba(0,0,0,0)"]], screen);
+          screen.fillRect(-wide, -wide, wide * 2, wide * 2);
+          screen.setTransform(1, 0, 0, 1, 0, 0);
+          // Its rims of light: its own shape, lit, set just off it, cold
+          // from the sky above and behind, warm on the side to the candle.
+          tint.globalCompositeOperation = "copy";
+          tint.drawImage(sheet, 0, 0);
+          tint.globalCompositeOperation = "source-in";
+          tint.fillStyle = "#b4c2e6";
+          tint.fillRect(0, 0, glow.width, glow.height);
+          screen.globalAlpha = .42;
+          screen.drawImage(glow, -.4 * scale, -.55 * scale);
+          if (light.strength > .02) {
+            tint.fillStyle = "#ffa24c";
+            tint.fillRect(0, 0, glow.width, glow.height);
+            screen.globalAlpha = .75 * light.strength;
+            screen.drawImage(glow, toward * .55 * scale, -.1 * scale);
+          }
+          screen.globalAlpha = 1;
+          screen.drawImage(sheet, 0, 0);
         };
         // Standing on the floor, its hips at x.
         const place = (x, floor, facing) => {
-          el.style.transform = `translate3d(${(x - HIP_X * unit).toFixed(1)}px, ${(floor - H * unit).toFixed(1)}px, 0) scaleX(${facing})`;
+          el.style.transform = `translate3d(${(x - HIP_X * unit).toFixed(1)}px, ${(floor - FLOOR * unit).toFixed(1)}px, 0) scaleX(${facing})`;
         };
         // The next to come on: through all five in a shuffled order, and
         // from the other side from the last, most of the time.
@@ -2214,8 +2629,8 @@
           const { who } = walker;
           // Quicker across a wider screen, so the walk never drags.
           const pace = Math.min(2.2, Math.max(1, innerWidth / 600));
-          // Up to the pumpkin, stopping a step short of it.
-          const gap = 8 * unit + 4, stop = walker.from < 0 ? box.left - gap : box.right + gap;
+          // Up to the pumpkin, stopping where its blade will just reach it.
+          const gap = who.reach * unit, stop = walker.from < 0 ? box.left - gap : box.right + gap;
           let pose;
           if (walker.stage === "act") {
             walker.since += dt * 1000;
@@ -2226,10 +2641,10 @@
             if (walker.since > who.act[who.act.length - 1].at) { walker.stage = "out"; walker.facing = -walker.facing; }
           } else {
             const target = walker.stage === "in" ? stop : walker.from;
-            const move = who.speed * pace * dt, way = Math.sign(target - walker.x);
+            const move = who.speed * unit * pace * dt, way = Math.sign(target - walker.x);
             walker.x = Math.abs(target - walker.x) <= move ? target : walker.x + way * move;
-            // A stride's length in pixels, so the feet don't slide.
-            const step = 2 * (who.limbs.thigh + who.limbs.shin) * Math.sin(rad(who.walk.stride)) * unit;
+            // A stride's length on the screen, so the feet don't slide.
+            const step = 2 * (who.body.thigh + who.body.shin) * Math.sin(rad(who.walk.stride)) * unit;
             walker.phase += move / step * Math.PI;
             pose = walkPose(who, walker.phase);
             if (walker.x === target) {
@@ -2244,7 +2659,7 @@
               }
             }
           }
-          paint(draw(who, pose));
+          paint(who, pose, lightAt(walker.x, walker.facing, time));
           place(walker.x, box.floor, walker.facing);
           requestAnimationFrame(walk);
         };
@@ -2252,8 +2667,9 @@
         const standStill = () => {
           const box = markBounds();
           if (!box) return;
-          paint(draw(cast.michael, { ...rest, grip: cast.michael.grip }));
-          place(box.left - 8 * unit - 4, box.floor, 1);
+          const x = box.left - cast.michael.reach * unit;
+          paint(cast.michael, { ...rest, grip: cast.michael.grip }, lightAt(x, 1, performance.now()));
+          place(x, box.floor, 1);
           el.style.opacity = "1";
         };
         addEventListener("resize", () => { measure(); if (calm.matches) standStill(); }, { passive: true });
