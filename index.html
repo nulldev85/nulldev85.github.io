@@ -1292,7 +1292,7 @@
           settle = setTimeout(regather, 200);
         }, { passive: true });
 
-        const count = innerWidth <= 600 ? 1 : 2, now = performance.now();
+        const count = innerWidth <= 600 ? 3 : 5, now = performance.now();
         for (let i = 0; i < count; i++) {
           const el = document.createElement("canvas");
           el.className = "spirit";
