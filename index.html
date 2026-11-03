@@ -65,9 +65,6 @@
        the page to disappear under. */
     .top-shade { position: fixed; top: 0; right: 0; left: 0; z-index: 22; height: var(--top); background: linear-gradient(var(--bg) calc(100% - 30px), rgba(10, 10, 11, 0)); pointer-events: none; }
     .wordmark { font-size: 15px; font-weight: 600; text-decoration: none; }
-    .site-nav { display: flex; gap: 24px; font-size: 14px; }
-    .site-nav a { color: var(--text-2); text-decoration: none; transition: color .15s ease; }
-    .site-nav a:hover { color: var(--text); }
 
     /* Intro */
     .intro { padding: 180px 0 32px; }
@@ -200,7 +197,6 @@
     }
     @media (max-width: 600px) {
       .wrap { width: calc(100% - 32px); }
-      .site-nav { gap: 18px; }
       :root { --top: 140px; }
       .intro { padding: 148px 0 28px; }
       .float-mark { --mark-size: 48px; top: 74px; }
@@ -212,7 +208,6 @@
       .dialog-body { padding: 22px 20px 26px; }
     }
     @media (max-width: 400px) {
-      .site-nav { gap: 14px; font-size: 13px; }
       .notes-button { padding: 0 10px; }
       .notes-button svg { display: none; }
     }
@@ -229,11 +224,6 @@
   <div class="top-shade" aria-hidden="true"></div>
   <header class="site-header wrap">
     <a class="wordmark" href="#top">Null’s Apps</a>
-    <nav class="site-nav" aria-label="Apps">
-      <a href="#lineup">Lineup</a>
-      <a href="#aether">Aether</a>
-      <a href="#nullsign">NullSign</a>
-    </nav>
   </header>
 
   <a class="float-mark" href="#top" aria-label="Back to top" data-float-mark>
@@ -695,7 +685,6 @@
         const app = hash.length > 1 ? document.getElementById(hash.slice(1)) : null;
         if (app?.matches("[data-project-card]")) setOpen(app, true);
       };
-      document.querySelectorAll(".site-nav a").forEach(link => link.addEventListener("click", () => openLinked(link.hash)));
       addEventListener("hashchange", () => openLinked(location.hash));
       openLinked(location.hash);
       const repoButton = document.getElementById("repo-copy");
