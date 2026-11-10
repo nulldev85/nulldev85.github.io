@@ -50,15 +50,20 @@
       -webkit-font-smoothing: antialiased;
       overflow-x: clip;
     }
-    /* An evenly spaced light-dot texture that never intercepts input. */
+    /* Reference-matched 8px amber halftone: broad, soft dots over warm light. */
     body::after {
       content: "";
       position: fixed;
       inset: 0;
       z-index: 25;
       pointer-events: none;
-      background-image: radial-gradient(circle, rgba(205,166,78,.15) 1px, transparent 1.25px);
-      background-size: 8px 8px;
+      background-image:
+        radial-gradient(circle at center, rgba(251,191,36,.085) 1.75px, rgba(251,191,36,.045) 2px, transparent 2.3px),
+        radial-gradient(ellipse at 8% 0%, rgba(190,132,30,.11), transparent 58%),
+        radial-gradient(ellipse at 96% 45%, rgba(182,83,25,.07), transparent 60%),
+        linear-gradient(135deg, rgba(142,113,32,.035), transparent 55%, rgba(120,76,25,.025));
+      background-size: 8px 8px, 100% 100%, 100% 100%, 100% 100%;
+      background-repeat: repeat, no-repeat, no-repeat, no-repeat;
     }
     ::selection { background: rgba(216,154,56,.35); }
     a { color: inherit; }
