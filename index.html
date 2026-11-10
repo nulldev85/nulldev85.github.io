@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0a0a0b">
+  <meta name="theme-color" content="#100e09">
   <meta name="description" content="Lineup, Aether and NullSign for iPhone and Apple TV: what each app does, what changed in its latest build, and where to download it.">
   <meta property="og:title" content="Null’s Apps">
   <meta property="og:description" content="Lineup, Aether and NullSign for iPhone and Apple TV.">
@@ -19,17 +19,17 @@
     @font-face { font-family: "Null Dots Display"; src: url("fonts/dots-display.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
     :root {
       color-scheme: dark;
-      --bg: #0a0a0b;
-      --surface: #111113;
-      --raised: #19191c;
-      --line: rgba(255,255,255,.075);
-      --line-strong: rgba(255,255,255,.13);
-      --text: #ececee;
-      --text-body: #d2d2d6;
-      --text-2: #b0b0b6;
-      --text-3: #95959c;
-      --accent: #f42e55;
-      --focus: rgba(255,255,255,.75);
+      --bg: #100e09;
+      --surface: #1a150f;
+      --raised: #272017;
+      --line: rgba(224,185,108,.12);
+      --line-strong: rgba(224,185,108,.22);
+      --text: #f7efdf;
+      --text-body: #dfd3bd;
+      --text-2: #c5b69b;
+      --text-3: #b0a080;
+      --accent: #d89a38;
+      --focus: rgba(237,190,103,.85);
       --sans: "Null Dots", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       --mono: "Null Dots", ui-monospace, Menlo, Consolas, monospace;
       --display: "Null Dots Display", var(--sans);
@@ -57,10 +57,10 @@
       inset: 0;
       z-index: 25;
       pointer-events: none;
-      background-image: radial-gradient(circle, rgba(208,186,129,.12) 1px, transparent 1.25px);
+      background-image: radial-gradient(circle, rgba(205,166,78,.15) 1px, transparent 1.25px);
       background-size: 8px 8px;
     }
-    ::selection { background: rgba(244,46,85,.35); }
+    ::selection { background: rgba(216,154,56,.35); }
     a { color: inherit; }
     button { font: inherit; color: inherit; }
     :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
@@ -71,7 +71,7 @@
     .site-header { position: fixed; top: 0; right: 0; left: 0; z-index: 22; display: flex; align-items: center; justify-content: space-between; height: 64px; margin: 0 auto; }
     /* Behind it, a band of the page's own dark, fading at its lower edge, for
        the page to disappear under. */
-    .top-shade { position: fixed; top: 0; right: 0; left: 0; z-index: 22; height: var(--top); background: linear-gradient(var(--bg) calc(100% - 30px), rgba(10, 10, 11, 0)); pointer-events: none; }
+    .top-shade { position: fixed; top: 0; right: 0; left: 0; z-index: 22; height: var(--top); background: linear-gradient(var(--bg) calc(100% - 30px), rgba(16, 14, 9, 0)); pointer-events: none; }
     .wordmark { font-size: 15px; font-weight: 600; text-decoration: none; }
 
     /* Signer source, below the app listings. */
@@ -115,8 +115,8 @@
     .build-meta .build-number { color: var(--text-2); font-family: var(--mono); font-size: 12.5px; }
     .build-meta .sep { display: none; }
     .build-meta time { flex-basis: 100%; }
-    .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 13px; border-radius: 8px; color: #0a0a0b; background: #ececee; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
-    .download:hover { background: #fff; }
+    .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 13px; border-radius: 8px; color: #100e09; background: #e8bb69; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
+    .download:hover { background: #f6d394; }
     .download svg { width: 14px; height: 14px; }
     .app-actions { display: flex; gap: 8px; margin-top: 10px; }
     .notes-button { display: inline-flex; flex: 1 1 0; align-items: center; justify-content: center; gap: 7px; min-width: 0; height: 32px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
@@ -160,6 +160,17 @@
     .float-mark { --mark-size: 56px; position: fixed; top: 86px; left: 50%; z-index: 30; display: grid; place-items: center; width: var(--mark-size); height: var(--mark-size); margin-left: calc(var(--mark-size) / -2); border-radius: 50%; -webkit-tap-highlight-color: transparent; }
     .mark-logo { display: block; width: 52%; height: 52%; margin-top: -4%; filter: drop-shadow(0 1px 0 rgba(255,255,255,.18)) drop-shadow(0 4px 10px rgba(0,0,0,.75)) drop-shadow(0 0 3px rgba(0,0,0,.6)); }
     @media print { .float-mark, body::after { display: none; } }
+
+    /* Translucent, noninteractive autumn leaves. Only transforms animate. */
+    .autumn-leaves { position: fixed; inset: 0; z-index: 26; overflow: hidden; pointer-events: none; }
+    .autumn-leaf { position: absolute; top: -64px; left: var(--x); width: var(--size); height: var(--size); opacity: var(--opacity); animation: leaf-fall var(--duration) var(--delay) linear infinite; }
+    .leaf-sway { display: block; width: 100%; height: 100%; animation: leaf-sway var(--sway) var(--delay) ease-in-out infinite alternate; }
+    .autumn-leaf img { display: block; width: 100%; height: 100%; animation: leaf-turn var(--turn) var(--delay) ease-in-out infinite alternate; }
+    @keyframes leaf-fall { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(28px, calc(100dvh + 128px), 0); } }
+    @keyframes leaf-sway { from { transform: translateX(-24px) rotate(-18deg); } to { transform: translateX(24px) rotate(22deg); } }
+    @keyframes leaf-turn { from { transform: rotate(-35deg) rotateY(0deg); } to { transform: rotate(145deg) rotateY(65deg); } }
+    @media (max-width: 600px) { .autumn-leaf:nth-child(n+9) { display: none; } }
+    @media (prefers-reduced-motion: reduce), print { .autumn-leaves { display: none; } }
 
     /* Motion */
     .has-js [data-project-card] { opacity: 0; transform: translateY(10px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
@@ -213,6 +224,21 @@
   </style>
 </head>
 <body>
+  <div class="autumn-leaves" aria-hidden="true">
+    <span class="autumn-leaf" style="--x:4%;--size:30px;--duration:22s;--delay:-3s;--opacity:0.32;--sway:4s;--turn:7s"><span class="leaf-sway"><img src="assets/leaf-maple.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:13%;--size:24px;--duration:27s;--delay:-17s;--opacity:0.28;--sway:5s;--turn:8s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:22%;--size:38px;--duration:25s;--delay:-10s;--opacity:0.33;--sway:6s;--turn:9s"><span class="leaf-sway"><img src="assets/leaf-rust.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:31%;--size:22px;--duration:30s;--delay:-24s;--opacity:0.28;--sway:7s;--turn:10s"><span class="leaf-sway"><img src="assets/leaf-maple.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:40%;--size:28px;--duration:24s;--delay:-7s;--opacity:0.36;--sway:4s;--turn:11s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:49%;--size:34px;--duration:29s;--delay:-20s;--opacity:0.3;--sway:5s;--turn:7s"><span class="leaf-sway"><img src="assets/leaf-rust.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:61%;--size:26px;--duration:23s;--delay:-14s;--opacity:0.32;--sway:6s;--turn:8s"><span class="leaf-sway"><img src="assets/leaf-maple.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:77%;--size:36px;--duration:28s;--delay:-4s;--opacity:0.34;--sway:7s;--turn:9s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:88%;--size:28px;--duration:26s;--delay:-18s;--opacity:0.3;--sway:4s;--turn:10s"><span class="leaf-sway"><img src="assets/leaf-rust.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:96%;--size:24px;--duration:32s;--delay:-26s;--opacity:0.28;--sway:5s;--turn:11s"><span class="leaf-sway"><img src="assets/leaf-maple.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:56%;--size:22px;--duration:31s;--delay:-12s;--opacity:0.25;--sway:6s;--turn:7s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:8%;--size:34px;--duration:33s;--delay:-29s;--opacity:0.3;--sway:7s;--turn:8s"><span class="leaf-sway"><img src="assets/leaf-rust.svg" alt="" width="48" height="64"></span></span>
+  </div>
+
   <div class="top-shade" aria-hidden="true"></div>
   <header class="site-header wrap">
     <a class="wordmark" href="#top">Null’s Apps</a>
