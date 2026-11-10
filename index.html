@@ -24,10 +24,10 @@
       --raised: #272017;
       --line: rgba(224,185,108,.12);
       --line-strong: rgba(224,185,108,.22);
-      --text: #faf5eb;
-      --text-body: #e7dfd0;
-      --text-2: #d3c8b4;
-      --text-3: #bfb29a;
+      --text: #f1dcb3;
+      --text-body: var(--text);
+      --text-2: var(--text);
+      --text-3: var(--text);
       --accent: #d89a38;
       --focus: rgba(237,190,103,.85);
       --sans: "Null Dots", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
@@ -98,7 +98,7 @@
     .app-icon::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255,255,255,.09); }
     .app-icon img { display: block; width: 100%; height: 100%; object-fit: cover; }
     .app-title { min-width: 0; }
-    .app-name { margin: 0; color: #f1dcb3; font-family: var(--display); font-size: 24px; font-weight: 600; line-height: 1.2; }
+    .app-name { margin: 0; color: var(--text); font-family: var(--display); font-size: 24px; font-weight: 600; line-height: 1.2; }
     .app-kind { margin: 2px 0 0; color: var(--text-2); font-size: 13px; line-height: 1.45; }
     .app-toggle { display: none; }
     .app-body { display: flex; flex: 1 1 auto; flex-direction: column; }
@@ -115,8 +115,8 @@
     .build-meta .build-number { color: var(--text-2); font-family: var(--mono); font-size: 12.5px; }
     .build-meta .sep { display: none; }
     .build-meta time { flex-basis: 100%; }
-    .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 13px; border-radius: 8px; color: #100e09; background: #e8bb69; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
-    .download:hover { background: #f6d394; }
+    .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 13px; border-radius: 8px; color: var(--text); border: 1px solid var(--line-strong); background: rgba(232,187,105,.12); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
+    .download:hover { background: rgba(232,187,105,.22); }
     .download svg { width: 14px; height: 14px; }
     .app-actions { display: flex; gap: 8px; margin-top: 10px; }
     .notes-button { display: inline-flex; flex: 1 1 0; align-items: center; justify-content: center; gap: 7px; min-width: 0; height: 32px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
@@ -245,7 +245,7 @@
   </header>
 
   <a class="float-mark" href="#top" aria-label="Back to top">
-    <img class="mark-logo" src="assets/apple-mark.svg?v=fall" width="24" height="24" alt="">
+    <img class="mark-logo" src="assets/apple-mark.svg?v=cream" width="24" height="24" alt="">
   </a>
 
   <main class="wrap" id="top">
