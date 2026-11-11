@@ -105,7 +105,6 @@
     .app-title { min-width: 0; }
     .app-name { margin: 0; color: var(--text); font-family: var(--display); font-size: 24px; font-weight: 600; line-height: 1.2; }
     .app-kind { margin: 2px 0 0; color: var(--text-2); font-size: 13px; line-height: 1.45; }
-    .app-toggle { display: none; }
     .app-body { display: flex; flex: 1 1 auto; flex-direction: column; }
     /* The summary takes up the slack, so every card's builds sit at its foot. */
     .app-summary { flex: 1 0 auto; margin: 14px 0 0; color: var(--text-body); font-size: 14px; line-height: 1.6; }
@@ -182,33 +181,34 @@
     .has-js [data-project-card].is-visible { opacity: 1; transform: none; }
     @keyframes dialog-in { from { opacity: 0; transform: translateY(6px) scale(.99); } }
 
-    /* Narrower, the cards become a list of the two apps, each opening in
-       place to show its builds; without scripts they all stay open. */
+    /* Both apps stay side by side; compact cards adapt to phone widths. */
     @media (max-width: 900px) {
-      .apps { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      .apps { gap: 16px; }
       .app { padding: 16px; }
-      .app-icon { width: 44px; height: 44px; border-radius: 10px; }
+      .app-head { flex-direction: column; align-items: flex-start; gap: 12px; }
       .app-name { font-size: 22px; }
-      .app-summary { margin-top: 14px; }
-      .has-js .app { padding: 0; }
-      .has-js .app-head { padding: 14px 12px 14px 16px; cursor: pointer; }
-      .has-js .app-body { padding: 0 16px 16px; }
-      .has-js .app-body .app-summary { margin-top: 0; }
-      .has-js .app:not(.is-open) .app-body { display: none; }
-      .has-js .app-toggle { display: grid; width: 32px; height: 32px; flex: 0 0 auto; margin-left: auto; padding: 0; place-items: center; border: 0; color: var(--text-2); background: transparent; cursor: pointer; transition: color .15s ease; }
-      /* The whole row opens the app, not just its arrow. */
-      .app-toggle::after { content: ""; position: absolute; inset: 0; border-radius: 13px 13px 0 0; }
-      .app:not(.is-open) .app-toggle::after { border-radius: 13px; }
-      .app-head:hover .app-toggle { color: var(--text); }
-      .app-toggle:focus-visible { outline: none; }
-      .app-toggle:focus-visible::after { outline: 2px solid var(--focus); outline-offset: -2px; }
-      .app-toggle svg { width: 18px; height: 18px; transition: transform .25s cubic-bezier(.2,.7,.2,1); }
-      .app.is-open .app-toggle svg { transform: rotate(180deg); }
+      .app-actions { flex-direction: column; }
+      .build { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+      .build-meta { grid-column: 1; grid-row: auto; }
+      .download { width: 100%; min-height: 44px; }
+      .notes-button { flex: auto; min-height: 44px; }
     }
     @media (max-width: 600px) {
       .wrap { width: calc(100% - 32px); }
       :root { --top: 140px; }
-      .apps { padding-top: 148px; }
+      .apps { padding-top: 148px; gap: 12px; }
+      .app { padding: 14px 12px 12px; }
+      .app-head { align-items: center; text-align: center; gap: 10px; }
+      .app-name { font-size: 18px; }
+      .app-kind { font-size: 11px; line-height: 1.5; }
+      .app-summary { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; flex: none; font-size: 12px; line-height: 1.6; }
+      .builds { margin-top: 14px; }
+      .build { padding: 10px 8px; }
+      .build h3 { font-size: 12px; }
+      .build-meta, .build-meta .build-number { font-size: 11px; }
+      .download, .notes-button { padding: 0 6px; font-size: 11px; }
+      .notes-button svg, .download svg { display: none; }
+      .app-body { margin-top: 0; }
       .float-mark { --mark-size: 48px; top: 74px; }
       .source-label { display: none; }
       .download { height: 36px; }
@@ -219,8 +219,6 @@
       .notes-button { padding: 0 10px; }
       .notes-button svg { display: none; }
     }
-    /* On paper every app is open. */
-    @media print { .has-js .app:not(.is-open) .app-body { display: flex; } .has-js .app-toggle { display: none; } }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -259,7 +257,6 @@
         <header class="app-head">
           <span class="app-icon"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/lineup.png" alt="" width="56" height="56"></span>
           <div class="app-title"><h2 class="app-name" id="lineup-name">Lineup</h2><p class="app-kind">Live sports · iPhone &amp; Apple TV</p></div>
-          <button class="app-toggle" type="button" data-app-toggle aria-expanded="false" aria-controls="lineup-details" aria-label="Lineup details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         </header>
         <div class="app-body" id="lineup-details">
           <p class="app-summary">Lineup puts live sports, live TV and your own media library in one app on iPhone and Apple TV. Connect your IPTV provider and media servers, follow the teams you care about, and watch everything from one place.</p>
@@ -290,7 +287,6 @@
         <header class="app-head">
           <span class="app-icon"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/nullsign.png" alt="" width="56" height="56" loading="lazy"></span>
           <div class="app-title"><h2 class="app-name" id="nullsign-name">NullSign</h2><p class="app-kind">iOS signing &amp; install</p></div>
-          <button class="app-toggle" type="button" data-app-toggle aria-expanded="false" aria-controls="nullsign-details" aria-label="NullSign details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         </header>
         <div class="app-body" id="nullsign-details">
           <p class="app-summary">NullSign signs and installs iOS apps on your device using your own Apple signing certificate and provisioning profile. Import an IPA or download one from an app source, then tap Install to sign it with your saved settings and follow its progress through installation.</p>
@@ -451,24 +447,6 @@
           else dialog.removeAttribute("open");
         });
       });
-      // In the narrow list, an app opens in place to show its builds; the
-      // links at the top open the app they go to.
-      const setOpen = (app, open) => {
-        if (!app || app.classList.contains("is-open") === open) return;
-        app.classList.toggle("is-open", open);
-        app.querySelector("[data-app-toggle]")?.setAttribute("aria-expanded", String(open));
-        dispatchEvent(new CustomEvent("reflow"));
-      };
-      document.querySelectorAll("[data-app-toggle]").forEach(toggle => {
-        const app = toggle.closest("[data-project-card]");
-        toggle.addEventListener("click", () => setOpen(app, !app.classList.contains("is-open")));
-      });
-      const openLinked = hash => {
-        const app = hash.length > 1 ? document.getElementById(hash.slice(1)) : null;
-        if (app?.matches("[data-project-card]")) setOpen(app, true);
-      };
-      addEventListener("hashchange", () => openLinked(location.hash));
-      openLinked(location.hash);
       const repoButton = document.getElementById("repo-copy");
       const repoLabel = document.getElementById("repo-copy-label");
       let resetCopyLabel;
