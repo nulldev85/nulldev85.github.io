@@ -540,7 +540,11 @@
         document.querySelectorAll("[data-bundle]").forEach(container => {
           const app = apps.get(container.dataset.bundle);
           const release = app && Array.isArray(app.versions) ? app.versions[0] : null;
-          if (release) updateBuild(release, container);
+          if (!release) return;
+          // A cached feed can briefly be older than this page after a release.
+          const published = Date.parse(container.querySelector("[data-release-time]")?.dateTime);
+          if (Date.parse(release.date) < published) return;
+          updateBuild(release, container);
         });
       }).catch(() => {
         // The page keeps its last-known direct download links.
