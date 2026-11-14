@@ -10,6 +10,7 @@
   <title>Null’s Apps</title>
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://signer.mateomedia.link">
   <style>
     :root {
       color-scheme: dark;
@@ -234,6 +235,9 @@
     .site-top .signer-launch { position: absolute; top: 8px; left: 16px; z-index: 24; min-width: 110px; height: 44px; padding: 0 12px; gap: 8px; border-radius: 12px; font-size: 12px; }
     .site-top .signer-launch svg { display: block; width: 16px; height: 16px; }
     .signer-frame { display: block; width: 100%; height: 640px; border: 0; background: transparent; }
+    /* Lay out the lightweight form before the first tap, without exposing it. */
+    #web-signer:not([open]) { display: block; visibility: hidden; pointer-events: none; }
+    #web-signer[open] { animation: none; }
     .site-menu { position: relative; z-index: 24; width: max-content; max-width: 100%; margin-left: auto; }
     .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; width: max-content; min-width: 110px; margin-left: auto; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; font-size: 12px; list-style: none; }
     .menu-toggle::-webkit-details-marker, .help-toggle::-webkit-details-marker { display: none; }
@@ -585,7 +589,7 @@
     <dialog class="release-dialog" id="web-signer" aria-labelledby="web-signer-title">
       <div class="dialog-body">
         <header class="dialog-head"><div><p class="dialog-kicker">Sign on this device · Beta</p><h2 id="web-signer-title">Web signer</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close web signer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
-        <div class="dialog-content"><iframe class="signer-frame" id="signer-frame" title="Local IPA signing" sandbox="allow-scripts allow-same-origin allow-downloads allow-top-navigation-by-user-activation allow-popups" allow="clipboard-write" referrerpolicy="no-referrer"></iframe></div>
+        <div class="dialog-content"><iframe class="signer-frame" id="signer-frame" src="https://signer.mateomedia.link/" loading="eager" title="Local IPA signing" sandbox="allow-scripts allow-same-origin allow-downloads allow-top-navigation-by-user-activation allow-popups" allow="clipboard-write" referrerpolicy="no-referrer"></iframe></div>
       </div>
     </dialog>
   </main>
@@ -701,7 +705,7 @@
         if (typeof dialog.close === "function") dialog.close();
         else {
           dialog.removeAttribute("open");
-          if (dialog.id === "web-signer") signerFrame.removeAttribute("src");
+          if (dialog.id === "web-signer") signerFrame.contentWindow?.postMessage({ type: "null-websigner-cancel" }, signerOrigin);
           restoreDialogFocus(dialog);
         }
       };
@@ -711,7 +715,6 @@
         button.addEventListener("click", () => {
           dialogReturnFocus.set(dialog, siteMenu.contains(button) ? siteMenu.querySelector("summary") : button);
           siteMenu.open = false;
-          if (dialog.id === "web-signer") signerFrame.src = signerOrigin + "/";
           if (typeof dialog.showModal === "function") {
             if (!dialog.open) dialog.showModal();
           } else dialog.setAttribute("open", "");
@@ -722,7 +725,6 @@
         dialog.addEventListener("close", () => restoreDialogFocus(dialog));
         if (dialog.id === "web-signer") dialog.addEventListener("close", () => {
           signerFrame.contentWindow?.postMessage({ type: "null-websigner-cancel" }, signerOrigin);
-          signerFrame.removeAttribute("src");
         });
         dialog.querySelector("[data-dialog-close]")?.addEventListener("click", () => {
           closeDialog(dialog);
