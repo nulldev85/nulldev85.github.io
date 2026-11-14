@@ -189,7 +189,7 @@ async def health(request):
 
 async def static(request):
     resource = request.path_params.get('resource', 'index.html')
-    if resource not in {'index.html','style.css','app.js','worker.js','zip-check.js','engine/zsign-mobile.js','engine/zsign-mobile.wasm','LICENSES.txt'}:
+    if resource not in {'index.html','style.css','app.js','worker.js','zip-check.js','app-metadata.js','preview-worker.js','engine/zsign-mobile.js','engine/zsign-mobile.wasm','LICENSES.txt'}:
         return Response(status_code=404)
     types = {'.html':'text/html', '.css':'text/css', '.js':'text/javascript', '.wasm':'application/wasm', '.txt':'text/plain'}
     path = STATIC / resource
