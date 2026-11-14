@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#100e09">
+  <meta name="theme-color" content="#080707">
   <meta name="description" content="Lineup and NullSign for iPhone and Apple TV: what each app does, what changed in its latest build, and where to download it.">
   <meta property="og:title" content="Null’s Apps">
   <meta property="og:description" content="Lineup and NullSign for iPhone and Apple TV.">
@@ -19,7 +19,7 @@
     @font-face { font-family: "Null Dots Display"; src: url("fonts/dots-display.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
     :root {
       color-scheme: dark;
-      --bg: #100e09;
+      --bg: #080707;
       --surface: #1a150f;
       --raised: #272017;
       --line: rgba(224,185,108,.12);
@@ -50,7 +50,8 @@
       -webkit-font-smoothing: antialiased;
       overflow-x: clip;
     }
-    /* Reference-matched 8px amber halftone: broad, soft dots over warm light. */
+    /* Normal-scale reference: fine 4px amber dots, soft edges and a dark ground.
+       Keep the texture continuous across the page, cards and fixed header. */
     body::after {
       content: "";
       position: fixed;
@@ -58,12 +59,11 @@
       z-index: 25;
       pointer-events: none;
       background-image:
-        radial-gradient(circle at center, rgba(251,191,36,.085) 1.75px, rgba(251,191,36,.045) 2px, transparent 2.3px),
-        radial-gradient(ellipse at 8% 0%, rgba(190,132,30,.11), transparent 58%),
-        radial-gradient(ellipse at 96% 45%, rgba(182,83,25,.07), transparent 60%),
-        linear-gradient(135deg, rgba(142,113,32,.035), transparent 55%, rgba(120,76,25,.025));
-      background-size: 8px 8px, 100% 100%, 100% 100%, 100% 100%;
-      background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+        radial-gradient(circle at center, rgba(224,199,151,.075) .75px, rgba(224,199,151,.035) 1px, transparent 1.2px),
+        radial-gradient(ellipse at 8% 0%, rgba(190,132,30,.055), transparent 58%),
+        radial-gradient(ellipse at 96% 45%, rgba(182,83,25,.025), transparent 60%);
+      background-size: 4px 4px, 100% 100%, 100% 100%;
+      background-repeat: repeat, no-repeat, no-repeat;
     }
     ::selection { background: rgba(216,154,56,.35); }
     a { color: inherit; }
@@ -76,7 +76,7 @@
     .site-header { position: fixed; top: 0; right: 0; left: 0; z-index: 22; display: flex; align-items: center; justify-content: space-between; height: 64px; margin: 0 auto; }
     /* Behind it, a band of the page's own dark, fading at its lower edge, for
        the page to disappear under. */
-    .top-shade { position: fixed; top: 0; right: 0; left: 0; z-index: 22; height: var(--top); background: linear-gradient(var(--bg) calc(100% - 30px), rgba(16, 14, 9, 0)); pointer-events: none; }
+    .top-shade { position: fixed; top: 0; right: 0; left: 0; z-index: 22; height: var(--top); background: linear-gradient(var(--bg) calc(100% - 30px), rgba(8, 7, 7, 0)); pointer-events: none; }
     .wordmark { font-size: 15px; font-weight: 600; text-decoration: none; }
 
     /* Signer source, below the app listings. */
