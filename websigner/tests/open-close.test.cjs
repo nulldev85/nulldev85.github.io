@@ -21,8 +21,14 @@ const dialog=new Target();dialog.id='web-signer';dialog.open=false;
 dialog.querySelector=()=>({scrollTop:100,addEventListener(){}});
 dialog.showModal=()=>{dialog.open=true;};
 dialog.close=()=>{dialog.open=false;dialog.fire('close');};
-const button=new Target();button.dataset={openDialog:'web-signer'};button.focus=()=>{};
-const document={getElementById:id=>id==='signer-frame'?frame:dialog,querySelectorAll:selector=>selector==='[data-open-dialog]'?[button]:[dialog]};
+const button=new Target();button.dataset={openDialog:'web-signer'};button.focus=()=>{};button.closest=()=>null;
+const guide=new Target();guide.id='nullsign-install';guide.open=false;guide.querySelector=dialog.querySelector;
+guide.showModal=()=>{guide.open=true;};
+let delayedGuideClose;guide.close=()=>{guide.open=false;delayedGuideClose=()=>guide.fire('close');};
+let guideFocus=0;
+const guideOpen=new Target();guideOpen.dataset={openDialog:'nullsign-install'};guideOpen.closest=()=>null;guideOpen.focus=()=>{guideFocus++;};
+const guideLaunch=new Target();guideLaunch.dataset={openDialog:'web-signer'};guideLaunch.closest=()=>guide.open?guide:null;
+const document={getElementById:id=>id==='signer-frame'?frame:id==='nullsign-install'?guide:dialog,querySelector:()=>dialog.open?dialog:guide.open?guide:null,querySelectorAll:selector=>selector==='[data-open-dialog]'?[button,guideOpen,guideLaunch]:[dialog,guide]};
 const siteMenu={contains:()=>false,open:false};
 vm.runInNewContext(script.slice(script.indexOf('const dialogReturnFocus'),script.indexOf('const repoButton')),{document,window,siteMenu});
 button.fire('click');assert.equal(dialog.open,true);
@@ -30,6 +36,15 @@ dialog.close();assert.equal(messages.length,1);assert.equal(messages[0].data.typ
 assert.equal(messages[0].origin,'https://signer.mateomedia.link');
 button.fire('click');dialog.close();assert.equal(messages.length,2);
 console.log('PASS: eager form, hidden layout, immediate opening, no per-open navigation, reset message on every close.');
+guideOpen.fire('click');assert.equal(guide.open,true);
+guideLaunch.fire('click');assert.equal(guide.open,false);assert.equal(dialog.open,true);
+delayedGuideClose();assert.equal(guideFocus,0,'Closing guide must not steal signer focus');
+dialog.close();assert.equal(guideFocus,1,'Return to original guide opener, not its hidden launch button');
+const tutorial=html.split('id="nullsign-install"')[1].split('</dialog>')[0];
+assert.doesNotMatch(tutorial,/flarestore\.app\/(?:signer|privacy)\//);
+for(const text of ['Open Web signer','Sign IPA','Prepare install','Install app','.p12 file','Provisioning profile'])assert.ok(tutorial.includes(text),text);
+assert.ok(tutorial.includes('data-guide-download="com.elmat.NullSign"'));
+console.log('PASS: tutorial uses current signer labels and direct modal handoff, keeps official IPA download, restores original focus.');
 
 // Exercise the actual empty-form reset code, since the iframe now stays mounted.
 const nodes=Object.fromEntries(['ipa','certificate','profile','password','status','signer','sign','cancel','upload-progress','install','hosted-actions','prepare','result','sign-form'].map(id=>[id,{value:'selected',hidden:false,disabled:true,classList:{add(){}},getBoundingClientRect:()=>({height:600})}]));
