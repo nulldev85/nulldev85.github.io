@@ -85,10 +85,11 @@
 
     /* Signer source, below the app listings. */
     .source-section { padding-bottom: 16px; }
-    .source { display: flex; align-items: stretch; max-width: 700px; height: 44px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: rgba(255,255,255,.025); }
+    .source { display: flex; align-items: stretch; max-width: 700px; height: 48px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: rgba(255,255,255,.025); }
     .source-label { display: flex; align-items: center; padding: 0 14px; border-right: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
     .source-url { flex: 1 1 auto; min-width: 0; align-self: center; padding: 0 14px; overflow: hidden; color: var(--text); font: 14px var(--mono); white-space: nowrap; text-overflow: ellipsis; }
-    .copy-repo { display: inline-flex; align-items: center; gap: 8px; min-width: 96px; padding: 0 16px; border: 0; border-left: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s ease; }
+    .copy-repo { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-left: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background .15s ease; }
+    .source .copy-repo { min-width: 104px; }
     @media (hover: hover) { .copy-repo:hover { background: var(--raised); } }
     .copy-repo:focus-visible { outline-offset: -3px; border-radius: 0 9px 9px 0; }
     .copy-repo svg { width: 15px; height: 15px; color: var(--text-2); }
@@ -137,11 +138,12 @@
     .feature p { margin: 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
 
     /* Release notes */
-    .release-dialog { width: min(560px, 100% - 32px); max-width: none; max-height: min(85dvh, 760px); padding: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; color: var(--text); background: var(--surface); box-shadow: 0 24px 80px rgba(0,0,0,.6); }
+    .release-dialog { --dialog-height: min(900px, calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))); width: min(560px, 100% - 32px); max-width: none; max-height: var(--dialog-height); margin: calc(12px + env(safe-area-inset-top)) auto auto; padding: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; color: var(--text); background: var(--surface); box-shadow: 0 24px 80px rgba(0,0,0,.6); }
     .release-dialog[open] { animation: dialog-in .2s cubic-bezier(.2,.7,.2,1); }
     .release-dialog::backdrop { background: rgba(0,0,0,.62); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-    .dialog-body { max-height: min(85dvh, 760px); overflow: auto; padding: 26px 28px 30px; overscroll-behavior: none; }
-    .dialog-head { position: sticky; top: 0; z-index: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin: -26px -28px 0; padding: 20px 28px 12px; border-bottom: 1px solid var(--line); background: var(--surface); }
+    .dialog-body { display: flex; flex-direction: column; max-height: calc(var(--dialog-height) - 2px); overflow: hidden; }
+    .dialog-head { display: flex; flex: 0 0 auto; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 20px 28px 16px; border-bottom: 1px solid var(--line); background: var(--surface); }
+    .dialog-content { min-height: 0; overflow: auto; padding: 6px 28px 30px; overscroll-behavior: none; }
     .dialog-kicker { margin: 0 0 2px; color: var(--text-2); font-size: 13px; }
     .dialog-head h2 { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 600; }
     .dialog-close { display: grid; width: 44px; height: 44px; flex: 0 0 auto; margin: -4px -8px 0 0; place-items: center; border: 1px solid var(--line); border-radius: 12px; color: var(--text-2); background: rgba(255,255,255,.035); cursor: pointer; }
@@ -186,7 +188,7 @@
     @keyframes dialog-in { from { opacity: 0; transform: translateY(6px) scale(.99); } }
 
     /* Raised at rest, visibly depressed on touch, mouse and keyboard presses. */
-    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark) {
+    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle) {
       min-height: 44px;
       min-width: 44px;
       touch-action: manipulation;
@@ -195,17 +197,17 @@
       cursor: pointer;
       transition: transform .14s cubic-bezier(.2,.8,.2,1), background .14s ease, border-color .14s ease, box-shadow .14s ease;
     }
-    :is(.download, .notes-button, .dialog-close) {
+    :is(.download, .notes-button, .dialog-close, .menu-toggle) {
       box-shadow: inset 0 1px 0 rgba(255,226,175,.09), 0 2px 5px rgba(0,0,0,.22);
     }
-    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark):is(.is-pointer-pressed, .is-key-pressed) {
+    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle):is(.is-pointer-pressed, .is-key-pressed) {
       transform: translateY(3px) scale(.97);
       background: rgba(232,187,105,.24);
       border-color: rgba(237,190,103,.55);
       box-shadow: inset 0 2px 5px rgba(0,0,0,.3);
       transition-duration: .04s;
     }
-    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark):focus-visible {
+    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle):focus-visible {
       outline: 2px solid var(--focus);
       outline-offset: 3px;
       box-shadow: 0 0 0 5px rgba(237,190,103,.12);
@@ -220,6 +222,27 @@
       opacity: 0; transform: translate(-50%, 8px); transition: opacity .16s ease, transform .16s ease;
     }
     .action-status.is-visible { opacity: 1; transform: translate(-50%, 0); }
+
+    .site-menu { position: fixed; top: calc(8px + env(safe-area-inset-top)); right: calc(16px + env(safe-area-inset-right)); z-index: 32; }
+    .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: #241b0c; font-size: 12px; list-style: none; }
+    .menu-toggle::-webkit-details-marker, .help-toggle::-webkit-details-marker { display: none; }
+    .menu-toggle svg { width: 16px; height: 16px; }
+    .menu-panel { position: absolute; top: calc(100% + 8px); right: 0; display: flex; flex-direction: column; gap: 8px; width: min(240px, calc(100vw - 32px)); padding: 10px; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--surface); box-shadow: 0 8px 28px rgba(0,0,0,.5); }
+    .menu-panel .notes-button { flex: none; min-height: 48px; height: auto; padding: 10px 12px; justify-content: flex-start; text-align: left; white-space: normal; font-size: 13px; }
+    .install-needs { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; line-height: 1.6; }
+    .install-steps { padding-left: 24px; margin: 18px 0; }
+    .install-steps li { padding-left: 4px; margin: 0 0 18px; font-size: 14px; line-height: 1.6; }
+    .install-steps li::marker { color: var(--accent); }
+    .install-steps strong { display: block; margin-bottom: 4px; }
+    .install-steps p { margin: 0; }
+    .guide-action { width: 100%; margin-top: 8px; text-decoration: none; }
+    .guide-note { margin: 14px 0 0; font-size: 12px; line-height: 1.6; }
+    .guide-note a, .install-needs a, .install-trouble a { text-underline-offset: 3px; }
+    .install-trouble { margin-top: 18px; border-top: 1px solid var(--line); }
+    .help-toggle { display: flex; align-items: center; padding: 10px 4px; gap: 10px; border-radius: 8px; list-style: none; font-size: 13px; }
+    .help-toggle::after { content: "+"; margin-left: auto; font: 20px/1 sans-serif; }
+    .install-trouble[open] > .help-toggle::after { content: "−"; }
+    .install-trouble p { font-size: 13px; line-height: 1.6; }
 
     /* Both apps stay side by side; compact cards adapt to phone widths. */
     @media (max-width: 900px) {
@@ -257,10 +280,10 @@
       .source-label { display: none; }
       .download { height: 36px; }
       .notes-button { height: 36px; }
-      .release-dialog { width: calc(100% - 16px); max-height: 88svh; margin: auto auto 0; border-radius: 20px 20px 0 0; }
+      .release-dialog { --dialog-height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); width: calc(100% - 16px); margin: calc(8px + env(safe-area-inset-top)) auto auto; border-radius: 20px; }
       .release-dialog[open] { animation-name: sheet-in; }
-      .dialog-body { max-height: 88svh; padding: 22px 20px calc(26px + env(safe-area-inset-bottom)); }
-      .dialog-head { margin: -22px -20px 0; padding: 16px 20px 12px; }
+      .dialog-head { padding: 16px 20px; }
+      .dialog-content { padding: 6px 20px calc(26px + env(safe-area-inset-bottom)); }
     }
     @keyframes sheet-in { from { opacity: 0; transform: translateY(24px); } }
     @media (max-width: 359px) {
@@ -296,11 +319,18 @@
       html, body { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
       .has-js [data-project-card] { opacity: 1; transform: none; }
-      :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark):is(.is-pointer-pressed, .is-key-pressed) { transform: translateY(3px); }
+      :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle):is(.is-pointer-pressed, .is-key-pressed) { transform: translateY(3px); }
     }
   </style>
 </head>
 <body>
+  <details class="site-menu">
+    <summary class="menu-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</summary>
+    <nav class="menu-panel" aria-label="Tutorials">
+      <button class="notes-button" type="button" data-open-dialog="nullsign-install" aria-haspopup="dialog" aria-controls="nullsign-install">Install NullSign on iPhone</button>
+      <button class="notes-button" type="button" data-open-dialog="appletv-install" aria-haspopup="dialog" aria-controls="appletv-install">Sideload apps onto Apple TV</button>
+    </nav>
+  </details>
   <div class="autumn-leaves" aria-hidden="true">
     <span class="autumn-leaf" style="--x:4%;--size:30px;--duration:22s;--delay:-3s;--opacity:0.32;--sway:4s;--turn:7s"><span class="leaf-sway"><img src="assets/leaf-maple.svg" alt="" width="48" height="64"></span></span>
     <span class="autumn-leaf" style="--x:13%;--size:24px;--duration:27s;--delay:-17s;--opacity:0.28;--sway:5s;--turn:8s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
@@ -392,6 +422,7 @@
     <dialog class="release-dialog" id="lineup-release" aria-labelledby="lineup-release-title">
       <div class="dialog-body">
         <header class="dialog-head"><div><p class="dialog-kicker">Lineup · latest release</p><h2 id="lineup-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+        <div class="dialog-content">
         <p class="dialog-intro">Here’s what’s new in Lineup on iPhone and Apple TV.</p>
         <section class="release-build" data-release-notes-bundle="com.nulldev85.NullSports.iOS" data-notes-build="0.19.0-1101">
           <div class="release-build-head"><h3>iPhone</h3><span class="release-build-version">v<span data-release-version-for="com.nulldev85.NullSports.iOS">0.19.0</span> · Build <span data-release-build-for="com.nulldev85.NullSports.iOS">1101</span></span></div>
@@ -414,12 +445,14 @@
             <li>If the sports schedule can't refresh because of a secure connection problem, it tells you that.</li>
           </ul>
         </section>
+        </div>
       </div>
     </dialog>
 
 <dialog class="release-dialog" id="nullsign-release" aria-labelledby="nullsign-release-title">
       <div class="dialog-body">
         <header class="dialog-head"><div><p class="dialog-kicker">NullSign · latest release</p><h2 id="nullsign-release-title">Release notes</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close release notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+        <div class="dialog-content">
         <p class="dialog-intro">The latest NullSign build is the current iOS signing and installation release.</p>
         <section class="release-build" data-release-notes-bundle="com.elmat.NullSign" data-notes-build="1.5.2-52">
           <div class="release-build-head"><h3>iOS</h3><span class="release-build-version">v<span data-release-version-for="com.elmat.NullSign">1.5.2</span> · Build <span data-release-build-for="com.elmat.NullSign">52</span></span></div>
@@ -434,12 +467,14 @@
             <li>A source with a missing file tells you that, instead of a confusing invalid JSON error. GitHub sources can drop out for a minute while a new release uploads.</li>
           </ul>
         </section>
+        </div>
       </div>
     </dialog>
 
     <dialog class="release-dialog" id="lineup-features" aria-labelledby="lineup-features-title">
       <div class="dialog-body">
         <header class="dialog-head"><div><p class="dialog-kicker">Lineup · what it does</p><h2 id="lineup-features-title">Features</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close features"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+        <div class="dialog-content">
         <div class="feature-list" aria-label="Lineup features">
           <section class="feature"><h3>Live sports &amp; teams</h3><p>Follow the NFL, NBA, NHL, MLB, college sports, soccer, tennis, UFC, Formula 1 and NASCAR. Check schedules, live scores and team pages, then jump straight to the channel showing a game, or to your provider’s catch-up when it has one. If a channel won’t start, Lineup moves on to the next one and remembers which channels let you down. NFL teams you follow also get Game Replays.</p></section>
           <section class="feature"><h3>Live TV guide</h3><p>Search channels and listings from one IPTV provider or several at once, keep your favorites in your own order, and start live TV or a catch-up recording right from the guide. On iPhone, the guide opens on your channel categories, and you can watch two channels side by side.</p></section>
@@ -449,12 +484,14 @@
           <section class="feature"><h3>Playback</h3><p>On iPhone, play with AetherEngine or MPVKit behind Liquid Glass controls. Apple TV also offers VLC. Ambient Mode spreads the picture’s colors into the black bars, like YouTube does, on both. Depending on the device and stream, you can follow live stats with Auto Sync, watch two games in multiview, search for subtitles, or skip an episode’s intro. On iPhone, picture-in-picture keeps the game going while you use another app.</p></section>
           <section class="feature"><h3>Built for each screen</h3><p>Lineup has touch-first iPhone controls, a side tab layout that fills the screen on iPhone Duo, and a remote-friendly Apple TV interface. To set up an Apple TV, scan the code it shows with your iPhone: your providers, servers, sign-ins and watch history come straight across, with nothing to type on the remote.</p></section>
         </div>
+        </div>
       </div>
     </dialog>
 
 <dialog class="release-dialog" id="nullsign-features" aria-labelledby="nullsign-features-title">
       <div class="dialog-body">
         <header class="dialog-head"><div><p class="dialog-kicker">NullSign · what it does</p><h2 id="nullsign-features-title">Features</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close features"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+        <div class="dialog-content">
         <div class="feature-list" aria-label="NullSign features">
           <section class="feature"><h3>Sign on your device</h3><p>Use your own .p12 certificate and matching .mobileprovision profile to sign an IPA right on your iPhone. Your certificate never gets uploaded to a remote signing service.</p></section>
           <section class="feature"><h3>Import apps easily</h3><p>Bring IPAs and TIPAs in from the Files app or a URL, a few at a time if you like. Apps keep their real names, versions and icons, and if an import fails you’ll see why.</p></section>
@@ -464,6 +501,53 @@
           <section class="feature"><h3>Manage signing identities</h3><p>Save several certificate and profile pairs, name them, check them, pick the one you need, or remove an old one. Passwordless .p12 files work, and you’ll get a clear message for a wrong password or a profile that doesn’t match.</p></section>
           <section class="feature"><h3>Browse app sources</h3><p>Add AltStore-compatible repositories to browse their apps and releases from inside NullSign. Versions show their build number, like 0.19.0 (960), so you can tell builds apart.</p></section>
           <section class="feature"><h3>Optional tweaks</h3><p>Import .deb and .dylib tweaks for supported signing workflows. ElleKit is on by default for new or reset signing settings, and you can change it in signing options.</p></section>
+        </div>
+        </div>
+      </div>
+    </dialog>
+    <dialog class="release-dialog" id="nullsign-install" aria-labelledby="nullsign-install-title">
+      <div class="dialog-body">
+        <header class="dialog-head"><div><p class="dialog-kicker">iPhone setup</p><h2 id="nullsign-install-title">Install NullSign</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close iPhone guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+        <div class="dialog-content">
+          <p class="install-needs">Have your <strong>.p12 certificate</strong>, matching <strong>.mobileprovision</strong> for your iPhone, and certificate password ready in Files. Need these? <a href="https://flarestore.app/faq/" target="_blank" rel="noopener noreferrer">See Flare’s certificate options ↗</a>.</p>
+          <ol class="install-steps">
+            <li><strong>Download NullSign.</strong><p>Open this page in Safari on your iPhone. Save the IPA in Files → Downloads.</p><a class="download guide-action" data-guide-download="com.elmat.NullSign" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-43566275481/NullSign-1.5.2-52.ipa">Download NullSign IPA</a></li>
+            <li><strong>Open Flare’s signer.</strong><a class="notes-button guide-action" href="https://flarestore.app/signer/" target="_blank" rel="noopener noreferrer">Open Flare Web Signer ↗</a></li>
+            <li><strong>Choose your IPA.</strong><p>Under Select IPA, choose File and select NullSign from Downloads.</p></li>
+            <li><strong>Add your certificate.</strong><p>Under Signing Assets, select your .mobileprovision and .p12. Enter the password if set. Leave Advanced Options alone.</p></li>
+            <li><strong>Sign and install.</strong><p>Tap Sign Application. On the install page, tap Install and accept the iPhone prompt. Then open NullSign from your Home Screen.</p></li>
+          </ol>
+          <details class="install-trouble">
+            <summary class="help-toggle">If NullSign won’t open</summary>
+            <p><strong>Untrusted Developer:</strong> Open Settings → General → VPN &amp; Device Management. Select the signing developer and follow the Trust or Allow &amp; Restart prompts.</p>
+            <p><strong>Developer Mode Required:</strong> Open Settings → Privacy &amp; Security → Developer Mode. Turn it on, restart, then confirm. Do this only if iPhone asks.</p>
+            <p><strong>Integrity or verification error:</strong> Check your internet connection and ask your certificate provider to confirm the certificate is valid and the profile covers this iPhone.</p>
+          </details>
+          <p class="guide-note">Flare signs on its servers, so your IPA and signing files are uploaded there. <a href="https://flarestore.app/privacy/" target="_blank" rel="noopener noreferrer">Privacy policy ↗</a></p>
+          <p class="guide-note"><a href="https://flarestore.app/signer/" target="_blank" rel="noopener noreferrer">Flare signer ↗</a> · <a href="https://support.apple.com/en-us/118254" target="_blank" rel="noopener noreferrer">Apple trust help ↗</a> · <a href="https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device" target="_blank" rel="noopener noreferrer">Developer Mode help ↗</a></p>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="release-dialog" id="appletv-install" aria-labelledby="appletv-install-title">
+      <div class="dialog-body">
+        <header class="dialog-head"><div><p class="dialog-kicker">NullSign on iPhone → Apple TV</p><h2 id="appletv-install-title">Sideload onto Apple TV</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close Apple TV guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+        <div class="dialog-content">
+          <p class="install-needs">You need NullSign on your iPhone, a <strong>tvOS IPA</strong>, and a <strong>tvOS signing certificate and profile</strong> valid for your Apple TV. Your iPhone profile alone won’t work.</p>
+          <ol class="install-steps">
+            <li><strong>Connect both devices.</strong><p>Put your iPhone and Apple TV on the same network. Keep Apple TV awake.</p></li>
+            <li><strong>Open pairing on Apple TV.</strong><p>Go to Settings → Remotes and Devices → Remote App and Devices. Leave that screen open.</p></li>
+            <li><strong>Pair in NullSign.</strong><p>On iPhone, open NullSign → Settings → Installation Method → Apple TV / Tunnel. Select your TV, enter its six-digit code and tap Pair.</p></li>
+            <li><strong>Add your TV certificate.</strong><p>In NullSign, open Settings → Certificates → +. Add your .p12, its tvOS .mobileprovision and password, then tap Save.</p></li>
+            <li><strong>Import a tvOS app.</strong><p>Download the Apple TV IPA for the app you want. In NullSign’s Signer tab, tap Import → Import from Files and select it.</p></li>
+            <li><strong>Install it.</strong><p>Tap the imported app’s Install action. Keep NullSign open until it finishes, then open the app on Apple TV.</p></li>
+          </ol>
+          <details class="install-trouble">
+            <summary class="help-toggle">If your TV doesn’t appear</summary>
+            <p>Keep Remote App and Devices open on TV. Check both devices are on the same network, allow NullSign’s Local Network permission in iPhone Settings, then tap Scan or Refresh in NullSign.</p>
+            <p>Apple TV pairing does not need a VPN or an imported pairing file. Those controls are for the separate iPhone tunnel route.</p>
+          </details>
+          <p class="guide-note">Steps match NullSign 1.5.2. Use an Apple TV build of the app; an iPhone IPA won’t install on TV.</p>
         </div>
       </div>
     </dialog>
@@ -478,7 +562,7 @@
   <script>
     (() => {
       document.documentElement.classList.add("has-js");
-      const controls = ".download, .notes-button, .copy-repo, .dialog-close, .float-mark";
+      const controls = ".download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle";
       // Explicit held state also works on touch browsers that omit :active.
       let heldPointer = null;
       const releasePointerPress = () => {
@@ -517,7 +601,7 @@
       document.addEventListener("keydown", event => {
         if (event.repeat || !(event.target instanceof Element)) return;
         const control = event.target.closest(controls);
-        if (control && (event.key === "Enter" || (event.key === " " && control.tagName === "BUTTON"))) control.classList.add("is-key-pressed");
+        if (control && (event.key === "Enter" || (event.key === " " && control.matches("button, summary")))) control.classList.add("is-key-pressed");
       });
       document.addEventListener("keyup", releaseKeyPress);
       document.addEventListener("focusout", releaseKeyPress);
@@ -557,24 +641,45 @@
         const formatted = formatReleaseTime(node.dateTime);
         if (formatted) node.textContent = formatted;
       });
+      const siteMenu = document.querySelector(".site-menu");
+      document.addEventListener("pointerdown", event => {
+        if (siteMenu.open && !siteMenu.contains(event.target)) siteMenu.open = false;
+      }, { passive: true });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && siteMenu.open) {
+          siteMenu.open = false;
+          siteMenu.querySelector("summary").focus({ preventScroll: true });
+        }
+      });
+      const dialogReturnFocus = new WeakMap();
+      const restoreDialogFocus = dialog => dialogReturnFocus.get(dialog)?.focus({ preventScroll: true });
+      const closeDialog = dialog => {
+        if (typeof dialog.close === "function") dialog.close();
+        else {
+          dialog.removeAttribute("open");
+          restoreDialogFocus(dialog);
+        }
+      };
       document.querySelectorAll("[data-open-dialog]").forEach(button => {
         const dialog = document.getElementById(button.dataset.openDialog);
         if (!dialog) return;
         button.addEventListener("click", () => {
+          dialogReturnFocus.set(dialog, siteMenu.contains(button) ? siteMenu.querySelector("summary") : button);
+          siteMenu.open = false;
           if (typeof dialog.showModal === "function") {
             if (!dialog.open) dialog.showModal();
           } else dialog.setAttribute("open", "");
+          dialog.querySelector(".dialog-content").scrollTop = 0;
         });
       });
       document.querySelectorAll(".release-dialog").forEach(dialog => {
+        dialog.addEventListener("close", () => restoreDialogFocus(dialog));
         dialog.querySelector("[data-dialog-close]")?.addEventListener("click", () => {
-          if (typeof dialog.close === "function") dialog.close();
-          else dialog.removeAttribute("open");
+          closeDialog(dialog);
         });
         dialog.addEventListener("click", event => {
           if (event.target !== dialog) return;
-          if (typeof dialog.close === "function") dialog.close();
-          else dialog.removeAttribute("open");
+          closeDialog(dialog);
         });
       });
       const repoButton = document.getElementById("repo-copy");
@@ -620,6 +725,9 @@
         if (url.protocol !== "https:" || url.hostname !== "github.com" || !url.pathname.startsWith("/nulldev85/AppSource/releases/download/") || !url.pathname.toLowerCase().endsWith(".ipa")) return;
         const link = container.querySelector("[data-download]");
         if (link) link.href = url.href;
+        document.querySelectorAll("[data-guide-download]").forEach(guideLink => {
+          if (guideLink.dataset.guideDownload === container.dataset.bundle) guideLink.href = url.href;
+        });
         const buildNumber = container.querySelector("[data-build-number]");
         if (buildNumber) buildNumber.textContent = release.buildVersion;
         const versionNumber = container.querySelector("[data-version-number]");
