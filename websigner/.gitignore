@@ -7,3 +7,4 @@ __pycache__/
 *.pyc
 .venv/
 service/data/
+engine-src/vendor/zsign/test/
