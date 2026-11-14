@@ -114,9 +114,8 @@
     /* The summary takes up the slack, so every card's builds sit at its foot. */
     .app-summary { flex: 1 0 auto; margin: 14px 0 0; color: var(--text-body); font-size: 14px; line-height: 1.6; }
     .builds { margin-top: 16px; border: 1px solid var(--line); border-radius: 10px; background: rgba(0,0,0,.12); }
-    /* Each build: its device and download button on one line, its version
-       and release time under them. */
-    .build { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 14px; padding: 12px 14px 13px; }
+    /* Versions above a matching Download / Copy link pair. */
+    .build { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 6px; padding: 12px 14px 13px; }
     .build + .build { border-top: 1px solid var(--line); }
     .build-info { display: contents; }
     .build h3 { min-width: 0; margin: 0; font-size: 14px; font-weight: 600; }
@@ -127,6 +126,13 @@
     .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 13px; border-radius: 8px; color: var(--text); border: 1px solid var(--line-strong); background: rgba(232,187,105,.12); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
     @media (hover: hover) { .download:hover { background: rgba(232,187,105,.22); } }
     .download svg { width: 14px; height: 14px; }
+    .build-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-column: 1 / -1; grid-row: 3; align-items: stretch; gap: 6px; min-width: 0; margin-top: 2px; }
+    .build-actions .download, .build-actions .ipa-copy { width: 100%; min-height: 44px; height: auto; padding: 9px 12px; border-radius: 9px; }
+    .build-actions .ipa-copy { min-width: 96px; font-size: 12px; white-space: nowrap; }
+    .build-actions .ipa-copy svg { display: block; width: 15px; height: 15px; }
+    .ipa-copy-label { display: inline-block; min-width: 8ch; text-align: center; }
+    .download-compact { display: none; }
+    .guide-download-actions { margin-top: 8px; }
     .app-actions { display: flex; gap: 8px; margin-top: 10px; }
     .notes-button { display: inline-flex; flex: 1 1 0; align-items: center; justify-content: center; gap: 7px; min-width: 0; height: 32px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
     @media (hover: hover) { .notes-button:hover { border-color: rgba(255,255,255,.22); background: var(--raised); } }
@@ -273,6 +279,11 @@
       .build-meta time { display: none; }
       .download, .notes-button { padding: 0 6px; font-size: 11px; }
       .notes-button svg, .download svg { display: none; }
+      .build-actions .download { padding: 9px 4px; font-size: 11px; }
+      .build-actions .ipa-copy { min-width: 44px; width: 44px; padding: 9px; }
+      .ipa-copy-label { display: none; }
+      .download-full { display: none; }
+      .download-compact { display: inline; }
       .app-body { margin-top: 0; }
       .app-actions { flex-direction: row; gap: 6px; }
       .notes-button { padding: 0 4px; white-space: normal; line-height: 1.3; }
@@ -288,6 +299,8 @@
     @keyframes sheet-in { from { opacity: 0; transform: translateY(24px); } }
     @media (max-width: 359px) {
       .app-head { flex-direction: column; text-align: center; }
+      .build { padding: 8px 4px; }
+      .build-actions .download { padding-inline: 2px; font-size: 10px; }
     }
     /* Wide phones and short desktop windows use the available width first. */
     @media (max-height: 700px) and (min-width: 601px) {
@@ -300,7 +313,7 @@
       .app-kind { font-size: 11px; }
       .app-summary { display: none; }
       .builds { margin-top: 10px; }
-      .build { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; padding: 8px; }
+      .build { grid-template-columns: minmax(0, 1fr); gap: 4px; padding: 8px; }
       .build-meta { grid-column: 1 / -1; grid-row: 2; }
       .build-meta time { display: none; }
       .download { width: auto; }
@@ -365,14 +378,20 @@
                 <h3 id="iphone-build-title">iPhone</h3>
                 <p class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>1101</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-14T07:58:01Z">Nov 14, 2026, 7:58 AM UTC</time></p>
               </div>
-              <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-43570415444/Lineup-iPhone-0.19.0-1101.ipa" aria-label="Download the latest Lineup iPhone IPA">Download IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+              <div class="build-actions">
+                <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-43570415444/Lineup-iPhone-0.19.0-1101.ipa" aria-label="Download the latest Lineup iPhone IPA"><span class="download-full">Download IPA</span><span class="download-compact">Download</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+                <button class="notes-button ipa-copy" type="button" data-copy-ipa aria-label="Copy the Lineup iPhone IPA link" title="Copy IPA link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span class="ipa-copy-label">Copy link</span></button>
+              </div>
             </section>
             <section class="build" data-bundle="com.nulldev85.NullSports" aria-labelledby="tvos-build-title">
               <div class="build-info">
                 <h3 id="tvos-build-title">Apple TV</h3>
                 <p class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>839</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-14T07:37:01Z">Nov 14, 2026, 7:37 AM UTC</time></p>
               </div>
-              <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-43570415490-1/Lineup-tvOS-0.19.0-839.ipa" aria-label="Download the latest Lineup Apple TV IPA">Download IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+              <div class="build-actions">
+                <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-43570415490-1/Lineup-tvOS-0.19.0-839.ipa" aria-label="Download the latest Lineup Apple TV IPA"><span class="download-full">Download IPA</span><span class="download-compact">Download</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+                <button class="notes-button ipa-copy" type="button" data-copy-ipa aria-label="Copy the Lineup Apple TV IPA link" title="Copy IPA link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span class="ipa-copy-label">Copy link</span></button>
+              </div>
             </section>
           </div>
           <div class="app-actions">
@@ -395,7 +414,10 @@
                 <h3>iOS</h3>
                 <p class="build-meta"><span class="build-number">v<span data-version-number>1.5.2</span> · Build <span data-build-number>52</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-14T06:33:30Z">Nov 13, 2026, 10:33 PM PST</time></p>
               </div>
-              <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-43566275481/NullSign-1.5.2-52.ipa" aria-label="Download the latest NullSign IPA">Download IPA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+              <div class="build-actions">
+                <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-43566275481/NullSign-1.5.2-52.ipa" aria-label="Download the latest NullSign IPA"><span class="download-full">Download IPA</span><span class="download-compact">Download</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
+                <button class="notes-button ipa-copy" type="button" data-copy-ipa aria-label="Copy the NullSign IPA link" title="Copy IPA link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span class="ipa-copy-label">Copy link</span></button>
+              </div>
             </section>
           </div>
           <div class="app-actions">
@@ -511,7 +533,10 @@
         <div class="dialog-content">
           <p class="install-needs">Have your <strong>.p12 certificate</strong>, matching <strong>.mobileprovision</strong> for your iPhone, and certificate password ready in Files. Need these? Browse certificates: <a href="https://flarestore.app/faq/" target="_blank" rel="noopener noreferrer">Flarestore ↗</a> · <a href="https://arcticsign.app/" target="_blank" rel="noopener noreferrer">Arcticsign ↗</a>.</p>
           <ol class="install-steps">
-            <li><strong>Download NullSign.</strong><p>Open this page in Safari on your iPhone. Save the IPA in Files → Downloads.</p><a class="download guide-action" data-guide-download="com.elmat.NullSign" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-43566275481/NullSign-1.5.2-52.ipa">Download NullSign IPA</a></li>
+            <li><strong>Download NullSign.</strong><p>Open this page in Safari on your iPhone. Save the IPA in Files → Downloads.</p><div class="build-actions guide-download-actions">
+                <a class="download" data-guide-download="com.elmat.NullSign" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-43566275481/NullSign-1.5.2-52.ipa">Download NullSign IPA</a>
+                <button class="notes-button ipa-copy" type="button" data-copy-ipa aria-label="Copy the NullSign IPA link" title="Copy IPA link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span class="ipa-copy-label">Copy link</span></button>
+              </div></li>
             <li><strong>Open Flarestore’s signer.</strong><a class="notes-button guide-action" href="https://flarestore.app/signer/" target="_blank" rel="noopener noreferrer">Open Flarestore Web Signer ↗</a></li>
             <li><strong>Choose your IPA.</strong><p>Under Select IPA, choose File and select NullSign from Downloads.</p></li>
             <li><strong>Add your certificate.</strong><p>Under Signing Assets, select your .mobileprovision and .p12. Enter the password if set. Leave Advanced Options alone.</p></li>
@@ -716,6 +741,21 @@
           repoLabel.textContent = "Copy";
           repoButton.classList.remove("is-copied");
         }, 1900);
+      });
+
+      document.querySelectorAll("[data-copy-ipa]").forEach(button => {
+        const label = button.querySelector(".ipa-copy-label");
+        let resetLabel;
+        button.addEventListener("click", async () => {
+          // Read the live link at press time, including any AppSource refresh.
+          const link = button.closest(".build-actions")?.querySelector("a.download");
+          if (!link) return;
+          const copied = await copyText(link.href);
+          label.textContent = copied ? "Copied" : "Try again";
+          announceAction(copied ? "IPA link copied" : "Couldn’t copy. Try again.");
+          clearTimeout(resetLabel);
+          resetLabel = setTimeout(() => { label.textContent = "Copy link"; }, 1900);
+        });
       });
 
       const updateBuild = (release, container) => {
