@@ -3,10 +3,10 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),asset
 const messages=[];let closed=false;
 const context=vm.createContext({Blob,Uint8Array,DataView,TextDecoder,TextEncoder,DecompressionStream,CompressionStream,Response,btoa,console});
 context.self=context;context.postMessage=message=>messages.push(message);context.close=()=>{closed=true;};
-context.importScripts=(...urls)=>{for(const url of urls){assert.ok(['/assets/vendor/fflate-0.8.3.js','/assets/zip-check.js','/assets/app-metadata.js'].includes(url));vm.runInContext(fs.readFileSync(path.join(assets,url.slice(8)),'utf8'),context);}};
+context.importScripts=(...urls)=>{for(const raw of urls){const url=raw.split('?')[0];assert.ok(['/assets/vendor/fflate-0.8.3.js','/assets/zip-check.js','/assets/app-metadata.js'].includes(url));vm.runInContext(fs.readFileSync(path.join(assets,url.slice(8)),'utf8'),context);}};
 vm.runInContext(fs.readFileSync(path.join(assets,'preview-worker.js'),'utf8'),context);
 await context.onmessage({data:{type:'preview',ipa:new Blob([fs.readFileSync(path.join(fixtures,'input.ipa'))])}});
-assert.ok(closed);assert.equal(messages.length,1);const preview=messages[0];
+assert.equal(closed,false,'Reader remains warm for later files');assert.equal(messages.length,1);const preview=messages[0];
 assert.equal(preview.type,'preview');assert.equal(preview.name,'NullSign');assert.equal(preview.bundle,'com.elmat.NullSign');
 assert.ok(preview.icon instanceof Uint8Array&&preview.icon.length>100);
 assert.ok(preview.iconDataURL.startsWith('data:image/png;base64,'));
@@ -18,7 +18,7 @@ for(const lineupPath of [path.resolve(root,'../../lineup-1089-835-release/Lineup
 if(fs.existsSync(lineupPath)){
  const other=vm.createContext({Blob,Uint8Array,DataView,TextDecoder,TextEncoder,DecompressionStream,CompressionStream,Response,btoa});let result;
  other.self=other;other.close=()=>{};other.postMessage=value=>{result=value;};
- other.importScripts=(...urls)=>{for(const url of urls){assert.ok(['/assets/vendor/fflate-0.8.3.js','/assets/zip-check.js','/assets/app-metadata.js'].includes(url));vm.runInContext(fs.readFileSync(path.join(assets,url.slice(8)),'utf8'),other);}};
+ other.importScripts=(...urls)=>{for(const raw of urls){const url=raw.split('?')[0];assert.ok(['/assets/vendor/fflate-0.8.3.js','/assets/zip-check.js','/assets/app-metadata.js'].includes(url));vm.runInContext(fs.readFileSync(path.join(assets,url.slice(8)),'utf8'),other);}};
  vm.runInContext(fs.readFileSync(path.join(assets,'preview-worker.js'),'utf8'),other);
  await other.onmessage({data:{type:'preview',ipa:new Blob([fs.readFileSync(lineupPath)])}});
  assert.equal(result.type,'preview');assert.equal(result.name,'Lineup');assert.ok(result.icon?.length>100);
@@ -36,5 +36,11 @@ assert.throws(()=>vm.runInContext('parseAppPlist(new TextEncoder().encode("bplis
 assert.throws(()=>vm.runInContext('pngInfo(new Uint8Array(100))',context));
 closed=false;messages.length=0;
 await context.onmessage({data:{type:'preview',ipa:new Blob([new Uint8Array(22)])}});
-assert.ok(closed);assert.equal(messages[0].type,'unavailable');
+assert.equal(closed,false);assert.equal(messages[0].type,'unavailable');
+messages.length=0;
+await Promise.all([
+ context.onmessage({data:{type:'preview',requestId:41,ipa:new Blob([fs.readFileSync(path.join(fixtures,'input.ipa'))])}}),
+ context.onmessage({data:{type:'preview',requestId:42,ipa:new Blob([new Uint8Array(22)])}}),
+]);
+assert.ok(messages.length>0&&messages.every(m=>m.requestId===42),'Reused worker suppresses older file results');
 console.log('PASS: XML/binary metadata supported; invalid/oversized metadata and malformed PNG fail safely; invalid IPA preview cannot block signing.');

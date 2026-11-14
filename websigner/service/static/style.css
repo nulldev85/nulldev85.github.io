@@ -53,13 +53,15 @@ input::placeholder { color:rgba(245,232,204,.7); font-weight:600; }
 .full { width:100%; margin:12px 0 0; }
 #status { margin:14px 0; min-height:0; overflow-wrap:anywhere; }
 #status:empty { margin:0; }
-progress { width:100%; height:6px; accent-color:#d89a38; }
+.upload-progress { width:100%; height:6px; margin:8px 0 14px; overflow:hidden; border-radius:999px; background:rgba(245,232,204,.16); }
+.upload-progress-fill { display:block; width:100%; height:100%; border-radius:inherit; background:#edb652; transform:scaleX(0); transform-origin:left center; will-change:transform; transition:transform .22s linear; }
 .footer { padding-top:14px; margin-bottom:0; border-top:1px solid var(--line); }
 a { color:inherit; text-underline-offset:3px; }
 @media(max-width:400px) { .file-pair { grid-template-columns:minmax(0,1fr); gap:0; } }
 @media(hover:hover) { .button:not(:disabled):hover { background:rgba(232,187,105,.10); } }
 @media(hover:hover) { .file-control:not(:has(input:disabled)):hover .file-choose { background:rgba(232,187,105,.10); } }
 @media(prefers-reduced-motion:reduce) { .button, .signer-guide summary, input::file-selector-button, .file-choose { transition:none; } .button.is-pressed, input[type=file].is-pressed::file-selector-button, .file-control:has(input.is-pressed) .file-choose, .signer-guide summary.is-pressed { transform:translateY(3px); } .button[aria-busy=true]::before { animation:none; } }
+@media(prefers-reduced-motion:reduce) { .upload-progress-fill { transition:none; } }
 body.standalone { min-height:100svh; padding:24px; background-color:#080707; background-image:radial-gradient(circle,rgba(224,199,151,.10) .5px,rgba(224,199,151,.045) .75px,transparent .95px),linear-gradient(180deg,rgba(190,132,30,.16),rgba(190,132,30,.075) 38%,rgba(190,132,30,.02) 72%,transparent); background-size:3px 3px,100% 100%; }
 .standalone main { max-width:520px; margin:0 auto; }
 .install-page h1 { font-size:24px; line-height:1.3; }
