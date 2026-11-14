@@ -11,7 +11,7 @@ async function checkIPA(file) {
   if(view.getUint16(end+4,true)||view.getUint16(end+6,true)||count===65535||size===0xffffffff||offset===0xffffffff) throw new Error('Split and ZIP64 archives are not supported in the web signer.');
   if(count<1||count>40000||size>8*1024*1024||offset+size>file.size-tail.length+end) throw new Error('This IPA has an invalid or oversized file list.');
   const raw=await file.slice(offset,offset+size).arrayBuffer(),cd=new DataView(raw),names=new Set();
-  let p=0,total=0,apps=0;
+  let p=0,total=0,apps=0;const entries=[];
   for(let i=0;i<count;i++){
     if(p+46>raw.byteLength||cd.getUint32(p,true)!==0x02014b50) throw new Error('This IPA has an invalid file list.');
     const flags=cd.getUint16(p+8,true),method=cd.getUint16(p+10,true),expanded=cd.getUint32(p+24,true),compressed=cd.getUint32(p+20,true),n=cd.getUint16(p+28,true),extra=cd.getUint16(p+30,true),comment=cd.getUint16(p+32,true),mode=cd.getUint32(p+38,true)>>>16,local=cd.getUint32(p+42,true);
@@ -22,8 +22,9 @@ async function checkIPA(file) {
     if(flags&1||![0,8].includes(method)) throw new Error('This IPA uses unsupported ZIP encryption or compression.');
     total+=expanded;if(total>MAX_EXPANDED) throw new Error('This app expands beyond the web signer’s memory limit. Use the NullSign app.');
     if(/^Payload\/[^/]+\.app\/Info\.plist$/.test(name)) apps++;
+    entries.push({name,method,expanded,compressed,local,crc:cd.getUint32(p+16,true)});
     names.add(canonical);p+=46+n+extra+comment;
   }
   if(p!==raw.byteLength||apps!==1) throw new Error('Choose an IPA containing one app inside Payload.');
-  return {files:count,expandedBytes:total};
+  return {files:count,expandedBytes:total,entries};
 }

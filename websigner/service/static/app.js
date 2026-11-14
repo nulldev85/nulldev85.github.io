@@ -3,6 +3,7 @@ const $=id=>document.getElementById(id);
 const fields=['ipa','certificate','profile','password'];
 const MAX_IPA_BYTES=512*1024**2;
 let worker=null,signed=null,downloadURL=null,upload=null,job=null,timer=null,activePress=null;
+let previewWorker=null,previewURL=null,previewTimer=null,previewEpoch=0;
 const PARENT='https://nulldev85.github.io';
 if(window.top===window)document.body.classList.add('standalone');
 const status=text=>{$('status').textContent=text;syncActionHints();};
@@ -16,25 +17,58 @@ function syncActionHints(){
 }
 function measure(){if(window.parent!==window)window.parent.postMessage({type:'null-websigner-size',height:Math.ceil($('signer').getBoundingClientRect().height+8)},PARENT);}
 new ResizeObserver(measure).observe($('signer'));
+function updateFileNames(){
+  for(const [id,empty] of [['ipa','No IPA selected'],['certificate','No .p12 selected'],['profile','No profile selected']])$(id+'-name').textContent=$(id).files[0]?.name||empty;
+}
+function clearAppPreview(){
+  previewEpoch++;clearTimeout(previewTimer);previewWorker?.terminate();previewWorker=null;
+  if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;
+  $('app-icon').hidden=true;$('app-icon').onload=null;$('app-icon').onerror=null;$('app-icon').removeAttribute('src');$('app-placeholder').hidden=false;$('app-preview').hidden=true;
+}
+function previewApp(){
+  clearAppPreview();const ipa=$('ipa').files[0];if(!ipa||ipa.size>MAX_IPA_BYTES)return;
+  const epoch=previewEpoch;
+  $('app-name').textContent=ipa.name.replace(/\.(ipa|tipa)$/i,'');$('app-detail').textContent='Reading app…';$('app-preview').hidden=false;
+  const finish=()=>{clearTimeout(previewTimer);previewWorker?.terminate();previewWorker=null;};
+  try{
+    previewWorker=new Worker('/assets/preview-worker.js');
+    previewWorker.onmessage=event=>{
+      if(epoch!==previewEpoch)return;finish();const data=event.data;
+      if(data?.type!=='preview'){$('app-detail').textContent='Selected IPA';return;}
+      if(typeof data.name==='string'&&data.name.trim())$('app-name').textContent=data.name.slice(0,160);
+      $('app-detail').textContent=[typeof data.version==='string'&&data.version?'Version '+data.version.slice(0,64):'',(ipa.size/1024**2).toFixed(1)+' MB'].filter(Boolean).join(' · ');
+      if(data.icon instanceof Uint8Array&&data.icon.length<=8*1024**2){
+        previewURL=URL.createObjectURL(new Blob([data.icon],{type:'image/png'}));const icon=$('app-icon');
+        icon.onload=()=>{if(epoch===previewEpoch){icon.hidden=false;$('app-placeholder').hidden=true;}};
+        icon.onerror=()=>{if(epoch===previewEpoch){icon.hidden=true;$('app-placeholder').hidden=false;if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;}};
+        icon.src=previewURL;
+      }
+    };
+    previewWorker.onerror=()=>{if(epoch===previewEpoch){finish();$('app-detail').textContent='Selected IPA';}};
+    previewWorker.postMessage({type:'preview',ipa});
+    previewTimer=setTimeout(()=>{if(epoch===previewEpoch){finish();$('app-detail').textContent='Selected IPA';}},15000);
+  }catch{finish();$('app-detail').textContent='Selected IPA';}
+}
 function showSignerView(view){
   const tutorial=view==='tutorials';
   $('signer-panel').hidden=tutorial;$('tutorials-panel').hidden=!tutorial;
   $('signer-tab').setAttribute('aria-pressed',String(!tutorial));$('tutorials-tab').setAttribute('aria-pressed',String(tutorial));
   measure();
 }
-function clearInputs(){fields.forEach(id=>{$(id).value='';});syncActionHints();}
+function clearInputs(){fields.forEach(id=>{$(id).value='';});updateFileNames();syncActionHints();}
 function busy(value){fields.forEach(id=>{$(id).disabled=value;});$('sign').disabled=value;$('sign').textContent=value?'Signing…':'Sign IPA';$('cancel').hidden=!value;syncActionHints();}
 function stop(){clearTimeout(timer);worker?.terminate();worker=null;upload?.abort();upload=null;busy(false);$('upload-progress').hidden=true;}
 function clearJob(){job=null;$('install').hidden=true;$('hosted-actions').hidden=true;$('prepare').hidden=false;$('prepare').disabled=false;$('prepare').textContent='Prepare install';}
-function reset(){stop();clearInputs();signed=null;if(downloadURL)URL.revokeObjectURL(downloadURL);downloadURL=null;clearJob();$('result').hidden=true;$('sign-form').hidden=false;status('');showSignerView('signer');}
-window.addEventListener('pagehide',()=>{stop();clearInputs();if(downloadURL)URL.revokeObjectURL(downloadURL);});
+function reset(){stop();clearInputs();clearAppPreview();signed=null;if(downloadURL)URL.revokeObjectURL(downloadURL);downloadURL=null;clearJob();$('result').hidden=true;$('sign-form').hidden=false;status('');showSignerView('signer');}
+window.addEventListener('pagehide',()=>{stop();clearInputs();clearAppPreview();if(downloadURL)URL.revokeObjectURL(downloadURL);});
 window.addEventListener('message',event=>{if(event.origin===PARENT&&event.source===window.parent&&event.data?.type==='null-websigner-cancel')reset();});
 document.querySelectorAll('[data-signer-view]').forEach(button=>button.addEventListener('click',()=>showSignerView(button.dataset.signerView)));
-fields.forEach(id=>{for(const type of ['input','change'])$(id).addEventListener(type,syncActionHints);});
+fields.forEach(id=>{for(const type of ['input','change'])$(id).addEventListener(type,()=>{updateFileNames();syncActionHints();});});
+$('ipa').addEventListener('change',previewApp);
 window.addEventListener('focus',syncActionHints);
 document.addEventListener('visibilitychange',syncActionHints);
 syncActionHints();
-$('cancel').addEventListener('click',()=>{stop();clearInputs();status('Signing cancelled.');});
+$('cancel').addEventListener('click',()=>{stop();clearInputs();clearAppPreview();status('Signing cancelled.');});
 $('again').addEventListener('click',reset);
 $('sign-form').addEventListener('submit',event=>{
   event.preventDefault();if(worker)return;
@@ -48,18 +82,18 @@ $('sign-form').addEventListener('submit',event=>{
       const data=event.data;
       if(data.type==='phase'){status(data.text);return;}
       clearTimeout(timer);worker?.terminate();worker=null;busy(false);clearInputs();
-      if(data.type==='failed'){status(data.text);return;}
-      if(data.type!=='signed'||!(data.bytes instanceof Uint8Array)){status('The signer returned an invalid result.');return;}
+      if(data.type==='failed'){clearAppPreview();status(data.text);return;}
+      if(data.type!=='signed'||!(data.bytes instanceof Uint8Array)){clearAppPreview();status('The signer returned an invalid result.');return;}
       signed=new Blob([data.bytes],{type:'application/octet-stream'});
       if(downloadURL)URL.revokeObjectURL(downloadURL);downloadURL=URL.createObjectURL(signed);
       $('save').href=downloadURL;$('save').download='Signed-'+ipa.name.replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').slice(0,100).replace(/\.(?:ipa|tipa)$/i,'')+'.ipa';
       $('sign-form').hidden=true;$('result').hidden=false;status('Signed IPA ready.');
     };
-    worker.onerror=()=>{stop();clearInputs();status('The browser couldn’t finish signing. Try a smaller IPA or use NullSign.');};
+    worker.onerror=()=>{stop();clearInputs();clearAppPreview();status('The browser couldn’t finish signing. Try a smaller IPA or use NullSign.');};
     worker.postMessage({type:'sign',ipa,certificate,profile,password});
     $('password').value='';
-    timer=setTimeout(()=>{stop();clearInputs();status('Signing took too long. Try a smaller IPA or use NullSign.');},10*60*1000);
-  }catch{stop();clearInputs();status('The local signer could not start in this browser.');}
+    timer=setTimeout(()=>{stop();clearInputs();clearAppPreview();status('Signing took too long. Try a smaller IPA or use NullSign.');},10*60*1000);
+  }catch{stop();clearInputs();clearAppPreview();status('The local signer could not start in this browser.');}
 });
 
 $('prepare').addEventListener('click',()=>{

@@ -46,7 +46,7 @@ assert.equal(tvGuide(html),tvGuide(previous),'Apple TV instructions retained');
 console.log('PASS: direct Apple TV Guide button opens guide and restores focus; redundant main-page iPhone guide removed.');
 
 // Exercise the actual empty-form reset code, since the iframe now stays mounted.
-const nodes=Object.fromEntries(['ipa','certificate','profile','password','status','signer','sign','cancel','upload-progress','install','hosted-actions','prepare','result','sign-form','signer-panel','tutorials-panel','signer-tab','tutorials-tab'].map(id=>[id,Object.assign(new Target(),{value:'selected',files:[{name:id+'.test'}],hidden:false,disabled:true,attributes:{},setAttribute(name,value){this.attributes[name]=value;},classList:{add(){},toggle(){}},getBoundingClientRect:()=>({height:600})})]));
+const nodes=Object.fromEntries(['ipa','certificate','profile','password','status','signer','sign','cancel','upload-progress','install','hosted-actions','prepare','result','sign-form','signer-panel','tutorials-panel','signer-tab','tutorials-tab','ipa-name','certificate-name','profile-name','app-preview','app-icon','app-placeholder','app-name','app-detail'].map(id=>[id,Object.assign(new Target(),{value:'selected',files:[{name:id+'.test'}],hidden:false,disabled:true,attributes:{},setAttribute(name,value){this.attributes[name]=value;},removeAttribute(name){delete this.attributes[name];},classList:{add(){},toggle(){}},getBoundingClientRect:()=>({height:600})})]));
 nodes['signer-tab'].dataset={signerView:'signer'};nodes['tutorials-tab'].dataset={signerView:'tutorials'};
 const childWindow=new Target();childWindow.parent={postMessage(){}};childWindow.top={};
 const calls={terminate:0,abort:0,revoke:0};

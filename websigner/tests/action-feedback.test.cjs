@@ -12,11 +12,12 @@ class Element extends Target{
  set value(value){this._value=value;if(value==='')this.files=[];}
  get value(){return this._value;}
  setAttribute(name,value){this.attributes[name]=value;}
+ removeAttribute(name){delete this.attributes[name];}
  getBoundingClientRect(){return {left:0,right:100,top:0,bottom:44,height:44};}
  closest(){return this;}
  matches(selector){return selector===':disabled'?this.disabled:['BUTTON','SUMMARY','INPUT'].includes(this.tagName);}
 }
-const ids=['ipa','certificate','profile','password','status','signer','sign','cancel','upload-progress','install','hosted-actions','prepare','result','sign-form','save','again','delete','copy-install','signer-panel','tutorials-panel','signer-tab','tutorials-tab'];
+const ids=['ipa','certificate','profile','password','status','signer','sign','cancel','upload-progress','install','hosted-actions','prepare','result','sign-form','save','again','delete','copy-install','signer-panel','tutorials-panel','signer-tab','tutorials-tab','ipa-name','certificate-name','profile-name','app-preview','app-icon','app-placeholder','app-name','app-detail'];
 const nodes=Object.fromEntries(ids.map(id=>[id,new Element()]));
 for(const id of ['ipa','certificate','profile','password'])nodes[id].tagName='INPUT';
 for(const id of ['result','install','hosted-actions','tutorials-panel'])nodes[id].hidden=true;
@@ -25,7 +26,7 @@ const document=new Target();document.getElementById=id=>nodes[id];document.body=
 document.querySelectorAll=selector=>selector==='[data-signer-view]'?[nodes['signer-tab'],nodes['tutorials-tab']]:Object.values(nodes).filter(n=>n.classes.has('is-pressed'));
 const window=new Target();window.top=window;window.parent=window;
 const workers=[],uploads=[];
-class Worker{constructor(){workers.push(this);}postMessage(){}terminate(){}}
+class Worker{constructor(url){this.url=url;workers.push(this);}postMessage(data){this.sent=data;}terminate(){this.terminated=true;}}
 class XHR{constructor(){this.upload={};uploads.push(this);}open(){}setRequestHeader(){}send(){}abort(){this.onabort?.();}}
 const context=vm.createContext({document,window,Element,Worker,XMLHttpRequest:XHR,Blob,Uint8Array,Date,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},location:{origin:'https://signer.mateomedia.link'},ResizeObserver:class{observe(){}},setTimeout:()=>1,clearTimeout(){}});
 const source=fs.readFileSync(path.join(__dirname,'../service/static/app.js'),'utf8');
@@ -34,16 +35,28 @@ const ready=id=>nodes[id].classes.has('is-ready');
 const busy=id=>nodes[id].attributes['aria-busy']==='true';
 assert.equal(ready('sign'),false);
 for(const id of ['ipa','certificate','profile']){nodes[id].files=[{name:id+'.ipa',size:100}];nodes[id].fire('change');}
+assert.equal(nodes['certificate-name'].textContent,'certificate.ipa');assert.equal(nodes['profile-name'].textContent,'profile.ipa');
+const oldPreview=workers.at(-1);assert.equal(oldPreview.url,'/assets/preview-worker.js');
+assert.deepEqual(Object.keys(oldPreview.sent).sort(),['ipa','type'],'Preview receives no signing identity/profile/password');
 nodes.ipa.files=[{name:'too-large.ipa',size:512*1024**2+1}];nodes.ipa.fire('change');
-assert.equal(ready('sign'),false);nodes['sign-form'].fire('submit');assert.equal(workers.length,0);
+assert.equal(ready('sign'),false);nodes['sign-form'].fire('submit');assert.equal(workers.filter(w=>w.url==='/assets/worker.js').length,0);
 assert.match(nodes.status.textContent,/512 MB/);
 nodes.ipa.files=[{name:'limit.ipa',size:512*1024**2}];nodes.ipa.fire('change');
+assert.ok(oldPreview.terminated);
+oldPreview.onmessage({data:{type:'preview',name:'Stale icon'}});assert.notEqual(nodes['app-name'].textContent,'Stale icon');
+const currentPreview=workers.at(-1);
+currentPreview.onmessage({data:{type:'preview',name:'Lineup',version:'0.19.0',bundle:'test.lineup',icon:new Uint8Array([137,80,78,71])}});
+nodes['app-icon'].onload();assert.equal(nodes['app-icon'].hidden,false);assert.equal(nodes['app-placeholder'].hidden,true);
+nodes['tutorials-tab'].fire('click');nodes['signer-tab'].fire('click');
+assert.equal(nodes['app-name'].textContent,'Lineup');assert.equal(nodes.ipa.files[0].name,'limit.ipa');
 assert.equal(ready('sign'),true);
 nodes['sign-form'].fire('submit');
 assert.equal(ready('sign'),false);assert.equal(busy('sign'),true);assert.equal(ready('prepare'),false);
 workers.at(-1).onmessage({data:{type:'phase',text:'Packaging the signed IPA…'}});
 assert.equal(busy('sign'),true);assert.equal(ready('install'),false);
 workers.at(-1).onmessage({data:{type:'signed',bytes:new Uint8Array([80,75,3,4])}});
+assert.equal(nodes['app-icon'].hidden,false,'App preview remains visible with signed result');
+assert.equal(nodes['certificate-name'].textContent,'No .p12 selected');
 assert.equal(busy('sign'),false);assert.equal(ready('prepare'),true);assert.equal(ready('install'),false);
 nodes.prepare.fire('click');let upload=uploads.at(-1);
 assert.equal(busy('prepare'),true);assert.equal(ready('prepare'),false);
@@ -60,6 +73,10 @@ vm.runInContext('job.expires=0',context);window.fire('focus');assert.equal(ready
 let prevented=false;nodes.install.fire('click',{preventDefault(){prevented=true;}});
 assert.ok(prevented);assert.equal(ready('prepare'),true);
 console.log('PASS: readiness glow follows real input/sign/upload/server states; busy markers clear on completion/error; no premature install or success claim.');
+window.fire('message',{origin:'https://nulldev85.github.io',source:window.parent,data:{type:'null-websigner-cancel'}});
+assert.equal(nodes['app-preview'].hidden,true);assert.equal(nodes['app-icon'].hidden,true);
+assert.equal(nodes['ipa-name'].textContent,'No IPA selected');
+console.log('PASS: clean picker filenames update/reset; preview gets only IPA, rejects stale responses, survives tutorial/signing and clears on close.');
 
 const summary=new Element('SUMMARY');nodes.summary=summary;
 for(const node of [nodes.prepare,nodes.ipa,summary]){

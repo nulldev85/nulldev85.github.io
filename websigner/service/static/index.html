@@ -15,11 +15,15 @@
     </nav>
     <section id="signer-panel" aria-label="Signer">
     <p class="intro">Sign an IPA on this device. Your .p12 and password aren’t uploaded or saved.</p>
+    <div id="app-preview" class="app-preview" hidden>
+      <div class="app-art"><svg id="app-placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 12h8M8 15h5"/></svg><img id="app-icon" width="56" height="56" alt="" decoding="async" hidden></div>
+      <div class="app-info"><strong id="app-name"></strong><span id="app-detail" class="small"></span></div>
+    </div>
     <form id="sign-form" autocomplete="off">
-      <label class="field">IPA<input id="ipa" type="file" accept=".ipa,.tipa" required></label>
+      <label class="field">IPA<span class="file-control"><span class="file-choose">Choose file</span><span id="ipa-name" class="file-name">No IPA selected</span><input id="ipa" type="file" accept=".ipa,.tipa" required></span></label>
       <div class="file-pair">
-        <label class="field">.p12 file<input id="certificate" type="file" accept=".p12,.pfx" required></label>
-        <label class="field">Provisioning profile<input id="profile" type="file" accept=".mobileprovision" required></label>
+        <label class="field">.p12 file<span class="file-control"><span class="file-choose">Choose file</span><span id="certificate-name" class="file-name">No .p12 selected</span><input id="certificate" type="file" accept=".p12,.pfx" required></span></label>
+        <label class="field">Provisioning profile<span class="file-control"><span class="file-choose">Choose file</span><span id="profile-name" class="file-name">No profile selected</span><input id="profile" type="file" accept=".mobileprovision" required></span></label>
       </div>
       <label class="field">.p12 password <span class="muted">(if set)</span><input id="password" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="1024" placeholder="Leave empty if there is no password"></label>
       <p class="muted small">Up to 512 MB. Large apps need more device memory. Use IPAs you trust.</p>
