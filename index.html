@@ -10,13 +10,7 @@
   <title>Null’s Apps</title>
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-  <link rel="preload" href="fonts/dots.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="fonts/dots-display.woff2" as="font" type="font/woff2" crossorigin>
   <style>
-    /* Both fonts use the same single-line dot grid. Display text has
-       slightly larger circles, with the same spacing and open counters. */
-    @font-face { font-family: "Null Dots"; src: url("fonts/dots.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
-    @font-face { font-family: "Null Dots Display"; src: url("fonts/dots-display.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
     :root {
       color-scheme: dark;
       --bg: #080707;
@@ -30,9 +24,9 @@
       --text-3: var(--text);
       --accent: #d89a38;
       --focus: rgba(237,190,103,.85);
-      --sans: "Null Dots", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      --mono: "Null Dots", ui-monospace, Menlo, Consolas, monospace;
-      --display: "Null Dots Display", var(--sans);
+      --sans: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: var(--sans);
+      --display: var(--sans);
     }
     * { box-sizing: border-box; }
     :root { --top: 0px; }
@@ -50,7 +44,7 @@
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       color: var(--text);
       background: var(--bg);
-      font: 15px/1.6 var(--sans);
+      font: 800 15px/1.6 var(--sans);
       font-synthesis: none;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
@@ -87,8 +81,8 @@
     .source-section { padding-bottom: 16px; }
     .source { display: flex; align-items: stretch; max-width: 700px; height: 48px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: rgba(255,255,255,.025); }
     .source-label { display: flex; align-items: center; padding: 0 14px; border-right: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
-    .source-url { flex: 1 1 auto; min-width: 0; align-self: center; padding: 0 14px; overflow: hidden; color: var(--text); font: 14px var(--mono); white-space: nowrap; text-overflow: ellipsis; }
-    .copy-repo { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-left: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background .15s ease; }
+    .source-url { flex: 1 1 auto; min-width: 0; align-self: center; padding: 0 14px; overflow: hidden; color: var(--text); font: 800 14px var(--mono); white-space: nowrap; text-overflow: ellipsis; }
+    .copy-repo { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-left: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: background .15s ease; }
     .source .copy-repo { min-width: 104px; }
     @media (hover: hover) { .copy-repo:hover { background: var(--raised); } }
     .copy-repo:focus-visible { outline-offset: -3px; border-radius: 0 9px 9px 0; }
@@ -108,7 +102,7 @@
     .app-icon::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255,255,255,.09); }
     .app-icon img { display: block; width: 100%; height: 100%; object-fit: cover; }
     .app-title { min-width: 0; }
-    .app-name { margin: 0; color: var(--text); font-family: var(--display); font-size: 24px; font-weight: 600; line-height: 1.2; }
+    .app-name { margin: 0; color: var(--text); font-family: var(--display); font-size: 24px; font-weight: 800; line-height: 1.2; }
     .app-kind { margin: 2px 0 0; color: var(--text-2); font-size: 13px; line-height: 1.45; }
     .app-body { display: flex; flex: 1 1 auto; flex-direction: column; }
     /* The summary takes up the slack, so every card's builds sit at its foot. */
@@ -118,12 +112,12 @@
     .build { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 6px; padding: 12px 14px 13px; }
     .build + .build { border-top: 1px solid var(--line); }
     .build-info { display: contents; }
-    .build h3 { min-width: 0; margin: 0; font-size: 14px; font-weight: 600; }
+    .build h3 { min-width: 0; margin: 0; font-size: 14px; font-weight: 800; }
     .build-meta { grid-column: 1 / -1; grid-row: 2; display: flex; flex-wrap: wrap; gap: 0 8px; min-width: 0; margin: 0; overflow-wrap: anywhere; color: var(--text-3); font-size: 12.5px; line-height: 1.5; font-variant-numeric: tabular-nums; }
     .build-meta .build-number { color: var(--text-2); font-family: var(--mono); font-size: 12.5px; }
     .build-meta .sep { display: none; }
     .build-meta time { flex-basis: 100%; }
-    .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 13px; border-radius: 8px; color: var(--text); border: 1px solid var(--line-strong); background: rgba(232,187,105,.12); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
+    .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 13px; border-radius: 8px; color: var(--text); border: 1px solid var(--line-strong); background: rgba(232,187,105,.12); font-size: 13px; font-weight: 800; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
     @media (hover: hover) { .download:hover { background: rgba(232,187,105,.22); } }
     .download svg { width: 14px; height: 14px; }
     .build-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-column: 1 / -1; grid-row: 3; align-items: stretch; gap: 6px; min-width: 0; margin-top: 2px; }
@@ -134,13 +128,13 @@
     .download-compact { display: none; }
     .guide-download-actions { margin-top: 8px; }
     .app-actions { display: flex; gap: 8px; margin-top: 10px; }
-    .notes-button { display: inline-flex; flex: 1 1 0; align-items: center; justify-content: center; gap: 7px; min-width: 0; height: 32px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+    .notes-button { display: inline-flex; flex: 1 1 0; align-items: center; justify-content: center; gap: 7px; min-width: 0; height: 32px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
     @media (hover: hover) { .notes-button:hover { border-color: rgba(255,255,255,.22); background: var(--raised); } }
     .notes-button svg { width: 15px; height: 15px; color: var(--text-2); }
     .feature-list { margin-top: 18px; }
     .feature { padding: 16px 0 18px; border-top: 1px solid var(--line); }
     .feature:last-child { padding-bottom: 0; }
-    .feature h3 { margin: 0 0 6px; font-size: 14px; font-weight: 600; }
+    .feature h3 { margin: 0 0 6px; font-size: 14px; font-weight: 800; }
     .feature p { margin: 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
 
     /* Release notes */
@@ -151,15 +145,15 @@
     .dialog-head { display: flex; flex: 0 0 auto; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 20px 28px 16px; border-bottom: 1px solid var(--line); background: var(--surface); }
     .dialog-content { min-height: 0; overflow: auto; padding: 6px 28px 30px; overscroll-behavior: none contain; }
     .dialog-kicker { margin: 0 0 2px; color: var(--text-2); font-size: 13px; }
-    .dialog-head h2 { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 600; }
+    .dialog-head h2 { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 800; }
     .dialog-close { display: grid; width: 44px; height: 44px; flex: 0 0 auto; margin: -4px -8px 0 0; place-items: center; border: 1px solid var(--line); border-radius: 12px; color: var(--text-2); background: rgba(255,255,255,.035); cursor: pointer; }
     @media (hover: hover) { .dialog-close:hover { color: var(--text); background: var(--raised); } }
     .dialog-close svg { width: 16px; height: 16px; }
     .dialog-intro { margin: 10px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
     .release-build { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
     .release-build-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-    .release-build-head h3 { margin: 0; font-size: 15px; font-weight: 600; }
-    .release-build-version { color: var(--text-2); font: 13px var(--mono); text-align: right; }
+    .release-build-head h3 { margin: 0; font-size: 15px; font-weight: 800; }
+    .release-build-version { color: var(--text-2); font: 800 13px var(--mono); text-align: right; }
     .release-build-info { margin: 3px 0 0; color: var(--text-3); font-size: 13px; line-height: 1.5; }
     .release-list { margin: 14px 0 0; padding: 0; list-style: none; }
     .release-list li { position: relative; padding-left: 18px; color: var(--text-body); font-size: 14px; line-height: 1.6; }
@@ -247,7 +241,7 @@
     .guide-note a, .install-needs a, .install-trouble a { text-underline-offset: 3px; }
     .install-trouble { margin-top: 18px; border-top: 1px solid var(--line); }
     .help-toggle { display: flex; align-items: center; padding: 10px 4px; gap: 10px; border-radius: 8px; list-style: none; font-size: 13px; }
-    .help-toggle::after { content: "+"; margin-left: auto; font: 20px/1 sans-serif; }
+    .help-toggle::after { content: "+"; margin-left: auto; font: 800 20px/1 var(--sans); }
     .install-trouble[open] > .help-toggle::after { content: "−"; }
     .install-trouble p { font-size: 13px; line-height: 1.6; }
 
