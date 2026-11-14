@@ -1,0 +1,17 @@
+{
+  "reference": "f7127d6857a6aaa919b7430ef73baa262fe28070",
+  "zsign": "28a6421",
+  "openssl": "3.5.7",
+  "openssl_sha256": "a8c0d28a529ca480f9f36cf5792e2cd21984552a3c8e4aa11a24aa31aeac98e8",
+  "emscripten": "6.0.0",
+  "patches": [
+    "reject_expired_profiles",
+    "require_p12_certificate_in_profile",
+    "require_current_certificate_dates",
+    "fail_closed_when_CMS_signature_generation_fails"
+  ],
+  "browser_artifacts": {
+    "zsign-mobile.js": "80b2981105961ad3e9469986b1b59a735554d92afbca40a0c675987337f997d7",
+    "zsign-mobile.wasm": "c532d99142b418af1c5406f90acccb02499f8ec45d022063d2564f2bad16fc86"
+  }
+}

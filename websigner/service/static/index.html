@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Web signer</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <script src="/assets/app.js" defer></script>
+</head>
+<body>
+  <main id="signer">
+    <p class="intro">Sign an IPA on this device. Your .p12 and password aren’t uploaded or saved.</p>
+    <form id="sign-form" autocomplete="off">
+      <label class="field">IPA<input id="ipa" type="file" accept=".ipa,.tipa" required></label>
+      <div class="file-pair">
+        <label class="field">Certificate<input id="certificate" type="file" accept=".p12,.pfx" required></label>
+        <label class="field">Provisioning profile<input id="profile" type="file" accept=".mobileprovision" required></label>
+      </div>
+      <label class="field">Certificate password <span class="muted">(if set)</span><input id="password" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="1024" placeholder="Leave empty if there is no password"></label>
+      <p class="muted small">Up to 128 MB. Large apps may need the NullSign app. Use IPAs you trust.</p>
+      <div class="actions"><button id="sign" class="button primary" type="submit">Sign IPA</button><button id="cancel" class="button" type="button" hidden>Cancel</button></div>
+    </form>
+    <p id="status" role="status" aria-live="polite" aria-atomic="true"></p>
+    <progress id="upload-progress" max="100" hidden aria-label="Signed IPA upload"></progress>
+    <section id="result" hidden aria-label="Signed IPA">
+      <div class="actions"><a id="save" class="button" download>Save IPA</a><button id="prepare" class="button primary" type="button">Prepare install</button><a id="install" class="button primary" target="_top" hidden>Install app</a></div>
+      <p class="muted small">Preparing installation uploads only the signed IPA to our temporary server. Its embedded provisioning profile is part of that IPA. The link expires after 20 minutes; the file is automatically removed.</p>
+      <div id="hosted-actions" class="actions" hidden><button id="copy-install" class="button" type="button">Copy install link</button><button id="delete" class="button" type="button">Remove temporary copy</button></div>
+      <button id="again" class="button full" type="button">Sign another IPA</button>
+    </section>
+    <p class="muted small footer">Beta · Signing locally does not guarantee iOS will accept the app or certificate. <a href="/assets/LICENSES.txt" target="_blank" rel="noopener noreferrer">Signing engine notices</a></p>
+  </main>
+</body>
+</html>

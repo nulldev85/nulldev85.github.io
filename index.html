@@ -218,7 +218,7 @@
       box-shadow: 0 0 0 5px rgba(237,190,103,.12);
     }
     body:has(.release-dialog[open]) { overflow: hidden; }
-    body:has(.release-dialog[open]) :is(.apps, .source-section, .float-mark, .site-menu, .site-footer) { visibility: hidden; }
+    body:has(.release-dialog[open]) :is(.apps, .source-section, .float-mark, .site-menu, .signer-launch, .site-footer) { visibility: hidden; }
     .action-status {
       position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 40;
       width: max-content; max-width: calc(100% - 32px); margin: 0; padding: 12px 18px;
@@ -231,8 +231,11 @@
 
     /* Opening Tutorials reserves real space above the still-visible app cards. */
     .site-top { position: relative; flex: 0 0 auto; min-height: 64px; padding: 8px 16px 4px; }
+    .site-top .signer-launch { position: absolute; top: 8px; left: 16px; z-index: 24; min-width: 110px; height: 44px; padding: 0 12px; gap: 8px; border-radius: 12px; font-size: 12px; }
+    .site-top .signer-launch svg { display: block; width: 16px; height: 16px; }
+    .signer-frame { display: block; width: 100%; height: 640px; border: 0; background: transparent; }
     .site-menu { position: relative; z-index: 24; width: max-content; max-width: 100%; margin-left: auto; }
-    .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; width: max-content; margin-left: auto; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; font-size: 12px; list-style: none; }
+    .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; width: max-content; min-width: 110px; margin-left: auto; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; font-size: 12px; list-style: none; }
     .menu-toggle::-webkit-details-marker, .help-toggle::-webkit-details-marker { display: none; }
     .menu-toggle svg { width: 16px; height: 16px; }
     .menu-panel { display: flex; flex-direction: column; gap: 8px; width: min(240px, calc(100vw - 32px)); margin-top: 8px; padding: 10px; border: 1px solid var(--line-strong); border-radius: 14px; background: transparent; box-shadow: none; }
@@ -339,6 +342,7 @@
 </head>
 <body>
   <header class="site-top">
+    <button class="notes-button signer-launch" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5 5 5M4 20l4-1 12-12a2.1 2.1 0 0 0-3-3L5 16l-1 4ZM13 20h7"/></svg>Web signer</button>
   <details class="site-menu">
     <summary class="menu-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Tutorials</summary>
     <nav class="menu-panel" aria-label="Tutorials">
@@ -578,6 +582,12 @@
         </div>
       </div>
     </dialog>
+    <dialog class="release-dialog" id="web-signer" aria-labelledby="web-signer-title">
+      <div class="dialog-body">
+        <header class="dialog-head"><div><p class="dialog-kicker">Sign on this device · Beta</p><h2 id="web-signer-title">Web signer</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close web signer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+        <div class="dialog-content"><iframe class="signer-frame" id="signer-frame" title="Local IPA signing" sandbox="allow-scripts allow-same-origin allow-downloads allow-top-navigation-by-user-activation allow-popups" allow="clipboard-write" referrerpolicy="no-referrer"></iframe></div>
+      </div>
+    </dialog>
   </main>
 
   <footer class="site-footer wrap">
@@ -679,11 +689,19 @@
         }
       });
       const dialogReturnFocus = new WeakMap();
+      const signerOrigin = "https://signer.mateomedia.link";
+      const signerFrame = document.getElementById("signer-frame");
+      window.addEventListener("message", event => {
+        if (event.origin !== signerOrigin || event.source !== signerFrame.contentWindow || event.data?.type !== "null-websigner-size") return;
+        const height = event.data.height;
+        if (Number.isFinite(height)) signerFrame.style.height = Math.min(1400, Math.max(160, Math.ceil(height))) + "px";
+      });
       const restoreDialogFocus = dialog => dialogReturnFocus.get(dialog)?.focus({ preventScroll: true });
       const closeDialog = dialog => {
         if (typeof dialog.close === "function") dialog.close();
         else {
           dialog.removeAttribute("open");
+          if (dialog.id === "web-signer") signerFrame.removeAttribute("src");
           restoreDialogFocus(dialog);
         }
       };
@@ -693,6 +711,7 @@
         button.addEventListener("click", () => {
           dialogReturnFocus.set(dialog, siteMenu.contains(button) ? siteMenu.querySelector("summary") : button);
           siteMenu.open = false;
+          if (dialog.id === "web-signer") signerFrame.src = signerOrigin + "/";
           if (typeof dialog.showModal === "function") {
             if (!dialog.open) dialog.showModal();
           } else dialog.setAttribute("open", "");
@@ -701,6 +720,10 @@
       });
       document.querySelectorAll(".release-dialog").forEach(dialog => {
         dialog.addEventListener("close", () => restoreDialogFocus(dialog));
+        if (dialog.id === "web-signer") dialog.addEventListener("close", () => {
+          signerFrame.contentWindow?.postMessage({ type: "null-websigner-cancel" }, signerOrigin);
+          signerFrame.removeAttribute("src");
+        });
         dialog.querySelector("[data-dialog-close]")?.addEventListener("click", () => {
           closeDialog(dialog);
         });
