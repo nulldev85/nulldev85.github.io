@@ -229,11 +229,12 @@
     }
     .action-status.is-visible { opacity: 1; transform: translate(-50%, 0); }
 
-    .site-menu { position: fixed; top: calc(8px + env(safe-area-inset-top)); right: calc(16px + env(safe-area-inset-right)); z-index: 32; }
-    .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: #241b0c; font-size: 12px; list-style: none; }
+    /* The shared texture/fade at layer 25 also covers these controls. */
+    .site-menu { position: fixed; top: calc(8px + env(safe-area-inset-top)); right: calc(16px + env(safe-area-inset-right)); z-index: 24; }
+    .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: rgba(255,255,255,.025); font-size: 12px; list-style: none; }
     .menu-toggle::-webkit-details-marker, .help-toggle::-webkit-details-marker { display: none; }
     .menu-toggle svg { width: 16px; height: 16px; }
-    .menu-panel { position: absolute; top: calc(100% + 8px); right: 0; display: flex; flex-direction: column; gap: 8px; width: min(240px, calc(100vw - 32px)); padding: 10px; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--surface); box-shadow: 0 8px 28px rgba(0,0,0,.5); }
+    .menu-panel { position: absolute; top: calc(100% + 8px); right: 0; display: flex; flex-direction: column; gap: 8px; width: min(240px, calc(100vw - 32px)); padding: 10px; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--bg); box-shadow: 0 8px 28px rgba(0,0,0,.5); }
     .menu-panel .notes-button { flex: none; min-height: 48px; height: auto; padding: 10px 12px; justify-content: flex-start; text-align: left; white-space: normal; font-size: 13px; }
     .install-needs { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; line-height: 1.6; }
     .install-steps { padding-left: 24px; margin: 18px 0; }
