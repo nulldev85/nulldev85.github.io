@@ -233,7 +233,11 @@
     /* Header actions sit on opposite sides of the centered Apple mark. */
     .site-top { position: relative; flex: 0 0 auto; min-height: 64px; padding: 8px 16px 4px; }
     .site-top .signer-launch { position: absolute; top: 8px; left: 16px; z-index: 24; width: 116px; min-width: 116px; height: 44px; padding: 0 12px; gap: 8px; border-radius: 12px; font-size: 12px; }
-    .site-top .signer-launch svg { display: block; width: 18px; height: 22px; }
+    .device-image { position: relative; display: block; flex: 0 0 auto; overflow: hidden; pointer-events: none; }
+    .device-image img { position: absolute; display: block; max-width: none; height: auto; }
+    .site-top .signer-launch { gap: 6px; }
+    .iphone-device { width: 24px; height: 30px; }
+    .iphone-device img { width: 37px; left: -6px; top: -8px; }
     .signer-frame { display: block; width: 100%; height: 640px; border: 0; background: transparent; }
     /* Lay out the lightweight form before the first tap, without exposing it. */
     #web-signer:not([open]) { display: block; visibility: hidden; pointer-events: none; }
@@ -242,7 +246,9 @@
     .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; width: 116px; min-width: 116px; height: 44px; margin-left: auto; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; font-size: 12px; list-style: none; }
     .menu-toggle::-webkit-details-marker, .help-toggle::-webkit-details-marker { display: none; }
     .menu-toggle svg { width: 16px; height: 16px; }
-    .menu-toggle .apple-tv-box { width: 22px; height: 22px; }
+    .menu-toggle .apple-tv-box { width: 27px; height: 28px; }
+    .apple-tv-box img { width: 48px; left: -5px; top: -16px; }
+    .dialog-head h2:focus { outline: none; }
     .install-needs { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; line-height: 1.6; }
     .install-steps { padding-left: 24px; margin: 18px 0; }
     .install-steps li { padding-left: 4px; margin: 0 0 18px; font-size: 14px; line-height: 1.6; }
@@ -345,16 +351,10 @@
 </head>
 <body>
   <header class="site-top">
-    <button class="notes-button signer-launch" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer"><svg class="iphone-device" viewBox="0 0 24 32" fill="none" aria-hidden="true"><defs><linearGradient id="iphone-screen" x1="6" y1="3" x2="18" y2="29" gradientUnits="userSpaceOnUse"><stop stop-color="#29292c"/><stop offset="1" stop-color="#101012"/></linearGradient></defs><rect x="3.5" y="1" width="17" height="30" rx="4" fill="#09090a" stroke="currentColor" stroke-opacity=".65"/><rect x="5" y="2.5" width="14" height="27" rx="2.8" fill="url(#iphone-screen)"/><rect x="9" y="3.8" width="6" height="1.6" rx=".8" fill="#050506"/><path d="M9 27.8h6" stroke="currentColor" stroke-opacity=".8" stroke-width="1.2" stroke-linecap="round"/><path d="M2.5 8v3m0 2v3m19-6v5" stroke="currentColor" stroke-opacity=".45" stroke-width=".8" stroke-linecap="round"/></svg>Web signer</button>
+    <button class="notes-button signer-launch" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer"><span class="device-image iphone-device" aria-hidden="true"><img src="assets/iphone-device.png" width="160" height="190" alt=""></span>Web signer</button>
   <div class="site-menu">
     <button class="menu-toggle" type="button" data-open-dialog="appletv-install" aria-label="Apple TV Guide" aria-haspopup="dialog" aria-controls="appletv-install">
-      <svg class="apple-tv-box" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <defs><linearGradient id="atv-shell" x1="16" y1="8" x2="16" y2="30" gradientUnits="userSpaceOnUse"><stop stop-color="#313134"/><stop offset="1" stop-color="#09090a"/></linearGradient><linearGradient id="atv-top" x1="8" y1="3" x2="25" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#29292c"/><stop offset="1" stop-color="#111113"/></linearGradient></defs>
-        <rect x="3" y="7" width="26" height="23" rx="5.5" fill="url(#atv-shell)" stroke="currentColor" stroke-opacity=".5"/>
-        <rect x="3" y="3" width="26" height="23" rx="5.5" fill="url(#atv-top)" stroke="currentColor" stroke-opacity=".6"/>
-        <g transform="translate(8.7 8.3) scale(.29)" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></g>
-        <text x="16.8" y="15.3" fill="currentColor" font-family="system-ui,-apple-system,sans-serif" font-size="6.3" font-weight="700">tv</text><circle cx="24.5" cy="27.7" r=".6" fill="currentColor"/>
-      </svg><span>Guide</span>
+      <span class="device-image apple-tv-box" aria-hidden="true"><img src="assets/apple-tv-device.png" width="160" height="160" alt=""></span><span>Guide</span>
     </button>
   </div>
     <a class="float-mark" href="#top" aria-label="Back to top">
@@ -542,7 +542,7 @@
     </dialog>
     <dialog class="release-dialog" id="appletv-install" aria-labelledby="appletv-install-title">
       <div class="dialog-body">
-        <header class="dialog-head"><div><p class="dialog-kicker">NullSign on iPhone → Apple TV</p><h2 id="appletv-install-title">Sideload onto Apple TV</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close Apple TV guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+        <header class="dialog-head"><div><p class="dialog-kicker">NullSign on iPhone → Apple TV</p><h2 id="appletv-install-title" tabindex="-1" autofocus>Sideload onto Apple TV</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close Apple TV guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
         <div class="dialog-content">
           <p class="install-needs">You need NullSign on your iPhone, a <strong>tvOS IPA</strong>, and a <strong>tvOS signing certificate and profile</strong> valid for your Apple TV. Your iPhone profile alone won’t work. Browse certificates: <a href="https://flarestore.vip/" target="_blank" rel="noopener noreferrer">Flarestore ↗</a> · <a href="https://arcticsign.app/" target="_blank" rel="noopener noreferrer">Arcticsign ↗</a>. Use your Apple TV’s UDID. Confirm tvOS support with Arcticsign before ordering.</p>
           <ol class="install-steps">
