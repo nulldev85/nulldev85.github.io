@@ -46,6 +46,10 @@ async def main():
     assert (await request('/assets/../app.py'))[0]==404
     assert (await request('/health',headers={'host':'evil.example'}))[0]==400
     upload={'origin':service.ORIGIN,'content-type':'application/octet-stream'}
+    assert service.MAX_UPLOAD==800*1024**2 and service.MAX_DISK==4*1024**3
+    assert (await request('/api/uploads','POST',b'x',{**upload,'content-length':str(service.MAX_UPLOAD+1)}))[0]==413
+    assert (await request('/api/uploads','POST',b'x',{**upload,'content-length':str(service.MAX_UPLOAD)}))[0]==400
+    assert not list(service.DATA.iterdir())
     assert (await request('/api/uploads','POST',ipa()))[0]==403
     assert (await request('/api/uploads','POST',ipa(),{'origin':service.ORIGIN,'content-type':'multipart/form-data'}))[0]==415
     assert (await request('/api/uploads','POST',b'p12 is never accepted',upload))[0]==400

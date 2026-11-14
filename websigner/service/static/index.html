@@ -22,7 +22,7 @@
         <label class="field">Provisioning profile<input id="profile" type="file" accept=".mobileprovision" required></label>
       </div>
       <label class="field">.p12 password <span class="muted">(if set)</span><input id="password" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="1024" placeholder="Leave empty if there is no password"></label>
-      <p class="muted small">Up to 128 MB. Large apps may need the NullSign app. Use IPAs you trust.</p>
+      <p class="muted small">Up to 512 MB. Large apps need more device memory. Use IPAs you trust.</p>
       <div class="actions"><button id="sign" class="button primary" type="submit">Sign IPA</button><button id="cancel" class="button" type="button" hidden>Cancel</button></div>
     </form>
     <p id="status" role="status" aria-live="polite" aria-atomic="true"></p>

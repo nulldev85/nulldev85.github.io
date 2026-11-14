@@ -34,6 +34,10 @@ const ready=id=>nodes[id].classes.has('is-ready');
 const busy=id=>nodes[id].attributes['aria-busy']==='true';
 assert.equal(ready('sign'),false);
 for(const id of ['ipa','certificate','profile']){nodes[id].files=[{name:id+'.ipa',size:100}];nodes[id].fire('change');}
+nodes.ipa.files=[{name:'too-large.ipa',size:512*1024**2+1}];nodes.ipa.fire('change');
+assert.equal(ready('sign'),false);nodes['sign-form'].fire('submit');assert.equal(workers.length,0);
+assert.match(nodes.status.textContent,/512 MB/);
+nodes.ipa.files=[{name:'limit.ipa',size:512*1024**2}];nodes.ipa.fire('change');
 assert.equal(ready('sign'),true);
 nodes['sign-form'].fire('submit');
 assert.equal(ready('sign'),false);assert.equal(busy('sign'),true);assert.equal(ready('prepare'),false);

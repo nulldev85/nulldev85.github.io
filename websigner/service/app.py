@@ -29,8 +29,8 @@ PARENT = 'https://nulldev85.github.io'
 DATA = Path(os.environ.get('DATA_ROOT', '/data/jobs'))
 STATIC = Path(__file__).parent / 'static'
 TTL = int(os.environ.get('JOB_TTL_SECONDS', '1200'))
-MAX_UPLOAD = 192 * 1024 * 1024
-MAX_DISK = 2 * 1024**3
+MAX_UPLOAD = 800 * 1024 * 1024
+MAX_DISK = 4 * 1024**3
 MAX_JOBS = 12
 TOKEN = re.compile(r'[a-f0-9]{64}\Z')
 RATE_SALT = secrets.token_bytes(32)
@@ -207,7 +207,7 @@ async def upload(request):
         size = int(request.headers.get('content-length','0'))
         if not 1 <= size <= MAX_UPLOAD: raise ValueError
     except ValueError:
-        return JSONResponse({'error':'Choose a signed IPA no larger than 192 MB.'},413)
+        return JSONResponse({'error':'Choose a signed IPA no larger than 800 MB.'},413)
     cleanup()
     # Traefik is the only ingress; its final X-Forwarded-For value is the peer IP.
     peer = request.headers.get('x-forwarded-for','').split(',')[-1].strip() or (request.client.host if request.client else 'unknown')
@@ -228,7 +228,7 @@ async def upload(request):
         received = 0
         with partial.open('xb') as out:
             os.chmod(partial, 0o600)
-            async with asyncio.timeout(180):
+            async with asyncio.timeout(900):
                 async for chunk in request.stream():
                     received += len(chunk)
                     if received > size or received > MAX_UPLOAD:
