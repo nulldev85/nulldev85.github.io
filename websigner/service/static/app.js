@@ -7,13 +7,20 @@ if(window.top===window)document.body.classList.add('standalone');
 const status=text=>{$('status').textContent=text;};
 function measure(){if(window.parent!==window)window.parent.postMessage({type:'null-websigner-size',height:Math.ceil($('signer').getBoundingClientRect().height+8)},PARENT);}
 new ResizeObserver(measure).observe($('signer'));
+function showSignerView(view){
+  const tutorial=view==='tutorials';
+  $('signer-panel').hidden=tutorial;$('tutorials-panel').hidden=!tutorial;
+  $('signer-tab').setAttribute('aria-pressed',String(!tutorial));$('tutorials-tab').setAttribute('aria-pressed',String(tutorial));
+  measure();
+}
 function clearInputs(){fields.forEach(id=>{$(id).value='';});}
 function busy(value){fields.forEach(id=>{$(id).disabled=value;});$('sign').disabled=value;$('sign').textContent=value?'Signing…':'Sign IPA';$('cancel').hidden=!value;}
 function stop(){clearTimeout(timer);worker?.terminate();worker=null;upload?.abort();upload=null;busy(false);$('upload-progress').hidden=true;}
 function clearJob(){job=null;$('install').hidden=true;$('hosted-actions').hidden=true;$('prepare').hidden=false;$('prepare').disabled=false;$('prepare').textContent='Prepare install';}
-function reset(){stop();clearInputs();signed=null;if(downloadURL)URL.revokeObjectURL(downloadURL);downloadURL=null;clearJob();$('result').hidden=true;$('sign-form').hidden=false;status('');}
+function reset(){stop();clearInputs();signed=null;if(downloadURL)URL.revokeObjectURL(downloadURL);downloadURL=null;clearJob();$('result').hidden=true;$('sign-form').hidden=false;status('');showSignerView('signer');}
 window.addEventListener('pagehide',()=>{stop();clearInputs();if(downloadURL)URL.revokeObjectURL(downloadURL);});
 window.addEventListener('message',event=>{if(event.origin===PARENT&&event.source===window.parent&&event.data?.type==='null-websigner-cancel')reset();});
+document.querySelectorAll('[data-signer-view]').forEach(button=>button.addEventListener('click',()=>showSignerView(button.dataset.signerView)));
 $('cancel').addEventListener('click',()=>{stop();clearInputs();status('Signing cancelled.');});
 $('again').addEventListener('click',reset);
 $('sign-form').addEventListener('submit',event=>{
