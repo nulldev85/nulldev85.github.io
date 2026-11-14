@@ -236,8 +236,8 @@
     .device-image { position: relative; display: block; flex: 0 0 auto; overflow: hidden; pointer-events: none; }
     .device-image img { position: absolute; display: block; max-width: none; height: auto; }
     .site-top .signer-launch { gap: 6px; }
-    .iphone-device { width: 18px; height: 36px; }
-    .iphone-device img { width: 46px; left: -20px; top: -11px; }
+    .iphone-device { width: 20px; height: 36px; }
+    .iphone-device img { position: static; width: 100%; height: 100%; object-fit: contain; }
     .signer-frame { display: block; width: 100%; height: 640px; border: 0; background: transparent; }
     /* Lay out the lightweight form before the first tap, without exposing it. */
     #web-signer:not([open]) { display: block; visibility: hidden; pointer-events: none; }
@@ -351,7 +351,7 @@
 </head>
 <body>
   <header class="site-top">
-    <button class="notes-button signer-launch" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer"><span class="device-image iphone-device" aria-hidden="true"><img src="assets/iphone-front.png" width="320" height="380" alt=""></span>Web signer</button>
+    <button class="notes-button signer-launch" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer"><span class="device-image iphone-device" aria-hidden="true"><img src="assets/iphone-hardware.png" width="120" height="240" alt=""></span>Web signer</button>
   <div class="site-menu">
     <button class="menu-toggle" type="button" data-open-dialog="appletv-install" aria-label="Apple TV Guide" aria-haspopup="dialog" aria-controls="appletv-install">
       <span class="device-image apple-tv-box" aria-hidden="true"><img src="assets/apple-tv-device.png" width="160" height="160" alt=""></span><span>Guide</span>
