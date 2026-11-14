@@ -44,9 +44,12 @@ async def main():
     assert status==200 and b"frame-ancestors https://nulldev85.github.io" in headers[b'content-security-policy']
     assert headers[b'cache-control']==b'no-store'
     assert (await request('/assets/../app.py'))[0]==404
-    for asset in ['app-metadata.js','preview-worker.js']:
+    for asset in ['app-metadata.js','preview-worker.js','vendor/fflate-0.8.3.js']:
         code,headers,body=await request('/assets/'+asset)
         assert code==200 and b'javascript' in headers[b'content-type'] and len(body)>100
+    for asset in ['app-icons/lineup.png','app-icons/nullsign.png']:
+        code,headers,body=await request('/assets/'+asset)
+        assert code==200 and b'image/png' in headers[b'content-type'] and body.startswith(b'\x89PNG\r\n\x1a\n')
     assert (await request('/health',headers={'host':'evil.example'}))[0]==400
     upload={'origin':service.ORIGIN,'content-type':'application/octet-stream'}
     assert service.MAX_UPLOAD==800*1024**2 and service.MAX_DISK==4*1024**3

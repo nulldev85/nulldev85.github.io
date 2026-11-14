@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id);
 const fields=['ipa','certificate','profile','password'];
 const MAX_IPA_BYTES=512*1024**2;
 let worker=null,signed=null,downloadURL=null,upload=null,job=null,timer=null,activePress=null;
-let previewWorker=null,previewURL=null,previewTimer=null,previewEpoch=0;
+let previewWorker=null,previewTimer=null,previewEpoch=0;
 const PARENT='https://nulldev85.github.io';
 if(window.top===window)document.body.classList.add('standalone');
 const status=text=>{$('status').textContent=text;syncActionHints();};
@@ -22,37 +22,44 @@ function updateFileNames(){
 }
 function clearAppPreview(){
   previewEpoch++;clearTimeout(previewTimer);previewWorker?.terminate();previewWorker=null;
-  if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;
-  $('app-icon').hidden=true;$('app-icon').onload=null;$('app-icon').onerror=null;$('app-icon').removeAttribute('src');$('app-placeholder').hidden=false;$('app-preview').hidden=true;
+  $('app-icon').hidden=true;$('app-icon').classList.remove('is-decoded');$('app-icon').onload=null;$('app-icon').onerror=null;$('app-icon').removeAttribute('src');$('app-placeholder').hidden=false;$('app-preview').hidden=true;
+}
+function displayAppIcon(source,fallback,epoch){
+  const icon=$('app-icon');let attempt=0;
+  const load=value=>{
+    const current=++attempt;
+    const ready=()=>{if(epoch===previewEpoch&&current===attempt&&icon.naturalWidth>0){icon.classList.add('is-decoded');$('app-placeholder').hidden=true;}};
+    const failed=()=>{if(epoch!==previewEpoch||current!==attempt)return;if(fallback&&value!==fallback){load(fallback);return;}icon.hidden=true;icon.classList.remove('is-decoded');$('app-placeholder').hidden=false;};
+    icon.onload=ready;icon.onerror=failed;icon.classList.remove('is-decoded');icon.hidden=false;icon.src=value;
+    if(typeof icon.decode==='function')icon.decode().then(ready).catch(()=>{if(icon.complete&&icon.naturalWidth===0)failed();});
+  };
+  if(source||fallback)load(source||fallback);
 }
 function previewApp(){
   clearAppPreview();const ipa=$('ipa').files[0];if(!ipa||ipa.size>MAX_IPA_BYTES)return;
   const epoch=previewEpoch;
-  $('app-name').textContent=ipa.name.replace(/\.(ipa|tipa)$/i,'');$('app-detail').textContent='Reading app…';$('app-preview').hidden=false;
+  $('app-name').textContent=ipa.name.replace(/\.(ipa|tipa)$/i,'');$('app-preview').hidden=false;
   const finish=()=>{clearTimeout(previewTimer);previewWorker?.terminate();previewWorker=null;};
   try{
     previewWorker=new Worker('/assets/preview-worker.js');
     previewWorker.onmessage=event=>{
       if(epoch!==previewEpoch)return;finish();const data=event.data;
-      if(data?.type!=='preview'){$('app-detail').textContent='Selected IPA';return;}
+      if(data?.type!=='preview')return;
       if(typeof data.name==='string'&&data.name.trim())$('app-name').textContent=data.name.slice(0,160);
-      $('app-detail').textContent=[typeof data.version==='string'&&data.version?'Version '+data.version.slice(0,64):'',(ipa.size/1024**2).toFixed(1)+' MB'].filter(Boolean).join(' · ');
-      if(data.icon instanceof Uint8Array&&data.icon.length<=8*1024**2){
-        previewURL=URL.createObjectURL(new Blob([data.icon],{type:'image/png'}));const icon=$('app-icon');
-        icon.onload=()=>{if(epoch===previewEpoch){icon.hidden=false;$('app-placeholder').hidden=true;}};
-        icon.onerror=()=>{if(epoch===previewEpoch){icon.hidden=true;$('app-placeholder').hidden=false;if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;}};
-        icon.src=previewURL;
-      }
+      const fallback=({'com.nulldev85.NullSports.iOS':'/assets/app-icons/lineup.png','com.nulldev85.NullSports':'/assets/app-icons/lineup.png','com.elmat.NullSign':'/assets/app-icons/nullsign.png'})[data.bundle]||null;
+      const source=typeof data.iconDataURL==='string'&&data.iconDataURL.startsWith('data:image/png;base64,')&&data.iconDataURL.length<=12*1024**2?data.iconDataURL:null;
+      displayAppIcon(source,fallback,epoch);
     };
-    previewWorker.onerror=()=>{if(epoch===previewEpoch){finish();$('app-detail').textContent='Selected IPA';}};
+    previewWorker.onerror=()=>{if(epoch===previewEpoch)finish();};
     previewWorker.postMessage({type:'preview',ipa});
-    previewTimer=setTimeout(()=>{if(epoch===previewEpoch){finish();$('app-detail').textContent='Selected IPA';}},15000);
-  }catch{finish();$('app-detail').textContent='Selected IPA';}
+    previewTimer=setTimeout(()=>{if(epoch===previewEpoch)finish();},15000);
+  }catch{finish();}
 }
 function showSignerView(view){
   const tutorial=view==='tutorials';
   $('signer-panel').hidden=tutorial;$('tutorials-panel').hidden=!tutorial;
   $('signer-tab').setAttribute('aria-pressed',String(!tutorial));$('tutorials-tab').setAttribute('aria-pressed',String(tutorial));
+  if(!tutorial&&$('app-icon').src&&!$('app-icon').hidden){const icon=$('app-icon');if(icon.complete&&icon.naturalWidth>0)icon.onload?.();else if(typeof icon.decode==='function')icon.decode().then(()=>icon.onload?.()).catch(()=>{});}
   measure();
 }
 function clearInputs(){fields.forEach(id=>{$(id).value='';});updateFileNames();syncActionHints();}
