@@ -4,3 +4,4 @@ websigner/**/*.png -text
 # Preserve the upstream source and license formatting verbatim.
 websigner/engine-src/vendor/** -whitespace
 websigner/service/static/LICENSES.txt -whitespace
+assets/**/*.png -text

@@ -39,12 +39,13 @@ console.log('PASS: eager form, hidden layout, immediate opening, no per-open nav
 guideOpen.fire('click');assert.equal(guide.open,true);
 guide.close();delayedGuideClose();assert.equal(guideFocus,1,'Return focus to Apple TV Guide button');
 assert.match(html,/class="menu-toggle"[^>]*aria-label="Apple TV Guide"/);
-assert.match(html,/<svg class="apple-tv-box"/);
+assert.match(html,/<span class="device-image apple-tv-box"/);
 assert.match(html,/<span>Guide<\/span>/);
 assert.doesNotMatch(html,/id="nullsign-install"|data-open-dialog="nullsign-install"|>Tutorials<\/summary>/);
 const previous=execFileSync('git',['show','c4d05df:index.html'],{cwd:root,encoding:'utf8'});
 const tvGuide=text=>text.match(/<dialog\b[^>]*id="appletv-install"[\s\S]*?<\/dialog>/)[0].replace(/\r/g,'');
-assert.equal(tvGuide(html),tvGuide(previous),'Apple TV instructions retained');
+assert.match(html, /id="appletv-install-title" tabindex="-1" autofocus/);
+assert.equal(tvGuide(html).replace(' tabindex="-1" autofocus', ''),tvGuide(previous),'Apple TV instructions retained');
 console.log('PASS: direct Apple TV Guide button opens guide and restores focus; redundant main-page iPhone guide removed.');
 
 // Exercise the actual empty-form reset code, since the iframe now stays mounted.
