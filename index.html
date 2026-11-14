@@ -36,9 +36,13 @@
     }
     * { box-sizing: border-box; }
     :root { --top: 0px; }
-    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    html { height: 100%; overflow: hidden; -webkit-text-size-adjust: 100%; overscroll-behavior: none; background: var(--bg); }
     body {
       margin: 0;
+      position: fixed;
+      inset: 0;
+      height: 100vh;
+      height: 100dvh;
       min-height: 100vh;
       min-height: 100svh;
       display: flex;
@@ -50,7 +54,10 @@
       font-synthesis: none;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
-      overflow-x: clip;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      overscroll-behavior: none;
     }
     /* Fine 3px amber dots over a warm top-to-bottom fade.
        Keep the texture continuous across the page, cards and fixed header. */
@@ -72,6 +79,7 @@
     button { font: inherit; color: inherit; }
     :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
     svg { flex: 0 0 auto; }
+    img { -webkit-user-drag: none; user-select: none; }
     .wrap { width: min(1120px, 100% - 48px); margin: 0 auto; }
     main.wrap { flex: 1 0 auto; display: flex; flex-direction: column; justify-content: center; }
 
@@ -81,7 +89,7 @@
     .source-label { display: flex; align-items: center; padding: 0 14px; border-right: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
     .source-url { flex: 1 1 auto; min-width: 0; align-self: center; padding: 0 14px; overflow: hidden; color: var(--text); font: 14px var(--mono); white-space: nowrap; text-overflow: ellipsis; }
     .copy-repo { display: inline-flex; align-items: center; gap: 8px; min-width: 96px; padding: 0 16px; border: 0; border-left: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s ease; }
-    .copy-repo:hover { background: var(--raised); }
+    @media (hover: hover) { .copy-repo:hover { background: var(--raised); } }
     .copy-repo:focus-visible { outline-offset: -3px; border-radius: 0 9px 9px 0; }
     .copy-repo svg { width: 15px; height: 15px; color: var(--text-2); }
     .copy-repo .icon-done { display: none; color: var(--text); }
@@ -116,11 +124,11 @@
     .build-meta .sep { display: none; }
     .build-meta time { flex-basis: 100%; }
     .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 13px; border-radius: 8px; color: var(--text); border: 1px solid var(--line-strong); background: rgba(232,187,105,.12); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
-    .download:hover { background: rgba(232,187,105,.22); }
+    @media (hover: hover) { .download:hover { background: rgba(232,187,105,.22); } }
     .download svg { width: 14px; height: 14px; }
     .app-actions { display: flex; gap: 8px; margin-top: 10px; }
     .notes-button { display: inline-flex; flex: 1 1 0; align-items: center; justify-content: center; gap: 7px; min-width: 0; height: 32px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
-    .notes-button:hover { border-color: rgba(255,255,255,.22); background: var(--raised); }
+    @media (hover: hover) { .notes-button:hover { border-color: rgba(255,255,255,.22); background: var(--raised); } }
     .notes-button svg { width: 15px; height: 15px; color: var(--text-2); }
     .feature-list { margin-top: 18px; }
     .feature { padding: 16px 0 18px; border-top: 1px solid var(--line); }
@@ -132,12 +140,12 @@
     .release-dialog { width: min(560px, 100% - 32px); max-width: none; max-height: min(85dvh, 760px); padding: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; color: var(--text); background: var(--surface); box-shadow: 0 24px 80px rgba(0,0,0,.6); }
     .release-dialog[open] { animation: dialog-in .2s cubic-bezier(.2,.7,.2,1); }
     .release-dialog::backdrop { background: rgba(0,0,0,.62); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-    .dialog-body { max-height: min(85dvh, 760px); overflow: auto; padding: 26px 28px 30px; overscroll-behavior: contain; }
-    .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+    .dialog-body { max-height: min(85dvh, 760px); overflow: auto; padding: 26px 28px 30px; overscroll-behavior: none; }
+    .dialog-head { position: sticky; top: 0; z-index: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin: -26px -28px 0; padding: 20px 28px 12px; border-bottom: 1px solid var(--line); background: var(--surface); }
     .dialog-kicker { margin: 0 0 2px; color: var(--text-2); font-size: 13px; }
     .dialog-head h2 { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 600; }
-    .dialog-close { display: grid; width: 32px; height: 32px; flex: 0 0 auto; margin: -4px -8px 0 0; place-items: center; border: 0; border-radius: 8px; color: var(--text-2); background: transparent; cursor: pointer; transition: background .15s ease, color .15s ease; }
-    .dialog-close:hover { color: var(--text); background: var(--raised); }
+    .dialog-close { display: grid; width: 44px; height: 44px; flex: 0 0 auto; margin: -4px -8px 0 0; place-items: center; border: 1px solid var(--line); border-radius: 12px; color: var(--text-2); background: rgba(255,255,255,.035); cursor: pointer; }
+    @media (hover: hover) { .dialog-close:hover { color: var(--text); background: var(--raised); } }
     .dialog-close svg { width: 16px; height: 16px; }
     .dialog-intro { margin: 10px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
     .release-build { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
@@ -177,6 +185,42 @@
     .has-js [data-project-card].is-visible { opacity: 1; transform: none; }
     @keyframes dialog-in { from { opacity: 0; transform: translateY(6px) scale(.99); } }
 
+    /* Raised at rest, visibly depressed on touch, mouse and keyboard presses. */
+    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark) {
+      min-height: 44px;
+      min-width: 44px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      cursor: pointer;
+      transition: transform .14s cubic-bezier(.2,.8,.2,1), background .14s ease, border-color .14s ease, box-shadow .14s ease;
+    }
+    :is(.download, .notes-button, .dialog-close) {
+      box-shadow: inset 0 1px 0 rgba(255,226,175,.09), 0 2px 5px rgba(0,0,0,.22);
+    }
+    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark):is(:active, .is-key-pressed) {
+      transform: translateY(1px) scale(.97);
+      background: rgba(232,187,105,.24);
+      border-color: rgba(237,190,103,.55);
+      box-shadow: inset 0 2px 5px rgba(0,0,0,.3);
+      transition-duration: .04s;
+    }
+    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark):focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 3px;
+      box-shadow: 0 0 0 5px rgba(237,190,103,.12);
+    }
+    body:has(.release-dialog[open]) { overflow: hidden; }
+    .action-status {
+      position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 40;
+      width: max-content; max-width: calc(100% - 32px); margin: 0; padding: 12px 18px;
+      border: 1px solid var(--line-strong); border-radius: 14px; color: var(--text);
+      background: rgba(34,27,18,.96); box-shadow: 0 6px 24px rgba(0,0,0,.35);
+      font-size: 13px; text-align: center; pointer-events: none;
+      opacity: 0; transform: translate(-50%, 8px); transition: opacity .16s ease, transform .16s ease;
+    }
+    .action-status.is-visible { opacity: 1; transform: translate(-50%, 0); }
+
     /* Both apps stay side by side; compact cards adapt to phone widths. */
     @media (max-width: 900px) {
       .apps { gap: 16px; }
@@ -213,8 +257,12 @@
       .source-label { display: none; }
       .download { height: 36px; }
       .notes-button { height: 36px; }
-      .dialog-body { padding: 22px 20px 26px; }
+      .release-dialog { width: calc(100% - 16px); max-height: 88svh; margin: auto auto 0; border-radius: 20px 20px 0 0; }
+      .release-dialog[open] { animation-name: sheet-in; }
+      .dialog-body { max-height: 88svh; padding: 22px 20px calc(26px + env(safe-area-inset-bottom)); }
+      .dialog-head { margin: -22px -20px 0; padding: 16px 20px 12px; }
     }
+    @keyframes sheet-in { from { opacity: 0; transform: translateY(24px); } }
     @media (max-width: 359px) {
       .app-head { flex-direction: column; text-align: center; }
     }
@@ -245,9 +293,10 @@
       .notes-button svg { display: none; }
     }
     @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
+      html, body { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
       .has-js [data-project-card] { opacity: 1; transform: none; }
+      :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark):is(:active, .is-key-pressed) { transform: none; }
     }
   </style>
 </head>
@@ -334,7 +383,7 @@
         <button class="copy-repo" id="repo-copy" type="button" aria-label="Copy the AppSource URL for your signer">
           <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
           <svg class="icon-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
-          <span id="repo-copy-label" aria-live="polite">Copy</span>
+          <span id="repo-copy-label">Copy</span>
         </button>
       </div>
       <p class="source-hint">Every IPA here is unsigned, so install it through a compatible signer.<span class="feed-status" data-feed-status></span></p>
@@ -424,10 +473,35 @@
     <span>© Null’s Apps</span>
   </footer>
 
+  <p class="action-status" id="action-status" role="status" aria-live="polite" aria-atomic="true"></p>
   <script src="release-notes.js?v=1"></script>
   <script>
     (() => {
       document.documentElement.classList.add("has-js");
+      const controls = ".download, .notes-button, .copy-repo, .dialog-close, .float-mark";
+      const releaseKeyPress = () => document.querySelectorAll(".is-key-pressed").forEach(node => node.classList.remove("is-key-pressed"));
+      document.addEventListener("keydown", event => {
+        if (event.repeat || !(event.target instanceof Element)) return;
+        const control = event.target.closest(controls);
+        if (control && (event.key === "Enter" || (event.key === " " && control.tagName === "BUTTON"))) control.classList.add("is-key-pressed");
+      });
+      document.addEventListener("keyup", releaseKeyPress);
+      document.addEventListener("focusout", releaseKeyPress);
+      window.addEventListener("blur", releaseKeyPress);
+      const actionStatus = document.getElementById("action-status");
+      let statusTimeout;
+      const announceAction = message => {
+        clearTimeout(statusTimeout);
+        actionStatus.textContent = message;
+        actionStatus.classList.add("is-visible");
+        statusTimeout = setTimeout(() => {
+          actionStatus.classList.remove("is-visible");
+          actionStatus.textContent = "";
+        }, 2800);
+      };
+      document.querySelectorAll(".download").forEach(link => link.addEventListener("click", event => {
+        if (!event.defaultPrevented && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) announceAction("Opening IPA download…");
+      }));
       const cards = [...document.querySelectorAll("[data-project-card]")];
       if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
         const observer = new IntersectionObserver(entries => entries.forEach(entry => {
@@ -497,6 +571,7 @@
         window.clearTimeout(resetCopyLabel);
         const copied = await copyText(appSourceURL);
         repoLabel.textContent = copied ? "Copied" : "Copy failed";
+        announceAction(copied ? "Source URL copied" : "Couldn’t copy. Try again.");
         repoButton.classList.toggle("is-copied", copied);
         resetCopyLabel = window.setTimeout(() => {
           repoLabel.textContent = "Copy";
