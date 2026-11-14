@@ -143,7 +143,7 @@
     .release-dialog::backdrop { background: rgba(0,0,0,.62); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
     .dialog-body { display: flex; flex-direction: column; max-height: calc(var(--dialog-height) - 2px); overflow: hidden; }
     .dialog-head { display: flex; flex: 0 0 auto; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 20px 28px 16px; border-bottom: 1px solid var(--line); background: var(--surface); }
-    .dialog-content { min-height: 0; overflow: auto; padding: 6px 28px 30px; overscroll-behavior: none; }
+    .dialog-content { min-height: 0; overflow: auto; padding: 6px 28px 30px; overscroll-behavior: none contain; }
     .dialog-kicker { margin: 0 0 2px; color: var(--text-2); font-size: 13px; }
     .dialog-head h2 { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 600; }
     .dialog-close { display: grid; width: 44px; height: 44px; flex: 0 0 auto; margin: -4px -8px 0 0; place-items: center; border: 1px solid var(--line); border-radius: 12px; color: var(--text-2); background: rgba(255,255,255,.035); cursor: pointer; }
