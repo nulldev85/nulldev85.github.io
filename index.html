@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#080707">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#241b0c">
   <meta name="description" content="Lineup and NullSign for iPhone and Apple TV: what each app does, what changed in its latest build, and where to download it.">
   <meta property="og:title" content="Null’s Apps">
   <meta property="og:description" content="Lineup and NullSign for iPhone and Apple TV.">
@@ -35,13 +35,15 @@
       --display: "Null Dots Display", var(--sans);
     }
     * { box-sizing: border-box; }
-    /* The top of the site, the header with the mark under it, stays put
-       like an app's; the page slips under it as it scrolls. */
-    :root { --top: 168px; }
+    :root { --top: 0px; }
     html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
       min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       color: var(--text);
       background: var(--bg);
       font: 15px/1.6 var(--sans);
@@ -50,7 +52,7 @@
       -webkit-font-smoothing: antialiased;
       overflow-x: clip;
     }
-    /* Normal-scale reference: fine 4px amber dots, soft edges and a dark ground.
+    /* Fine 3px amber dots over a warm top-to-bottom fade.
        Keep the texture continuous across the page, cards and fixed header. */
     body::after {
       content: "";
@@ -59,10 +61,10 @@
       z-index: 25;
       pointer-events: none;
       background-image:
-        radial-gradient(circle at center, rgba(224,199,151,.075) .75px, rgba(224,199,151,.035) 1px, transparent 1.2px),
-        radial-gradient(ellipse at 8% 0%, rgba(190,132,30,.055), transparent 58%),
-        radial-gradient(ellipse at 96% 45%, rgba(182,83,25,.025), transparent 60%);
-      background-size: 4px 4px, 100% 100%, 100% 100%;
+        radial-gradient(circle at center, rgba(224,199,151,.10) .5px, rgba(224,199,151,.045) .75px, transparent .95px),
+        linear-gradient(180deg, rgba(190,132,30,.16) 0%, rgba(190,132,30,.075) 38%, rgba(190,132,30,.02) 72%, transparent 100%),
+        radial-gradient(ellipse at 96% 25%, rgba(182,83,25,.045), transparent 65%);
+      background-size: 3px 3px, 100% 100%, 100% 100%;
       background-repeat: repeat, no-repeat, no-repeat;
     }
     ::selection { background: rgba(216,154,56,.35); }
@@ -71,17 +73,11 @@
     :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
     svg { flex: 0 0 auto; }
     .wrap { width: min(1120px, 100% - 48px); margin: 0 auto; }
-
-    /* Header */
-    .site-header { position: fixed; top: 0; right: 0; left: 0; z-index: 22; display: flex; align-items: center; justify-content: space-between; height: 64px; margin: 0 auto; }
-    /* Behind it, a band of the page's own dark, fading at its lower edge, for
-       the page to disappear under. */
-    .top-shade { position: fixed; top: 0; right: 0; left: 0; z-index: 22; height: var(--top); background: linear-gradient(var(--bg) calc(100% - 30px), rgba(8, 7, 7, 0)); pointer-events: none; }
-    .wordmark { font-size: 15px; font-weight: 600; text-decoration: none; }
+    main.wrap { flex: 1 0 auto; display: flex; flex-direction: column; justify-content: center; }
 
     /* Signer source, below the app listings. */
-    .source-section { padding-bottom: 56px; }
-    .source { display: flex; align-items: stretch; max-width: 700px; height: 44px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); }
+    .source-section { padding-bottom: 16px; }
+    .source { display: flex; align-items: stretch; max-width: 700px; height: 44px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: rgba(255,255,255,.025); }
     .source-label { display: flex; align-items: center; padding: 0 14px; border-right: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
     .source-url { flex: 1 1 auto; min-width: 0; align-self: center; padding: 0 14px; overflow: hidden; color: var(--text); font: 14px var(--mono); white-space: nowrap; text-overflow: ellipsis; }
     .copy-repo { display: inline-flex; align-items: center; gap: 8px; min-width: 96px; padding: 0 16px; border: 0; border-left: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s ease; }
@@ -96,8 +92,8 @@
 
     /* Apps: two cards side by side, so all of them are in view as the
        page opens. What each app does is a dialog away, like its notes. */
-    .apps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 180px 0 32px; }
-    .app { display: flex; flex-direction: column; min-width: 0; padding: 20px 22px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); scroll-margin-top: calc(var(--top) + 8px); }
+    .apps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 8px 0 20px; }
+    .app { display: flex; flex-direction: column; min-width: 0; padding: 20px 22px 18px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.025); scroll-margin-top: calc(var(--top) + 8px); }
     .app-head { position: relative; display: flex; align-items: center; gap: 14px; }
     .app-icon { position: relative; display: block; flex: 0 0 auto; width: 48px; height: 48px; overflow: hidden; border-radius: 11px; background: var(--raised); }
     .app-icon::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255,255,255,.09); }
@@ -108,14 +104,14 @@
     .app-body { display: flex; flex: 1 1 auto; flex-direction: column; }
     /* The summary takes up the slack, so every card's builds sit at its foot. */
     .app-summary { flex: 1 0 auto; margin: 14px 0 0; color: var(--text-body); font-size: 14px; line-height: 1.6; }
-    .builds { margin-top: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+    .builds { margin-top: 16px; border: 1px solid var(--line); border-radius: 10px; background: rgba(0,0,0,.12); }
     /* Each build: its device and download button on one line, its version
        and release time under them. */
     .build { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 14px; padding: 12px 14px 13px; }
     .build + .build { border-top: 1px solid var(--line); }
     .build-info { display: contents; }
     .build h3 { min-width: 0; margin: 0; font-size: 14px; font-weight: 600; }
-    .build-meta { grid-column: 1 / -1; grid-row: 2; display: flex; flex-wrap: wrap; gap: 0 8px; margin: 0; color: var(--text-3); font-size: 12.5px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+    .build-meta { grid-column: 1 / -1; grid-row: 2; display: flex; flex-wrap: wrap; gap: 0 8px; min-width: 0; margin: 0; overflow-wrap: anywhere; color: var(--text-3); font-size: 12.5px; line-height: 1.5; font-variant-numeric: tabular-nums; }
     .build-meta .build-number { color: var(--text-2); font-family: var(--mono); font-size: 12.5px; }
     .build-meta .sep { display: none; }
     .build-meta time { flex-basis: 100%; }
@@ -156,12 +152,12 @@
     .notes-pending { margin: 14px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
 
     /* Footer */
-    .site-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding: 28px 0 48px; border-top: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
+    .site-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding: 12px 0 16px; border-top: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
     .site-footer a { color: var(--text-2); text-decoration: none; transition: color .15s ease; }
     .site-footer a:hover { color: var(--text); }
 
     /* Static autumn-gold Apple image, retained as a back-to-top link. */
-    .float-mark { --mark-size: 56px; position: fixed; top: 86px; left: 50%; z-index: 30; display: grid; place-items: center; width: var(--mark-size); height: var(--mark-size); margin-left: calc(var(--mark-size) / -2); border-radius: 50%; -webkit-tap-highlight-color: transparent; }
+    .float-mark { --mark-size: 48px; position: relative; z-index: 30; display: grid; flex: 0 0 auto; place-items: center; width: var(--mark-size); height: var(--mark-size); margin: 12px auto 4px; border-radius: 50%; -webkit-tap-highlight-color: transparent; }
     .mark-logo { display: block; width: 52%; height: 52%; margin-top: -4%; filter: drop-shadow(0 1px 0 rgba(255,255,255,.18)) drop-shadow(0 4px 10px rgba(0,0,0,.75)) drop-shadow(0 0 3px rgba(0,0,0,.6)); }
     @media print { .float-mark, body::after { display: none; } }
 
@@ -195,28 +191,57 @@
     }
     @media (max-width: 600px) {
       .wrap { width: calc(100% - 32px); }
-      :root { --top: 140px; }
-      .apps { padding-top: 148px; gap: 12px; }
+      .apps { gap: 12px; padding-bottom: 16px; }
       .app { padding: 14px 12px 12px; }
-      .app-head { align-items: center; text-align: center; gap: 10px; }
+      .app-head { flex-direction: row; align-items: center; gap: 8px; }
+      .app-icon { width: 32px; height: 32px; border-radius: 8px; }
       .app-name { font-size: 18px; }
-      .app-kind { font-size: 11px; line-height: 1.5; }
-      .app-summary { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; flex: none; font-size: 12px; line-height: 1.6; }
+      .app-kind { display: none; }
+      /* Full descriptions remain in Features; keep downloads in view on phones. */
+      .app-summary { display: none; }
       .builds { margin-top: 14px; }
       .build { padding: 10px 8px; }
       .build h3 { font-size: 12px; }
       .build-meta, .build-meta .build-number { font-size: 11px; }
+      .build-meta time { display: none; }
       .download, .notes-button { padding: 0 6px; font-size: 11px; }
       .notes-button svg, .download svg { display: none; }
       .app-body { margin-top: 0; }
-      .float-mark { --mark-size: 48px; top: 74px; }
+      .app-actions { flex-direction: row; gap: 6px; }
+      .notes-button { padding: 0 4px; white-space: normal; line-height: 1.3; }
+      .float-mark { --mark-size: 40px; margin-top: 8px; }
       .source-label { display: none; }
       .download { height: 36px; }
       .notes-button { height: 36px; }
       .dialog-body { padding: 22px 20px 26px; }
     }
+    @media (max-width: 359px) {
+      .app-head { flex-direction: column; text-align: center; }
+    }
+    /* Wide phones and short desktop windows use the available width first. */
+    @media (max-height: 700px) and (min-width: 601px) {
+      .float-mark { --mark-size: 36px; margin-top: 4px; }
+      .apps { gap: 14px; padding-bottom: 12px; }
+      .app { padding: 12px; }
+      .app-head { flex-direction: row; align-items: center; gap: 10px; }
+      .app-icon { width: 36px; height: 36px; }
+      .app-name { font-size: 20px; }
+      .app-kind { font-size: 11px; }
+      .app-summary { display: none; }
+      .builds { margin-top: 10px; }
+      .build { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; padding: 8px; }
+      .build-meta { grid-column: 1 / -1; grid-row: 2; }
+      .build-meta time { display: none; }
+      .download { width: auto; }
+      .app-actions { flex-direction: row; gap: 6px; }
+      .notes-button { padding: 0 6px; font-size: 12px; }
+      .notes-button svg { display: none; }
+      .source-section { padding-bottom: 10px; }
+      .source-hint { margin-top: 6px; font-size: 12px; }
+      .site-footer { padding-top: 8px; padding-bottom: 8px; }
+    }
     @media (max-width: 400px) {
-      .notes-button { padding: 0 10px; }
+      .notes-button { padding: 0 4px; }
       .notes-button svg { display: none; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -241,11 +266,6 @@
     <span class="autumn-leaf" style="--x:56%;--size:22px;--duration:31s;--delay:-12s;--opacity:0.25;--sway:6s;--turn:7s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
     <span class="autumn-leaf" style="--x:8%;--size:34px;--duration:33s;--delay:-29s;--opacity:0.3;--sway:7s;--turn:8s"><span class="leaf-sway"><img src="assets/leaf-rust.svg" alt="" width="48" height="64"></span></span>
   </div>
-
-  <div class="top-shade" aria-hidden="true"></div>
-  <header class="site-header wrap">
-    <a class="wordmark" href="#top">Null’s Apps</a>
-  </header>
 
   <a class="float-mark" href="#top" aria-label="Back to top">
     <img class="mark-logo" src="assets/apple-mark.svg?v=cream" width="24" height="24" alt="">
