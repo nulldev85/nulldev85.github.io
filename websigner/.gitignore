@@ -1,0 +1,9 @@
+engine-src/.build/
+engine-src/deps/
+engine-src/public/
+engine-src/.emscripten-cache/
+.test-data/
+__pycache__/
+*.pyc
+.venv/
+service/data/

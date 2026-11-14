@@ -1,0 +1,5 @@
+websigner/** text eol=lf
+websigner/**/*.wasm -text
+# Preserve the upstream source and license formatting verbatim.
+websigner/engine-src/vendor/** -whitespace
+websigner/service/static/LICENSES.txt -whitespace
