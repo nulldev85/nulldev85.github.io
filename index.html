@@ -233,7 +233,7 @@
     /* Header actions sit on opposite sides of the centered Apple mark. */
     .site-top { position: relative; flex: 0 0 auto; min-height: 64px; padding: 8px 16px 4px; }
     .site-top .signer-launch { position: absolute; top: 8px; left: 16px; z-index: 24; width: 116px; min-width: 116px; height: 44px; padding: 0 12px; gap: 8px; border-radius: 12px; font-size: 12px; }
-    .site-top .signer-launch svg { display: block; width: 16px; height: 16px; }
+    .site-top .signer-launch svg { display: block; width: 18px; height: 22px; }
     .signer-frame { display: block; width: 100%; height: 640px; border: 0; background: transparent; }
     /* Lay out the lightweight form before the first tap, without exposing it. */
     #web-signer:not([open]) { display: block; visibility: hidden; pointer-events: none; }
@@ -345,7 +345,7 @@
 </head>
 <body>
   <header class="site-top">
-    <button class="notes-button signer-launch" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5 5 5M4 20l4-1 12-12a2.1 2.1 0 0 0-3-3L5 16l-1 4ZM13 20h7"/></svg>Web signer</button>
+    <button class="notes-button signer-launch" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer"><svg class="iphone-device" viewBox="0 0 24 32" fill="none" aria-hidden="true"><defs><linearGradient id="iphone-screen" x1="6" y1="3" x2="18" y2="29" gradientUnits="userSpaceOnUse"><stop stop-color="#29292c"/><stop offset="1" stop-color="#101012"/></linearGradient></defs><rect x="3.5" y="1" width="17" height="30" rx="4" fill="#09090a" stroke="currentColor" stroke-opacity=".65"/><rect x="5" y="2.5" width="14" height="27" rx="2.8" fill="url(#iphone-screen)"/><rect x="9" y="3.8" width="6" height="1.6" rx=".8" fill="#050506"/><path d="M9 27.8h6" stroke="currentColor" stroke-opacity=".8" stroke-width="1.2" stroke-linecap="round"/><path d="M2.5 8v3m0 2v3m19-6v5" stroke="currentColor" stroke-opacity=".45" stroke-width=".8" stroke-linecap="round"/></svg>Web signer</button>
   <div class="site-menu">
     <button class="menu-toggle" type="button" data-open-dialog="appletv-install" aria-label="Apple TV Guide" aria-haspopup="dialog" aria-controls="appletv-install">
       <svg class="apple-tv-box" viewBox="0 0 32 32" fill="none" aria-hidden="true">
