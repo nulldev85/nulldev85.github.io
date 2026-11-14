@@ -45,7 +45,7 @@ assert.doesNotMatch(html,/id="nullsign-install"|data-open-dialog="nullsign-insta
 const previous=execFileSync('git',['show','c4d05df:index.html'],{cwd:root,encoding:'utf8'});
 const tvGuide=text=>text.match(/<dialog\b[^>]*id="appletv-install"[\s\S]*?<\/dialog>/)[0].replace(/\r/g,'');
 assert.match(html, /id="appletv-install-title" tabindex="-1" autofocus/);
-const restartTip = '            <p>Restarting your Apple TV and repeating the pairing steps can also help if NullSign still can’t find it.</p>\n';
+const restartTip = '            <p>Restarting your Apple TV and repeating the pairing steps can also help if NullSign still cannot find it.</p>\n';
 assert.ok(tvGuide(html).includes(restartTip));
 assert.equal(tvGuide(html).replace(' tabindex="-1" autofocus', '').replace(restartTip, ''),tvGuide(previous),'Other Apple TV instructions retained');
 console.log('PASS: direct Apple TV Guide button opens guide and restores focus; redundant main-page iPhone guide removed.');
