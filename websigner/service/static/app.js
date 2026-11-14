@@ -4,7 +4,15 @@ const fields=['ipa','certificate','profile','password'];
 let worker=null,signed=null,downloadURL=null,upload=null,job=null,timer=null,activePress=null;
 const PARENT='https://nulldev85.github.io';
 if(window.top===window)document.body.classList.add('standalone');
-const status=text=>{$('status').textContent=text;};
+const status=text=>{$('status').textContent=text;syncActionHints();};
+function syncActionHints(){
+  const selected=['ipa','certificate','profile'].every(id=>$(id).files?.length>0);
+  $('sign').classList.toggle('is-ready',selected&&!$('sign').disabled&&!$('sign-form').hidden);
+  $('prepare').classList.toggle('is-ready',!!signed&&!job&&!upload&&!$('prepare').disabled&&!$('result').hidden);
+  $('install').classList.toggle('is-ready',!!job&&job.expires*1000>Date.now()&&!$('install').hidden);
+  $('sign').setAttribute('aria-busy',String($('sign').disabled));
+  $('prepare').setAttribute('aria-busy',String(!$('prepare').hidden&&$('prepare').disabled));
+}
 function measure(){if(window.parent!==window)window.parent.postMessage({type:'null-websigner-size',height:Math.ceil($('signer').getBoundingClientRect().height+8)},PARENT);}
 new ResizeObserver(measure).observe($('signer'));
 function showSignerView(view){
@@ -13,14 +21,18 @@ function showSignerView(view){
   $('signer-tab').setAttribute('aria-pressed',String(!tutorial));$('tutorials-tab').setAttribute('aria-pressed',String(tutorial));
   measure();
 }
-function clearInputs(){fields.forEach(id=>{$(id).value='';});}
-function busy(value){fields.forEach(id=>{$(id).disabled=value;});$('sign').disabled=value;$('sign').textContent=value?'Signing…':'Sign IPA';$('cancel').hidden=!value;}
+function clearInputs(){fields.forEach(id=>{$(id).value='';});syncActionHints();}
+function busy(value){fields.forEach(id=>{$(id).disabled=value;});$('sign').disabled=value;$('sign').textContent=value?'Signing…':'Sign IPA';$('cancel').hidden=!value;syncActionHints();}
 function stop(){clearTimeout(timer);worker?.terminate();worker=null;upload?.abort();upload=null;busy(false);$('upload-progress').hidden=true;}
 function clearJob(){job=null;$('install').hidden=true;$('hosted-actions').hidden=true;$('prepare').hidden=false;$('prepare').disabled=false;$('prepare').textContent='Prepare install';}
 function reset(){stop();clearInputs();signed=null;if(downloadURL)URL.revokeObjectURL(downloadURL);downloadURL=null;clearJob();$('result').hidden=true;$('sign-form').hidden=false;status('');showSignerView('signer');}
 window.addEventListener('pagehide',()=>{stop();clearInputs();if(downloadURL)URL.revokeObjectURL(downloadURL);});
 window.addEventListener('message',event=>{if(event.origin===PARENT&&event.source===window.parent&&event.data?.type==='null-websigner-cancel')reset();});
 document.querySelectorAll('[data-signer-view]').forEach(button=>button.addEventListener('click',()=>showSignerView(button.dataset.signerView)));
+fields.forEach(id=>{for(const type of ['input','change'])$(id).addEventListener(type,syncActionHints);});
+window.addEventListener('focus',syncActionHints);
+document.addEventListener('visibilitychange',syncActionHints);
+syncActionHints();
 $('cancel').addEventListener('click',()=>{stop();clearInputs();status('Signing cancelled.');});
 $('again').addEventListener('click',reset);
 $('sign-form').addEventListener('submit',event=>{
@@ -71,7 +83,10 @@ $('prepare').addEventListener('click',()=>{
   };
   xhr.send(signed);
 });
-$('install').addEventListener('click',event=>{if(!job||job.expires*1000<=Date.now()){event.preventDefault();clearJob();status('The link expired. Prepare installation again.');}});
+$('install').addEventListener('click',event=>{
+  if(!job||job.expires*1000<=Date.now()){event.preventDefault();clearJob();status('The link expired. Prepare installation again.');return;}
+  status('Confirm Install in the iPhone prompt.');
+});
 $('copy-install').addEventListener('click',async()=>{
   if(!job)return;
   const value=location.origin+'/install/'+job.token;
@@ -89,10 +104,11 @@ $('delete').addEventListener('click',async()=>{
 });
 
 function releasePress(){activePress?.node.classList.remove('is-pressed');activePress=null;}
-document.addEventListener('pointerdown',event=>{releasePress();if(!event.isPrimary||event.button!==0||!(event.target instanceof Element))return;const node=event.target.closest('.button');if(!node||node.matches(':disabled'))return;activePress={node,id:event.pointerId,bounds:node.getBoundingClientRect()};node.classList.add('is-pressed');},{passive:true});
+const pressControls='.button, input[type=file], .signer-guide summary';
+document.addEventListener('pointerdown',event=>{releasePress();if(!event.isPrimary||event.button!==0||!(event.target instanceof Element))return;const node=event.target.closest(pressControls);if(!node||node.matches(':disabled'))return;activePress={node,id:event.pointerId,bounds:node.getBoundingClientRect()};node.classList.add('is-pressed');},{passive:true});
 document.addEventListener('pointermove',event=>{if(!activePress||activePress.id!==event.pointerId)return;const b=activePress.bounds;activePress.node.classList.toggle('is-pressed',event.clientX>=b.left&&event.clientX<=b.right&&event.clientY>=b.top&&event.clientY<=b.bottom);},{passive:true});
 for(const type of ['pointerup','pointercancel','lostpointercapture'])document.addEventListener(type,releasePress,true);
 document.addEventListener('scroll',releasePress,{capture:true,passive:true});window.addEventListener('blur',releasePress);
-document.addEventListener('keydown',event=>{if(event.repeat||!(event.target instanceof Element))return;const node=event.target.closest('.button');if(node&&!node.matches(':disabled')&&(event.key==='Enter'||(event.key===' '&&node.tagName==='BUTTON')))node.classList.add('is-pressed');});
+document.addEventListener('keydown',event=>{if(event.repeat||!(event.target instanceof Element))return;const node=event.target.closest(pressControls);if(node&&!node.matches(':disabled')&&(event.key==='Enter'||(event.key===' '&&node.matches('button, summary, input[type=file]'))))node.classList.add('is-pressed');});
 const releaseKeys=()=>document.querySelectorAll('.is-pressed').forEach(node=>node.classList.remove('is-pressed'));
 document.addEventListener('keyup',releaseKeys);document.addEventListener('focusout',releaseKeys);window.addEventListener('blur',releaseKeys);
