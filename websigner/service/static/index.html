@@ -9,6 +9,11 @@
 </head>
 <body>
   <main id="signer">
+    <nav class="signer-views" aria-label="Web signer views">
+      <button id="signer-tab" class="button" type="button" data-signer-view="signer" aria-controls="signer-panel" aria-pressed="true">Signer</button>
+      <button id="tutorials-tab" class="button" type="button" data-signer-view="tutorials" aria-controls="tutorials-panel" aria-pressed="false">Tutorials</button>
+    </nav>
+    <section id="signer-panel" aria-label="Signer">
     <p class="intro">Sign an IPA on this device. Your .p12 and password aren’t uploaded or saved.</p>
     <form id="sign-form" autocomplete="off">
       <label class="field">IPA<input id="ipa" type="file" accept=".ipa,.tipa" required></label>
@@ -29,6 +34,30 @@
       <button id="again" class="button full" type="button">Sign another IPA</button>
     </section>
     <p class="muted small footer">Beta · Signing locally does not guarantee iOS will accept the app or certificate.</p>
+    </section>
+    <section id="tutorials-panel" aria-label="Tutorials" hidden>
+      <p class="intro">Switch back to Signer whenever you need to choose a file. Your selections and password stay in place.</p>
+      <details class="signer-guide" name="signer-guides" open>
+        <summary>Install NullSign on iPhone</summary>
+        <p>You need an IPA, a .p12 file, its matching .mobileprovision for your iPhone, and the .p12 password if set.</p>
+        <p class="small">Need signing files? <a href="https://flarestore.app/faq/" target="_blank" rel="noopener noreferrer">Flarestore ↗</a> · <a href="https://arcticsign.app/" target="_blank" rel="noopener noreferrer">Arcticsign ↗</a></p>
+        <ol>
+          <li><strong>Download the IPA.</strong> Save NullSign from <a href="https://nulldev85.github.io/#nullsign" target="_blank" rel="noopener noreferrer">its app card ↗</a> to Files → Downloads. These steps also work with another iPhone IPA.</li>
+          <li><strong>Choose the IPA.</strong> Switch to Signer. Under IPA, select the file from Downloads.</li>
+          <li><strong>Add your signing files.</strong> Under .p12 file, select your .p12. Under Provisioning profile, select your .mobileprovision. Enter the .p12 password if set.</li>
+          <li><strong>Sign.</strong> Tap Sign IPA. Keep this page open until it says Signed IPA ready.</li>
+          <li><strong>Install.</strong> Tap Prepare install, then Install app. Confirm Install on your iPhone. Open the app from your Home Screen when it finishes.</li>
+        </ol>
+        <p class="small">Prepare install uploads the signed IPA, including its provisioning profile. The installation link expires after 20 minutes. Your .p12 and password aren’t uploaded.</p>
+        <details class="guide-help"><summary>If the app won’t open</summary>
+          <p><strong>Untrusted Developer:</strong> Go to Settings → General → VPN &amp; Device Management. Select the signing developer and follow the Trust or Allow &amp; Restart prompts.</p>
+          <p><strong>Developer Mode Required:</strong> Go to Settings → Privacy &amp; Security → Developer Mode. Enable it, restart and confirm. Do this only if iPhone asks.</p>
+          <p><strong>Verification error:</strong> Check your internet connection and confirm with your provider that the certificate is valid and the profile covers this iPhone.</p>
+        </details>
+      </details>
+      <button class="button full" type="button" data-signer-view="signer">Back to signer</button>
+      <p class="muted small">Closing the signer or reloading the page clears your files and password.</p>
+    </section>
   </main>
 </body>
 </html>

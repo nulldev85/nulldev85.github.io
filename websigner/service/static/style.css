@@ -6,6 +6,16 @@ body { font-size:14px; line-height:1.6; }
 main { padding:2px; }
 p { margin:8px 0 14px; }
 .intro { margin-top:8px; }
+.signer-views { display:flex; gap:8px; margin:8px 0 16px; }
+.signer-views .button { flex:1; }
+.signer-views [aria-pressed=true] { border-color:rgba(224,185,108,.55); box-shadow:inset 0 -2px 0 rgba(224,185,108,.45); }
+.signer-guide { margin:12px 0; padding:12px; border:1px solid var(--line); border-radius:12px; }
+.signer-guide summary { cursor:pointer; touch-action:manipulation; }
+.signer-guide > summary { min-height:32px; display:list-item; align-content:center; }
+.signer-guide ol { margin:16px 0; padding-left:22px; }
+.signer-guide li { padding-left:3px; margin:0 0 16px; }
+.signer-guide li strong { display:block; }
+.guide-help { border-top:1px solid var(--line); padding-top:12px; }
 .muted { color:var(--text); }
 .small { font-size:12px; line-height:1.6; }
 .field { display:block; margin-bottom:14px; font-size:13px; }
