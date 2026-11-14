@@ -198,8 +198,8 @@
     :is(.download, .notes-button, .dialog-close) {
       box-shadow: inset 0 1px 0 rgba(255,226,175,.09), 0 2px 5px rgba(0,0,0,.22);
     }
-    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark):is(:active, .is-key-pressed) {
-      transform: translateY(1px) scale(.97);
+    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark):is(.is-pointer-pressed, .is-key-pressed) {
+      transform: translateY(3px) scale(.97);
       background: rgba(232,187,105,.24);
       border-color: rgba(237,190,103,.55);
       box-shadow: inset 0 2px 5px rgba(0,0,0,.3);
@@ -296,7 +296,7 @@
       html, body { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
       .has-js [data-project-card] { opacity: 1; transform: none; }
-      :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark):is(:active, .is-key-pressed) { transform: none; }
+      :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark):is(.is-pointer-pressed, .is-key-pressed) { transform: translateY(3px); }
     }
   </style>
 </head>
@@ -479,6 +479,40 @@
     (() => {
       document.documentElement.classList.add("has-js");
       const controls = ".download, .notes-button, .copy-repo, .dialog-close, .float-mark";
+      // Explicit held state also works on touch browsers that omit :active.
+      let heldPointer = null;
+      const releasePointerPress = () => {
+        heldPointer?.control.classList.remove("is-pointer-pressed");
+        heldPointer = null;
+      };
+      document.addEventListener("pointerdown", event => {
+        releasePointerPress();
+        if (!event.isPrimary || event.button !== 0 || !(event.target instanceof Element)) return;
+        const control = event.target.closest(controls);
+        if (!control || control.matches(":disabled, [aria-disabled='true']")) return;
+        // Save the unpressed bounds so the visual depression cannot move the hit area.
+        heldPointer = { control, id: event.pointerId, bounds: control.getBoundingClientRect() };
+        control.classList.add("is-pointer-pressed");
+      }, { passive: true });
+      document.addEventListener("pointermove", event => {
+        if (!heldPointer || event.pointerId !== heldPointer.id) return;
+        const { control, bounds } = heldPointer;
+        const inside = event.clientX >= bounds.left && event.clientX <= bounds.right && event.clientY >= bounds.top && event.clientY <= bounds.bottom;
+        control.classList.toggle("is-pointer-pressed", inside);
+      }, { passive: true });
+      const endPointerPress = event => {
+        if (heldPointer?.id === event.pointerId) releasePointerPress();
+      };
+      document.addEventListener("pointerup", endPointerPress, true);
+      document.addEventListener("pointercancel", endPointerPress, true);
+      document.addEventListener("lostpointercapture", endPointerPress, true);
+      document.addEventListener("pointerout", event => {
+        if (!event.relatedTarget) releasePointerPress();
+      });
+      document.addEventListener("scroll", releasePointerPress, { capture: true, passive: true });
+      document.addEventListener("visibilitychange", releasePointerPress);
+      window.addEventListener("blur", releasePointerPress);
+      window.addEventListener("resize", releasePointerPress);
       const releaseKeyPress = () => document.querySelectorAll(".is-key-pressed").forEach(node => node.classList.remove("is-key-pressed"));
       document.addEventListener("keydown", event => {
         if (event.repeat || !(event.target instanceof Element)) return;
