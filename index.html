@@ -230,7 +230,7 @@
     }
     .action-status.is-visible { opacity: 1; transform: translate(-50%, 0); }
 
-    /* Opening Tutorials reserves real space above the still-visible app cards. */
+    /* Header actions sit on opposite sides of the centered Apple mark. */
     .site-top { position: relative; flex: 0 0 auto; min-height: 64px; padding: 8px 16px 4px; }
     .site-top .signer-launch { position: absolute; top: 8px; left: 16px; z-index: 24; min-width: 110px; height: 44px; padding: 0 12px; gap: 8px; border-radius: 12px; font-size: 12px; }
     .site-top .signer-launch svg { display: block; width: 16px; height: 16px; }
@@ -242,8 +242,7 @@
     .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; width: max-content; min-width: 110px; margin-left: auto; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; font-size: 12px; list-style: none; }
     .menu-toggle::-webkit-details-marker, .help-toggle::-webkit-details-marker { display: none; }
     .menu-toggle svg { width: 16px; height: 16px; }
-    .menu-panel { display: flex; flex-direction: column; gap: 8px; width: min(240px, calc(100vw - 32px)); margin-top: 8px; padding: 10px; border: 1px solid var(--line-strong); border-radius: 14px; background: transparent; box-shadow: none; }
-    .menu-panel .notes-button { flex: none; min-height: 48px; height: auto; padding: 10px 12px; justify-content: flex-start; text-align: left; white-space: normal; font-size: 13px; }
+    @media (max-width: 360px) { .menu-toggle svg, .site-top .signer-launch svg { display: none; } }
     .install-needs { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; line-height: 1.6; }
     .install-steps { padding-left: 24px; margin: 18px 0; }
     .install-steps li { padding-left: 4px; margin: 0 0 18px; font-size: 14px; line-height: 1.6; }
@@ -347,13 +346,9 @@
 <body>
   <header class="site-top">
     <button class="notes-button signer-launch" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5 5 5M4 20l4-1 12-12a2.1 2.1 0 0 0-3-3L5 16l-1 4ZM13 20h7"/></svg>Web signer</button>
-  <details class="site-menu">
-    <summary class="menu-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Tutorials</summary>
-    <nav class="menu-panel" aria-label="Tutorials">
-      <button class="notes-button" type="button" data-open-dialog="nullsign-install" aria-haspopup="dialog" aria-controls="nullsign-install">Install NullSign on iPhone</button>
-      <button class="notes-button" type="button" data-open-dialog="appletv-install" aria-haspopup="dialog" aria-controls="appletv-install">Sideload apps onto Apple TV</button>
-    </nav>
-  </details>
+  <div class="site-menu">
+    <button class="menu-toggle" type="button" data-open-dialog="appletv-install" aria-haspopup="dialog" aria-controls="appletv-install"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Apple TV Guide</button>
+  </div>
     <a class="float-mark" href="#top" aria-label="Back to top">
       <img class="mark-logo" src="assets/apple-mark.svg?v=cream" width="24" height="24" alt="">
     </a>
@@ -537,33 +532,6 @@
         </div>
       </div>
     </dialog>
-    <dialog class="release-dialog" id="nullsign-install" aria-labelledby="nullsign-install-title">
-      <div class="dialog-body">
-        <header class="dialog-head"><div><p class="dialog-kicker">iPhone setup</p><h2 id="nullsign-install-title">Install NullSign</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close iPhone guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
-        <div class="dialog-content">
-          <p class="install-needs">Have your <strong>.p12 file</strong>, matching <strong>.mobileprovision</strong> for your iPhone, and .p12 password (if set) ready in Files. Need these? Browse certificates: <a href="https://flarestore.app/faq/" target="_blank" rel="noopener noreferrer">Flarestore ↗</a> · <a href="https://arcticsign.app/" target="_blank" rel="noopener noreferrer">Arcticsign ↗</a>.</p>
-          <ol class="install-steps">
-            <li><strong>Download NullSign.</strong><p>Open this page in Safari on your iPhone. Save the IPA in Files → Downloads.</p><div class="build-actions guide-download-actions">
-                <a class="download" data-guide-download="com.elmat.NullSign" href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-43566275481/NullSign-1.5.2-52.ipa">Download NullSign IPA</a>
-                <button class="notes-button ipa-copy" type="button" data-copy-ipa aria-label="Copy the NullSign IPA link" title="Copy IPA link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span class="ipa-copy-label">Copy link</span></button>
-              </div></li>
-            <li><strong>Open our Web signer.</strong><p>Use Web signer at the top left, or tap below.</p><button class="notes-button guide-action" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer">Open Web signer</button></li>
-            <li><strong>Choose your files.</strong><p>Under IPA, select NullSign from Downloads. Under .p12 file, select your .p12. Under Provisioning profile, select your .mobileprovision. Enter the .p12 password if set.</p></li>
-            <li><strong>Sign NullSign.</strong><p>Tap Sign IPA and keep this page open until it says Signed IPA ready.</p></li>
-            <li><strong>Install.</strong><p>Tap Prepare install, then Install app. Confirm Install on your iPhone. When it finishes, open NullSign from your Home Screen.</p></li>
-          </ol>
-          <details class="install-trouble">
-            <summary class="help-toggle">If NullSign won’t open</summary>
-            <p><strong>Untrusted Developer:</strong> Open Settings → General → VPN &amp; Device Management. Select the signing developer and follow the Trust or Allow &amp; Restart prompts.</p>
-            <p><strong>Developer Mode Required:</strong> Open Settings → Privacy &amp; Security → Developer Mode. Turn it on, restart, then confirm. Do this only if iPhone asks.</p>
-            <p><strong>Integrity or verification error:</strong> Check your internet connection and ask your certificate provider to confirm the certificate is valid and the profile covers this iPhone.</p>
-          </details>
-          <p class="guide-note">Signing happens on your device. Your .p12 and password aren’t uploaded. Prepare install uploads the signed IPA, including its provisioning profile, for a link that expires after 20 minutes.</p>
-          <p class="guide-note"><a href="https://support.apple.com/en-us/118254" target="_blank" rel="noopener noreferrer">Apple trust help ↗</a> · <a href="https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device" target="_blank" rel="noopener noreferrer">Developer Mode help ↗</a></p>
-        </div>
-      </div>
-    </dialog>
-
     <dialog class="release-dialog" id="appletv-install" aria-labelledby="appletv-install-title">
       <div class="dialog-body">
         <header class="dialog-head"><div><p class="dialog-kicker">NullSign on iPhone → Apple TV</p><h2 id="appletv-install-title">Sideload onto Apple TV</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close Apple TV guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
@@ -682,16 +650,6 @@
         const formatted = formatReleaseTime(node.dateTime);
         if (formatted) node.textContent = formatted;
       });
-      const siteMenu = document.querySelector(".site-menu");
-      document.addEventListener("click", event => {
-        if (siteMenu.open && !siteMenu.contains(event.target)) siteMenu.open = false;
-      });
-      document.addEventListener("keydown", event => {
-        if (event.key === "Escape" && siteMenu.open) {
-          siteMenu.open = false;
-          siteMenu.querySelector("summary").focus({ preventScroll: true });
-        }
-      });
       const dialogReturnFocus = new WeakMap();
       const signerOrigin = "https://signer.mateomedia.link";
       const signerFrame = document.getElementById("signer-frame");
@@ -715,11 +673,7 @@
         const dialog = document.getElementById(button.dataset.openDialog);
         if (!dialog) return;
         button.addEventListener("click", () => {
-          const sourceDialog = button.closest(".release-dialog[open]");
-          const returnFocus = sourceDialog ? dialogReturnFocus.get(sourceDialog) : siteMenu.contains(button) ? siteMenu.querySelector("summary") : button;
-          if (sourceDialog && sourceDialog !== dialog) closeDialog(sourceDialog);
-          dialogReturnFocus.set(dialog, returnFocus || siteMenu.querySelector("summary"));
-          siteMenu.open = false;
+          dialogReturnFocus.set(dialog, button);
           if (typeof dialog.showModal === "function") {
             if (!dialog.open) dialog.showModal();
           } else dialog.setAttribute("open", "");
@@ -797,9 +751,6 @@
         if (url.protocol !== "https:" || url.hostname !== "github.com" || !url.pathname.startsWith("/nulldev85/AppSource/releases/download/") || !url.pathname.toLowerCase().endsWith(".ipa")) return;
         const link = container.querySelector("[data-download]");
         if (link) link.href = url.href;
-        document.querySelectorAll("[data-guide-download]").forEach(guideLink => {
-          if (guideLink.dataset.guideDownload === container.dataset.bundle) guideLink.href = url.href;
-        });
         const buildNumber = container.querySelector("[data-build-number]");
         if (buildNumber) buildNumber.textContent = release.buildVersion;
         const versionNumber = container.querySelector("[data-version-number]");
