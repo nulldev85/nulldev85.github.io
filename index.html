@@ -172,7 +172,7 @@
     .site-footer a:hover { color: var(--text); }
 
     /* Static autumn-gold Apple image, retained as a back-to-top link. */
-    .float-mark { --mark-size: 48px; position: relative; z-index: 30; display: grid; flex: 0 0 auto; place-items: center; width: var(--mark-size); height: var(--mark-size); margin: 12px auto 4px; border-radius: 50%; -webkit-tap-highlight-color: transparent; }
+    .float-mark { --mark-size: 48px; position: absolute; top: 8px; left: calc(50% - var(--mark-size) / 2); z-index: 30; display: grid; place-items: center; width: var(--mark-size); height: var(--mark-size); margin: 0; border-radius: 50%; -webkit-tap-highlight-color: transparent; }
     .mark-logo { display: block; width: 52%; height: 52%; margin-top: -4%; filter: drop-shadow(0 1px 0 rgba(255,255,255,.18)) drop-shadow(0 4px 10px rgba(0,0,0,.75)) drop-shadow(0 0 3px rgba(0,0,0,.6)); }
     @media print { .float-mark, body::after { display: none; } }
 
@@ -219,7 +219,6 @@
     }
     body:has(.release-dialog[open]) { overflow: hidden; }
     body:has(.release-dialog[open]) :is(.apps, .source-section, .float-mark, .site-menu, .site-footer) { visibility: hidden; }
-    body:has(.site-menu[open]) :is(.apps, .source-section) { visibility: hidden; }
     .action-status {
       position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 40;
       width: max-content; max-width: calc(100% - 32px); margin: 0; padding: 12px 18px;
@@ -230,12 +229,13 @@
     }
     .action-status.is-visible { opacity: 1; transform: translate(-50%, 0); }
 
-    /* The shared texture/fade at layer 25 also covers these controls. */
-    .site-menu { position: fixed; top: calc(8px + env(safe-area-inset-top)); right: calc(16px + env(safe-area-inset-right)); z-index: 24; }
-    .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; font-size: 12px; list-style: none; }
+    /* Opening Tutorials reserves real space above the still-visible app cards. */
+    .site-top { position: relative; flex: 0 0 auto; min-height: 64px; padding: 8px 16px 4px; }
+    .site-menu { position: relative; z-index: 24; width: max-content; max-width: 100%; margin-left: auto; }
+    .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; width: max-content; margin-left: auto; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; font-size: 12px; list-style: none; }
     .menu-toggle::-webkit-details-marker, .help-toggle::-webkit-details-marker { display: none; }
     .menu-toggle svg { width: 16px; height: 16px; }
-    .menu-panel { position: absolute; top: calc(100% + 8px); right: 0; display: flex; flex-direction: column; gap: 8px; width: min(240px, calc(100vw - 32px)); padding: 10px; border: 1px solid var(--line-strong); border-radius: 14px; background: transparent; box-shadow: none; }
+    .menu-panel { display: flex; flex-direction: column; gap: 8px; width: min(240px, calc(100vw - 32px)); margin-top: 8px; padding: 10px; border: 1px solid var(--line-strong); border-radius: 14px; background: transparent; box-shadow: none; }
     .menu-panel .notes-button { flex: none; min-height: 48px; height: auto; padding: 10px 12px; justify-content: flex-start; text-align: left; white-space: normal; font-size: 13px; }
     .install-needs { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; line-height: 1.6; }
     .install-steps { padding-left: 24px; margin: 18px 0; }
@@ -289,7 +289,8 @@
       .app-body { margin-top: 0; }
       .app-actions { flex-direction: row; gap: 6px; }
       .notes-button { padding: 0 4px; white-space: normal; line-height: 1.3; }
-      .float-mark { --mark-size: 40px; margin-top: 8px; }
+      .site-top { min-height: 56px; }
+      .float-mark { --mark-size: 44px; }
       .source-label { display: none; }
       .download { height: 36px; }
       .notes-button { height: 36px; }
@@ -306,7 +307,7 @@
     }
     /* Wide phones and short desktop windows use the available width first. */
     @media (max-height: 700px) and (min-width: 601px) {
-      .float-mark { --mark-size: 36px; margin-top: 4px; }
+      .float-mark { --mark-size: 44px; top: 4px; }
       .apps { gap: 14px; padding-bottom: 12px; }
       .app { padding: 12px; }
       .app-head { flex-direction: row; align-items: center; gap: 10px; }
@@ -339,6 +340,7 @@
   </style>
 </head>
 <body>
+  <header class="site-top">
   <details class="site-menu">
     <summary class="menu-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Tutorials</summary>
     <nav class="menu-panel" aria-label="Tutorials">
@@ -346,6 +348,10 @@
       <button class="notes-button" type="button" data-open-dialog="appletv-install" aria-haspopup="dialog" aria-controls="appletv-install">Sideload apps onto Apple TV</button>
     </nav>
   </details>
+    <a class="float-mark" href="#top" aria-label="Back to top">
+      <img class="mark-logo" src="assets/apple-mark.svg?v=cream" width="24" height="24" alt="">
+    </a>
+  </header>
   <div class="autumn-leaves" aria-hidden="true">
     <span class="autumn-leaf" style="--x:4%;--size:30px;--duration:22s;--delay:-3s;--opacity:0.32;--sway:4s;--turn:7s"><span class="leaf-sway"><img src="assets/leaf-maple.svg" alt="" width="48" height="64"></span></span>
     <span class="autumn-leaf" style="--x:13%;--size:24px;--duration:27s;--delay:-17s;--opacity:0.28;--sway:5s;--turn:8s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
@@ -360,10 +366,6 @@
     <span class="autumn-leaf" style="--x:56%;--size:22px;--duration:31s;--delay:-12s;--opacity:0.25;--sway:6s;--turn:7s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
     <span class="autumn-leaf" style="--x:8%;--size:34px;--duration:33s;--delay:-29s;--opacity:0.3;--sway:7s;--turn:8s"><span class="leaf-sway"><img src="assets/leaf-rust.svg" alt="" width="48" height="64"></span></span>
   </div>
-
-  <a class="float-mark" href="#top" aria-label="Back to top">
-    <img class="mark-logo" src="assets/apple-mark.svg?v=cream" width="24" height="24" alt="">
-  </a>
 
   <main class="wrap" id="top">
     <div class="apps">
@@ -669,9 +671,9 @@
         if (formatted) node.textContent = formatted;
       });
       const siteMenu = document.querySelector(".site-menu");
-      document.addEventListener("pointerdown", event => {
+      document.addEventListener("click", event => {
         if (siteMenu.open && !siteMenu.contains(event.target)) siteMenu.open = false;
-      }, { passive: true });
+      });
       document.addEventListener("keydown", event => {
         if (event.key === "Escape" && siteMenu.open) {
           siteMenu.open = false;
