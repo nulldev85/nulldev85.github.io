@@ -28,8 +28,8 @@
       --mono: var(--sans);
       --display: var(--sans);
     }
-    /* One texture recipe for the main page and native dialog top layers. */
-    :root, .release-dialog::backdrop {
+    /* The single page layer stays visible behind every transparent surface. */
+    :root {
       --page-texture:
         radial-gradient(circle at center, rgba(224,199,151,.10) .5px, rgba(224,199,151,.045) .75px, transparent .95px),
         linear-gradient(180deg, rgba(190,132,30,.16) 0%, rgba(190,132,30,.075) 38%, rgba(190,132,30,.02) 72%, transparent 100%),
@@ -84,12 +84,12 @@
 
     /* Signer source, below the app listings. */
     .source-section { padding-bottom: 16px; }
-    .source { display: flex; align-items: stretch; max-width: 700px; height: 48px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: rgba(255,255,255,.025); }
+    .source { display: flex; align-items: stretch; max-width: 700px; height: 48px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: transparent; }
     .source-label { display: flex; align-items: center; padding: 0 14px; border-right: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
     .source-url { flex: 1 1 auto; min-width: 0; align-self: center; padding: 0 14px; overflow: hidden; color: var(--text); font: 800 14px var(--mono); white-space: nowrap; text-overflow: ellipsis; }
     .copy-repo { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-left: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: background .15s ease; }
     .source .copy-repo { min-width: 104px; }
-    @media (hover: hover) { .copy-repo:hover { background: var(--raised); } }
+    @media (hover: hover) { .copy-repo:hover { background: rgba(232,187,105,.10); } }
     .copy-repo:focus-visible { outline-offset: -3px; border-radius: 0 9px 9px 0; }
     .copy-repo svg { width: 15px; height: 15px; color: var(--text-2); }
     .copy-repo .icon-done { display: none; color: var(--text); }
@@ -101,9 +101,9 @@
     /* Apps: two cards side by side, so all of them are in view as the
        page opens. What each app does is a dialog away, like its notes. */
     .apps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 8px 0 20px; }
-    .app { display: flex; flex-direction: column; min-width: 0; padding: 20px 22px 18px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.025); scroll-margin-top: calc(var(--top) + 8px); }
+    .app { display: flex; flex-direction: column; min-width: 0; padding: 20px 22px 18px; border: 1px solid var(--line); border-radius: 14px; background: transparent; scroll-margin-top: calc(var(--top) + 8px); }
     .app-head { position: relative; display: flex; align-items: center; gap: 14px; }
-    .app-icon { position: relative; display: block; flex: 0 0 auto; width: 48px; height: 48px; overflow: hidden; border-radius: 11px; background: var(--raised); }
+    .app-icon { position: relative; display: block; flex: 0 0 auto; width: 48px; height: 48px; overflow: hidden; border-radius: 11px; background: transparent; }
     .app-icon::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255,255,255,.09); }
     .app-icon img { display: block; width: 100%; height: 100%; object-fit: cover; }
     .app-title { min-width: 0; }
@@ -112,7 +112,7 @@
     .app-body { display: flex; flex: 1 1 auto; flex-direction: column; }
     /* The summary takes up the slack, so every card's builds sit at its foot. */
     .app-summary { flex: 1 0 auto; margin: 14px 0 0; color: var(--text-body); font-size: 14px; line-height: 1.6; }
-    .builds { margin-top: 16px; border: 1px solid var(--line); border-radius: 10px; background: rgba(0,0,0,.12); }
+    .builds { margin-top: 16px; border: 1px solid var(--line); border-radius: 10px; background: transparent; }
     /* Versions above a matching Download / Copy link pair. */
     .build { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 6px; padding: 12px 14px 13px; }
     .build + .build { border-top: 1px solid var(--line); }
@@ -122,7 +122,7 @@
     .build-meta .build-number { color: var(--text-2); font-family: var(--mono); font-size: 12.5px; }
     .build-meta .sep { display: none; }
     .build-meta time { flex-basis: 100%; }
-    .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 13px; border-radius: 8px; color: var(--text); border: 1px solid var(--line-strong); background: rgba(232,187,105,.12); font-size: 13px; font-weight: 800; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
+    .download { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 13px; border-radius: 8px; color: var(--text); border: 1px solid var(--line-strong); background: transparent; font-size: 13px; font-weight: 800; text-decoration: none; white-space: nowrap; transition: background .15s ease; }
     @media (hover: hover) { .download:hover { background: rgba(232,187,105,.22); } }
     .download svg { width: 14px; height: 14px; }
     .build-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-column: 1 / -1; grid-row: 3; align-items: stretch; gap: 6px; min-width: 0; margin-top: 2px; }
@@ -134,7 +134,7 @@
     .guide-download-actions { margin-top: 8px; }
     .app-actions { display: flex; gap: 8px; margin-top: 10px; }
     .notes-button { display: inline-flex; flex: 1 1 0; align-items: center; justify-content: center; gap: 7px; min-width: 0; height: 32px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
-    @media (hover: hover) { .notes-button:hover { border-color: rgba(255,255,255,.22); background: var(--raised); } }
+    @media (hover: hover) { .notes-button:hover { border-color: rgba(255,255,255,.22); background: rgba(232,187,105,.10); } }
     .notes-button svg { width: 15px; height: 15px; color: var(--text-2); }
     .feature-list { margin-top: 18px; }
     .feature { padding: 16px 0 18px; border-top: 1px solid var(--line); }
@@ -143,16 +143,16 @@
     .feature p { margin: 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
 
     /* Release notes */
-    .release-dialog { --dialog-height: min(900px, calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))); width: min(560px, 100% - 32px); max-width: none; max-height: var(--dialog-height); margin: calc(12px + env(safe-area-inset-top)) auto auto; padding: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; color: var(--text); background: rgba(255,255,255,.025); box-shadow: 0 8px 28px rgba(0,0,0,.5); }
+    .release-dialog { --dialog-height: min(900px, calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))); width: min(560px, 100% - 32px); max-width: none; max-height: var(--dialog-height); margin: calc(12px + env(safe-area-inset-top)) auto auto; padding: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; color: var(--text); background: transparent; box-shadow: none; }
     .release-dialog[open] { animation: dialog-in .2s cubic-bezier(.2,.7,.2,1); }
-    .release-dialog::backdrop { background-color: var(--bg, #080707); background-image: var(--page-texture); background-size: var(--page-texture-size); background-repeat: repeat, no-repeat, no-repeat; }
+    .release-dialog::backdrop { background: transparent; }
     .dialog-body { display: flex; flex-direction: column; max-height: calc(var(--dialog-height) - 2px); overflow: hidden; }
     .dialog-head { display: flex; flex: 0 0 auto; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 20px 28px 16px; border-bottom: 1px solid var(--line); background: transparent; }
     .dialog-content { min-height: 0; overflow: auto; padding: 6px 28px 30px; overscroll-behavior: none contain; }
     .dialog-kicker { margin: 0 0 2px; color: var(--text-2); font-size: 13px; }
     .dialog-head h2 { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 800; }
-    .dialog-close { display: grid; width: 44px; height: 44px; flex: 0 0 auto; margin: -4px -8px 0 0; place-items: center; border: 1px solid var(--line); border-radius: 12px; color: var(--text-2); background: rgba(255,255,255,.035); cursor: pointer; }
-    @media (hover: hover) { .dialog-close:hover { color: var(--text); background: var(--raised); } }
+    .dialog-close { display: grid; width: 44px; height: 44px; flex: 0 0 auto; margin: -4px -8px 0 0; place-items: center; border: 1px solid var(--line); border-radius: 12px; color: var(--text-2); background: transparent; cursor: pointer; }
+    @media (hover: hover) { .dialog-close:hover { color: var(--text); background: rgba(232,187,105,.10); } }
     .dialog-close svg { width: 16px; height: 16px; }
     .dialog-intro { margin: 10px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
     .release-build { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
@@ -218,11 +218,13 @@
       box-shadow: 0 0 0 5px rgba(237,190,103,.12);
     }
     body:has(.release-dialog[open]) { overflow: hidden; }
+    body:has(.release-dialog[open]) :is(.apps, .source-section, .float-mark, .site-menu, .site-footer) { visibility: hidden; }
+    body:has(.site-menu[open]) :is(.apps, .source-section) { visibility: hidden; }
     .action-status {
       position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 40;
       width: max-content; max-width: calc(100% - 32px); margin: 0; padding: 12px 18px;
       border: 1px solid var(--line-strong); border-radius: 14px; color: var(--text);
-      background: rgba(34,27,18,.96); box-shadow: 0 6px 24px rgba(0,0,0,.35);
+      background: transparent; box-shadow: none;
       font-size: 13px; text-align: center; pointer-events: none;
       opacity: 0; transform: translate(-50%, 8px); transition: opacity .16s ease, transform .16s ease;
     }
@@ -230,10 +232,10 @@
 
     /* The shared texture/fade at layer 25 also covers these controls. */
     .site-menu { position: fixed; top: calc(8px + env(safe-area-inset-top)); right: calc(16px + env(safe-area-inset-right)); z-index: 24; }
-    .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: rgba(255,255,255,.025); font-size: 12px; list-style: none; }
+    .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; font-size: 12px; list-style: none; }
     .menu-toggle::-webkit-details-marker, .help-toggle::-webkit-details-marker { display: none; }
     .menu-toggle svg { width: 16px; height: 16px; }
-    .menu-panel { position: absolute; top: calc(100% + 8px); right: 0; display: flex; flex-direction: column; gap: 8px; width: min(240px, calc(100vw - 32px)); padding: 10px; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--bg); box-shadow: 0 8px 28px rgba(0,0,0,.5); }
+    .menu-panel { position: absolute; top: calc(100% + 8px); right: 0; display: flex; flex-direction: column; gap: 8px; width: min(240px, calc(100vw - 32px)); padding: 10px; border: 1px solid var(--line-strong); border-radius: 14px; background: transparent; box-shadow: none; }
     .menu-panel .notes-button { flex: none; min-height: 48px; height: auto; padding: 10px 12px; justify-content: flex-start; text-align: left; white-space: normal; font-size: 13px; }
     .install-needs { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; line-height: 1.6; }
     .install-steps { padding-left: 24px; margin: 18px 0; }
