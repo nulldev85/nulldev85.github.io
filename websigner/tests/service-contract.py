@@ -25,7 +25,8 @@ def ipa(extra=None):
 async def request(path,method='GET',body=b'',headers=None):
     supplied={'host':'signer.mateomedia.link','content-length':str(len(body))}
     supplied.update(headers or {})
-    scope={'type':'http','asgi':{'version':'3.0'},'http_version':'1.1','method':method,'scheme':'https','path':path,'raw_path':path.encode(),'query_string':b'','root_path':'','server':('signer.mateomedia.link',443),'client':('127.0.0.1',1000),'headers':[(k.encode(),v.encode()) for k,v in supplied.items()]}
+    route,_,query=path.partition('?')
+    scope={'type':'http','asgi':{'version':'3.0'},'http_version':'1.1','method':method,'scheme':'https','path':route,'raw_path':route.encode(),'query_string':query.encode(),'root_path':'','server':('signer.mateomedia.link',443),'client':('127.0.0.1',1000),'headers':[(k.encode(),v.encode()) for k,v in supplied.items()]}
     sent=[]
     received=False
     async def receive():
@@ -43,6 +44,11 @@ async def main():
     status,headers,_=await request('/health')
     assert status==200 and b"frame-ancestors https://nulldev85.github.io" in headers[b'content-security-policy']
     assert headers[b'cache-control']==b'no-store'
+    for asset in ['preview-worker.js','app-metadata.js','zip-check.js','vendor/fflate-0.8.3.js','app-icons/lineup.png','app-icons/nullsign.png']:
+        code,cached,_=await request('/assets/'+asset+'?v=icon-stable-1')
+        assert code==200 and b'public' in cached[b'cache-control'] and b'immutable' in cached[b'cache-control']
+        assert (await request('/assets/'+asset))[1][b'cache-control']==b'no-store'
+    assert (await request('/?v=icon-stable-1'))[1][b'cache-control']==b'no-store'
     assert (await request('/assets/../app.py'))[0]==404
     for asset in ['app-metadata.js','preview-worker.js','vendor/fflate-0.8.3.js']:
         code,headers,body=await request('/assets/'+asset)
@@ -71,6 +77,8 @@ async def main():
     assert manifest['assets'][0]['url']==service.ORIGIN+'/files/'+token+'.ipa'
     status,headers,body=await request('/files/'+token+'.ipa',headers={'range':'bytes=0-3'})
     assert status==206 and body==b'PK\x03\x04' and b'content-range' in headers
+    assert (await request('/files/'+token+'.ipa?v=icon-stable-1',headers={'range':'bytes=0-3'}))[1][b'cache-control']==b'no-store'
+    assert (await request('/manifest/'+token+'.plist?v=icon-stable-1'))[1][b'cache-control']==b'no-store'
     assert (await request('/files/'+token+'.ipa',headers={'range':'bytes=0-2,3-4'}))[0]==416
     status,_,body=await request('/install/'+token)
     assert status==200 and b'&lt;Test&gt;' in body and b'<Test>' not in body

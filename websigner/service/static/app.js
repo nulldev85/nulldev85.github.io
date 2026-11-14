@@ -2,8 +2,13 @@
 const $=id=>document.getElementById(id);
 const fields=['ipa','certificate','profile','password'];
 const MAX_IPA_BYTES=512*1024**2;
+// Bump whenever a versioned preview worker/helper/icon asset changes.
+const PREVIEW_ASSET_VERSION='icon-stable-1';
 let worker=null,signed=null,downloadURL=null,upload=null,job=null,timer=null,activePress=null;
 let previewWorker=null,previewTimer=null,previewEpoch=0;
+let iconLoad=null,iconLoadId=0,previewMetadataCache=new WeakMap();
+let uploadFraction=0;
+const decodedIcons=new Map();
 const PARENT='https://nulldev85.github.io';
 if(window.top===window)document.body.classList.add('standalone');
 const status=text=>{$('status').textContent=text;syncActionHints();};
@@ -20,58 +25,111 @@ new ResizeObserver(measure).observe($('signer'));
 function updateFileNames(){
   for(const [id,empty] of [['ipa','No IPA selected'],['certificate','No .p12 selected'],['profile','No profile selected']])$(id+'-name').textContent=$(id).files[0]?.name||empty;
 }
-function clearAppPreview(){
-  previewEpoch++;clearTimeout(previewTimer);previewWorker?.terminate();previewWorker=null;
-  $('app-icon').hidden=true;$('app-icon').classList.remove('is-decoded');$('app-icon').onload=null;$('app-icon').onerror=null;$('app-icon').removeAttribute('src');$('app-placeholder').hidden=false;$('app-preview').hidden=true;
+function clearAppPreview(release=true){
+  previewEpoch++;iconLoadId++;clearTimeout(previewTimer);
+  if(iconLoad){iconLoad.onload=null;iconLoad.onerror=null;iconLoad.removeAttribute('src');iconLoad=null;}
+  if(release){previewWorker?.terminate();previewWorker=null;previewMetadataCache=new WeakMap();decodedIcons.clear();}
+  $('app-icon').hidden=true;$('app-icon').classList.remove('is-decoded');$('app-icon').onload=null;$('app-icon').onerror=null;
+  if(release)$('app-icon').removeAttribute('src');
+  $('app-placeholder').hidden=false;$('app-preview').hidden=true;
 }
-function displayAppIcon(source,fallback,epoch){
-  const icon=$('app-icon');let attempt=0;
+function displayAppIcon(source,fallback,epoch,onReady){
+  const request=++iconLoadId;let settled=false;
+  const current=()=>epoch===previewEpoch&&request===iconLoadId&&!settled;
+  const commit=(image,value)=>{
+    if(!current()||!image.naturalWidth)return;
+    settled=true;image.onload=null;image.onerror=null;iconLoad=null;
+    image.id='app-icon';image.alt='';image.width=56;image.height=56;image.hidden=false;image.classList.add('is-decoded');
+    const old=$('app-icon');if(old!==image)old.replaceWith(image);
+    $('app-placeholder').hidden=true;
+    decodedIcons.delete(value);decodedIcons.set(value,image);
+    while(decodedIcons.size>2)decodedIcons.delete(decodedIcons.keys().next().value);
+    onReady?.(value);
+  };
   const load=value=>{
-    const current=++attempt;
-    const ready=()=>{if(epoch===previewEpoch&&current===attempt&&icon.naturalWidth>0){icon.classList.add('is-decoded');$('app-placeholder').hidden=true;}};
-    const failed=()=>{if(epoch!==previewEpoch||current!==attempt)return;if(fallback&&value!==fallback){load(fallback);return;}icon.hidden=true;icon.classList.remove('is-decoded');$('app-placeholder').hidden=false;};
-    icon.onload=ready;icon.onerror=failed;icon.classList.remove('is-decoded');icon.hidden=false;icon.src=value;
-    if(typeof icon.decode==='function')icon.decode().then(ready).catch(()=>{if(icon.complete&&icon.naturalWidth===0)failed();});
+    if(!current())return;
+    const cached=decodedIcons.get(value);if(cached?.complete&&cached.naturalWidth>0){commit(cached,value);return;}
+    const image=new Image();iconLoad=image;image.decoding='async';let decoding=false,failedOnce=false;
+    const failed=()=>{if(!current()||iconLoad!==image||failedOnce)return;failedOnce=true;image.onload=null;image.onerror=null;iconLoad=null;if(fallback&&value!==fallback)load(fallback);};
+    const ready=()=>{
+      if(!current()||iconLoad!==image||decoding)return;decoding=true;
+      if(typeof image.decode==='function')image.decode().then(()=>commit(image,value)).catch(failed);
+      else commit(image,value);
+    };
+    image.onload=ready;image.onerror=failed;image.src=value;
+    if(image.complete&&image.naturalWidth>0)ready();
   };
   if(source||fallback)load(source||fallback);
 }
+function ensurePreviewWorker(){
+  if(!previewWorker){
+    const reader=new Worker('/assets/preview-worker.js?v='+PREVIEW_ASSET_VERSION);
+    reader.onerror=()=>{if(previewWorker===reader){reader.terminate();previewWorker=null;}};
+    previewWorker=reader;
+  }
+  return previewWorker;
+}
+function warmPreviewWorker(){try{ensurePreviewWorker();}catch{}}
 function previewApp(){
-  clearAppPreview();const ipa=$('ipa').files[0];if(!ipa||ipa.size>MAX_IPA_BYTES)return;
+  clearAppPreview(false);const ipa=$('ipa').files[0];if(!ipa||ipa.size>MAX_IPA_BYTES)return;
   const epoch=previewEpoch;
   $('app-name').textContent=ipa.name.replace(/\.(ipa|tipa)$/i,'');$('app-preview').hidden=false;
-  const finish=()=>{clearTimeout(previewTimer);previewWorker?.terminate();previewWorker=null;};
-  try{
-    previewWorker=new Worker('/assets/preview-worker.js');
-    previewWorker.onmessage=event=>{
-      if(epoch!==previewEpoch)return;finish();const data=event.data;
-      if(data?.type!=='preview')return;
-      if(typeof data.name==='string'&&data.name.trim())$('app-name').textContent=data.name.slice(0,160);
-      const fallback=({'com.nulldev85.NullSports.iOS':'/assets/app-icons/lineup.png','com.nulldev85.NullSports':'/assets/app-icons/lineup.png','com.elmat.NullSign':'/assets/app-icons/nullsign.png'})[data.bundle]||null;
-      const source=typeof data.iconDataURL==='string'&&data.iconDataURL.startsWith('data:image/png;base64,')&&data.iconDataURL.length<=12*1024**2?data.iconDataURL:null;
-      displayAppIcon(source,fallback,epoch);
+  const render=data=>{
+    if(typeof data.name==='string'&&data.name.trim())$('app-name').textContent=data.name.slice(0,160);
+    const fallback=({'com.nulldev85.NullSports.iOS':'/assets/app-icons/lineup.png','com.nulldev85.NullSports':'/assets/app-icons/lineup.png','com.elmat.NullSign':'/assets/app-icons/nullsign.png'})[data.bundle];
+    const source=typeof data.iconDataURL==='string'&&data.iconDataURL.startsWith('data:image/png;base64,')&&data.iconDataURL.length<=12*1024**2?data.iconDataURL:null;
+    displayAppIcon(data.preferredSource||source,fallback?fallback+'?v='+PREVIEW_ASSET_VERSION:null,epoch,value=>{data.preferredSource=value;});
+  };
+  const cached=previewMetadataCache.get(ipa);if(cached){render(cached);return;}
+  const read=attempt=>{
+    let reader;
+    const failed=()=>{
+      if(epoch!==previewEpoch||(reader&&previewWorker!==reader))return;
+      clearTimeout(previewTimer);reader?.terminate();previewWorker=null;
+      if(attempt===0)read(1);
     };
-    previewWorker.onerror=()=>{if(epoch===previewEpoch)finish();};
-    previewWorker.postMessage({type:'preview',ipa});
-    previewTimer=setTimeout(()=>{if(epoch===previewEpoch)finish();},15000);
-  }catch{finish();}
+    try{
+      reader=ensurePreviewWorker();
+      reader.onmessage=event=>{
+        const data=event.data;if(epoch!==previewEpoch||data?.requestId!==epoch||previewWorker!==reader)return;
+        clearTimeout(previewTimer);reader.onerror=()=>{if(previewWorker===reader){reader.terminate();previewWorker=null;}};
+        if(data.type!=='preview')return;
+        const metadata={name:data.name,bundle:data.bundle,iconDataURL:data.iconDataURL};
+        previewMetadataCache.set(ipa,metadata);render(metadata);
+      };
+      reader.onerror=failed;reader.postMessage({type:'preview',requestId:epoch,ipa});
+      previewTimer=setTimeout(()=>{if(epoch===previewEpoch&&previewWorker===reader){reader.terminate();previewWorker=null;}},60000);
+    }catch{failed();}
+  };
+  read(0);
 }
 function showSignerView(view){
   const tutorial=view==='tutorials';
   $('signer-panel').hidden=tutorial;$('tutorials-panel').hidden=!tutorial;
   $('signer-tab').setAttribute('aria-pressed',String(!tutorial));$('tutorials-tab').setAttribute('aria-pressed',String(tutorial));
-  if(!tutorial&&$('app-icon').src&&!$('app-icon').hidden){const icon=$('app-icon');if(icon.complete&&icon.naturalWidth>0)icon.onload?.();else if(typeof icon.decode==='function')icon.decode().then(()=>icon.onload?.()).catch(()=>{});}
   measure();
 }
 function clearInputs(){fields.forEach(id=>{$(id).value='';});updateFileNames();syncActionHints();}
 function busy(value){fields.forEach(id=>{$(id).disabled=value;});$('sign').disabled=value;$('sign').textContent=value?'Signing…':'Sign IPA';$('cancel').hidden=!value;syncActionHints();}
 function stop(){clearTimeout(timer);worker?.terminate();worker=null;upload?.abort();upload=null;busy(false);$('upload-progress').hidden=true;}
 function clearJob(){job=null;$('install').hidden=true;$('hosted-actions').hidden=true;$('prepare').hidden=false;$('prepare').disabled=false;$('prepare').textContent='Prepare install';}
+function updateUploadProgress(fraction,reset=false){
+  const progress=$('upload-progress');
+  const value=Number.isFinite(fraction)?Math.min(1,Math.max(0,fraction)):0;
+  const measured=reset?value:Math.max(uploadFraction,value);uploadFraction=measured;
+  const previousPercent=Math.floor(progress.value||0),percent=Math.floor(measured*100);
+  progress.value=measured*100;if(reset||percent!==previousPercent)progress.setAttribute('aria-valuenow',String(percent));
+  $('upload-progress-fill').style.transform='scaleX('+measured+')';
+  return percent;
+}
 function reset(){stop();clearInputs();clearAppPreview();signed=null;if(downloadURL)URL.revokeObjectURL(downloadURL);downloadURL=null;clearJob();$('result').hidden=true;$('sign-form').hidden=false;status('');showSignerView('signer');}
 window.addEventListener('pagehide',()=>{stop();clearInputs();clearAppPreview();if(downloadURL)URL.revokeObjectURL(downloadURL);});
 window.addEventListener('message',event=>{if(event.origin===PARENT&&event.source===window.parent&&event.data?.type==='null-websigner-cancel')reset();});
 document.querySelectorAll('[data-signer-view]').forEach(button=>button.addEventListener('click',()=>showSignerView(button.dataset.signerView)));
 fields.forEach(id=>{for(const type of ['input','change'])$(id).addEventListener(type,()=>{updateFileNames();syncActionHints();});});
 $('ipa').addEventListener('change',previewApp);
+$('ipa').addEventListener('pointerdown',warmPreviewWorker,{passive:true});
+$('ipa').addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' ')warmPreviewWorker();});
 window.addEventListener('focus',syncActionHints);
 document.addEventListener('visibilitychange',syncActionHints);
 syncActionHints();
@@ -106,13 +164,15 @@ $('sign-form').addEventListener('submit',event=>{
 $('prepare').addEventListener('click',()=>{
   if(!signed||upload)return;
   $('prepare').disabled=true;$('prepare').textContent='Uploading…';status('Uploading the signed IPA only…');
-  const progress=$('upload-progress');progress.value=0;progress.hidden=false;
+  const progress=$('upload-progress');updateUploadProgress(0,true);progress.hidden=false;
   const xhr=new XMLHttpRequest();upload=xhr;
+  let reportedPercent=-1;
   xhr.open('POST','/api/uploads');xhr.setRequestHeader('Content-Type','application/octet-stream');xhr.timeout=900000;
-  xhr.upload.onprogress=event=>{if(event.lengthComputable){progress.value=Math.floor(event.loaded/event.total*100);status(progress.value<100?'Uploading signed IPA… '+progress.value+'%':'Checking the uploaded IPA…');}};
-  const failure=text=>{upload=null;progress.hidden=true;$('prepare').disabled=false;$('prepare').textContent='Prepare install';status(text);};
+  xhr.upload.onprogress=event=>{if(upload===xhr&&event.lengthComputable&&event.total>0){const percent=updateUploadProgress(event.loaded/event.total);if(percent!==reportedPercent){reportedPercent=percent;status(percent<100?'Uploading signed IPA… '+percent+'%':'Checking the uploaded IPA…');}}};
+  const failure=text=>{if(upload!==xhr)return;upload=null;progress.hidden=true;$('prepare').disabled=false;$('prepare').textContent='Prepare install';status(text);};
   xhr.onerror=()=>failure('The upload failed. Please try again.');xhr.ontimeout=()=>failure('The upload timed out. Please try again.');xhr.onabort=()=>failure('Upload cancelled.');
   xhr.onload=()=>{
+    if(upload!==xhr)return;
     let data;try{data=JSON.parse(xhr.responseText);}catch{failure('The server returned an invalid response.');return;}
     if(xhr.status!==201){failure(data.error||'The signed IPA could not be uploaded.');return;}
     if(!/^[a-f0-9]{64}$/.test(data.token)||typeof data.deleteToken!=='string'||!Number.isInteger(data.expires)){failure('The server returned an invalid installation link.');return;}

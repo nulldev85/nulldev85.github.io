@@ -14,7 +14,7 @@ import stat
 import struct
 import time
 from contextlib import asynccontextmanager, suppress
-from urllib.parse import quote, urlsplit
+from urllib.parse import parse_qs, quote, urlsplit
 import zipfile
 
 from starlette.applications import Starlette
@@ -168,12 +168,17 @@ class Headers:
             return await self.app(scope, receive, send)
         async def secured(message):
             if message['type'] == 'http.response.start':
+                # Only versioned public preview assets may be cached. Uploaded
+                # IPAs, capability links, manifests, API and HTML stay no-store.
+                preview_assets={'/assets/preview-worker.js','/assets/zip-check.js','/assets/app-metadata.js','/assets/vendor/fflate-0.8.3.js','/assets/app-icons/lineup.png','/assets/app-icons/nullsign.png'}
+                version=parse_qs(scope.get('query_string',b'').decode('ascii','ignore')).get('v',[''])[0]
+                cache='public, max-age=31536000, immutable' if message['status']==200 and scope['path'] in preview_assets and re.fullmatch(r'[a-zA-Z0-9._-]{1,64}',version) else 'no-store'
                 extra = {
                     'X-Content-Type-Options': 'nosniff',
                     'Referrer-Policy': 'no-referrer',
                     'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
                     'Strict-Transport-Security': 'max-age=31536000',
-                    'Cache-Control': 'no-store',
+                    'Cache-Control': cache,
                     'Content-Security-Policy': "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; style-src 'self'; img-src 'self' blob: data:; base-uri 'none'; object-src 'none'; form-action 'none'; frame-src 'none'; frame-ancestors "+PARENT,
                 }
                 headers = [(k,v) for k,v in message.get('headers', []) if k.lower() not in {n.lower().encode() for n in extra}]
