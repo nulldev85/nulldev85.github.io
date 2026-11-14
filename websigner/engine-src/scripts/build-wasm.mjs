@@ -148,8 +148,8 @@ if (selectedVariant !== "opfs") {
     linkVariant(memoryObjects, "zsign.mjs", memoryFlags);
   }
   if (selectedVariant === "all" || selectedVariant === "mobile") {
-    linkVariant(memoryObjects, "zsign-mobile.mjs", memoryFlags, 17432576, 536870912);
-    linkVariant(memoryObjects, "zsign-mobile.js", memoryFlags, 17432576, 536870912, false);
+    linkVariant(memoryObjects, "zsign-mobile.mjs", memoryFlags, 17432576, 2147483648);
+    linkVariant(memoryObjects, "zsign-mobile.js", memoryFlags, 17432576, 2147483648, false);
   }
 }
 

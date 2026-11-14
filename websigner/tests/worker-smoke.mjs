@@ -19,7 +19,7 @@ for(const [name,mutate] of [
  ['unsafe path',b=>b.write('../',central+46)],
  ['symbolic link',b=>b.writeUInt32LE(0xa1ff0000,central+38)],
  ['ZIP64',b=>b.writeUInt16LE(65535,end+10)],
- ['expanded size',b=>b.writeUInt32LE(250*1024**2,central+24)],
+ ['expanded size',b=>b.writeUInt32LE(769*1024**2,central+24)],
  ['encryption',b=>b.writeUInt16LE(1,central+8)],
  ['invalid local offset',b=>b.writeUInt32LE(central,central+42)],
 ]){

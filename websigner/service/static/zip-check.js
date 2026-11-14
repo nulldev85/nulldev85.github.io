@@ -1,7 +1,7 @@
 /* Bounded ZIP directory preflight. No extraction, network, or credentials. */
 async function checkIPA(file) {
-  const MAX_INPUT=128*1024*1024, MAX_EXPANDED=240*1024*1024;
-  if (!file || file.size<22 || file.size>MAX_INPUT) throw new Error('Choose an IPA no larger than 128 MB.');
+  const MAX_INPUT=512*1024*1024, MAX_EXPANDED=768*1024*1024;
+  if (!file || file.size<22 || file.size>MAX_INPUT) throw new Error('Choose an IPA no larger than 512 MB.');
   const tail=new Uint8Array(await file.slice(Math.max(0,file.size-65557)).arrayBuffer());
   const view=new DataView(tail.buffer,tail.byteOffset,tail.byteLength);
   let end=-1;

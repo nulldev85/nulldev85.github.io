@@ -11,7 +11,14 @@
     "fail_closed_when_CMS_signature_generation_fails"
   ],
   "browser_artifacts": {
-    "zsign-mobile.js": "80b2981105961ad3e9469986b1b59a735554d92afbca40a0c675987337f997d7",
-    "zsign-mobile.wasm": "c532d99142b418af1c5406f90acccb02499f8ec45d022063d2564f2bad16fc86"
+    "zsign-mobile.js": "4f7812c8ba777d23436dfd0ebbcc3b56236f911c04d57696c47d3c34a510f3b2",
+    "zsign-mobile.wasm": "1477955da105fa3b861b9042035b2db04b0d6c182d84d96d987615cfc1d14296"
+  },
+  "limits": {
+    "inputBytes": 536870912,
+    "expandedBytes": 805306368,
+    "initialWasmMemoryBytes": 17432576,
+    "maximumWasmMemoryBytes": 2147483648,
+    "signedUploadBytes": 838860800
   }
 }

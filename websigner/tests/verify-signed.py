@@ -19,7 +19,7 @@ def slices(binary):
             yield binary[off:off+size]
     else: yield binary
 
-def verify(binary,index):
+def verify(binary,index,resources=None):
     total=0
     for arch in slices(binary):
         assert arch[:4] in (b'\xcf\xfa\xed\xfe',b'\xce\xfa\xed\xfe')
@@ -50,6 +50,9 @@ def verify(binary,index):
             assert page<=24 and limit<=len(arch)
             assert nslots==math.ceil(limit/(1<<page))
             algorithm={1:'sha1',2:'sha256',3:'sha256',4:'sha384'}[kind]
+            if resources is not None:
+                assert u32(cd,24)>=3
+                assert cd[hash_off-3*hash_size:hash_off-2*hash_size]==hashlib.new(algorithm,resources).digest()[:hash_size], 'CodeResources binding mismatch'
             for j in range(nslots):
                 expected=hashlib.new(algorithm,arch[j*(1<<page):min((j+1)*(1<<page),limit)]).digest()[:hash_size]
                 assert cd[hash_off+j*hash_size:hash_off+(j+1)*hash_size]==expected, 'Code page hash mismatch'
@@ -76,7 +79,9 @@ with zipfile.ZipFile(root/(sys.argv[1] if len(sys.argv)>1 else 'signed.ipa')) as
         with signed.open(item) as f: magic=f.read(4)
         if magic in (b'\xcf\xfa\xed\xfe',b'\xce\xfa\xed\xfe',b'\xca\xfe\xba\xbe',b'\xca\xfe\xba\xbf'):
             try:
-                architectures+=verify(signed.read(item),verified);verified+=1
+                resource_path=item.filename.rsplit('/',1)[0]+'/_CodeSignature/CodeResources'
+                resources=signed.read(resource_path) if resource_path in signed.namelist() else None
+                architectures+=verify(signed.read(item),verified,resources);verified+=1
             except AssertionError as error:
                 raise AssertionError(f'{item.filename}: {error}') from error
         elif item.filename.endswith('.deb') and item.filename in original.namelist():

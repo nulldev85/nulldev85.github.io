@@ -1,12 +1,13 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const fields=['ipa','certificate','profile','password'];
+const MAX_IPA_BYTES=512*1024**2;
 let worker=null,signed=null,downloadURL=null,upload=null,job=null,timer=null,activePress=null;
 const PARENT='https://nulldev85.github.io';
 if(window.top===window)document.body.classList.add('standalone');
 const status=text=>{$('status').textContent=text;syncActionHints();};
 function syncActionHints(){
-  const selected=['ipa','certificate','profile'].every(id=>$(id).files?.length>0);
+  const selected=['ipa','certificate','profile'].every(id=>$(id).files?.length>0)&&$('ipa').files[0].size<=MAX_IPA_BYTES;
   $('sign').classList.toggle('is-ready',selected&&!$('sign').disabled&&!$('sign-form').hidden);
   $('prepare').classList.toggle('is-ready',!!signed&&!job&&!upload&&!$('prepare').disabled&&!$('result').hidden);
   $('install').classList.toggle('is-ready',!!job&&job.expires*1000>Date.now()&&!$('install').hidden);
@@ -39,7 +40,7 @@ $('sign-form').addEventListener('submit',event=>{
   event.preventDefault();if(worker)return;
   const ipa=$('ipa').files[0],certificate=$('certificate').files[0],profile=$('profile').files[0],password=$('password').value;
   if(!ipa||!certificate||!profile){status('Choose an IPA, certificate and provisioning profile.');return;}
-  if(ipa.size>128*1024**2){status('Choose an IPA no larger than 128 MB.');return;}
+  if(ipa.size>MAX_IPA_BYTES){status('Choose an IPA no larger than 512 MB.');return;}
   busy(true);clearJob();$('result').hidden=true;
   try{
     worker=new Worker('/assets/worker.js');
@@ -66,7 +67,7 @@ $('prepare').addEventListener('click',()=>{
   $('prepare').disabled=true;$('prepare').textContent='Uploading…';status('Uploading the signed IPA only…');
   const progress=$('upload-progress');progress.value=0;progress.hidden=false;
   const xhr=new XMLHttpRequest();upload=xhr;
-  xhr.open('POST','/api/uploads');xhr.setRequestHeader('Content-Type','application/octet-stream');xhr.timeout=180000;
+  xhr.open('POST','/api/uploads');xhr.setRequestHeader('Content-Type','application/octet-stream');xhr.timeout=900000;
   xhr.upload.onprogress=event=>{if(event.lengthComputable){progress.value=Math.floor(event.loaded/event.total*100);status(progress.value<100?'Uploading signed IPA… '+progress.value+'%':'Checking the uploaded IPA…');}};
   const failure=text=>{upload=null;progress.hidden=true;$('prepare').disabled=false;$('prepare').textContent='Prepare install';status(text);};
   xhr.onerror=()=>failure('The upload failed. Please try again.');xhr.ontimeout=()=>failure('The upload timed out. Please try again.');xhr.onabort=()=>failure('Upload cancelled.');
