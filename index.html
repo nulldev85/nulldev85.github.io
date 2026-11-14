@@ -101,7 +101,7 @@
 
     /* Apps: two cards side by side, so all of them are in view as the
        page opens. What each app does is a dialog away, like its notes. */
-    .apps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 8px 0 20px; }
+    .apps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 20px; padding: 8px 0 20px; }
     .app { display: flex; flex-direction: column; min-width: 0; padding: 20px 22px 18px; border: 1px solid var(--line); border-radius: 14px; background: transparent; scroll-margin-top: calc(var(--top) + 8px); }
     .app-head { position: relative; display: flex; align-items: center; gap: 14px; }
     .app-icon { position: relative; display: block; flex: 0 0 auto; width: 48px; height: 48px; overflow: hidden; border-radius: 11px; background: transparent; }
@@ -232,17 +232,17 @@
 
     /* Header actions sit on opposite sides of the centered Apple mark. */
     .site-top { position: relative; flex: 0 0 auto; min-height: 64px; padding: 8px 16px 4px; }
-    .site-top .signer-launch { position: absolute; top: 8px; left: 16px; z-index: 24; min-width: 110px; height: 44px; padding: 0 12px; gap: 8px; border-radius: 12px; font-size: 12px; }
+    .site-top .signer-launch { position: absolute; top: 8px; left: 16px; z-index: 24; width: 116px; min-width: 116px; height: 44px; padding: 0 12px; gap: 8px; border-radius: 12px; font-size: 12px; }
     .site-top .signer-launch svg { display: block; width: 16px; height: 16px; }
     .signer-frame { display: block; width: 100%; height: 640px; border: 0; background: transparent; }
     /* Lay out the lightweight form before the first tap, without exposing it. */
     #web-signer:not([open]) { display: block; visibility: hidden; pointer-events: none; }
     #web-signer[open] { animation: none; }
     .site-menu { position: relative; z-index: 24; width: max-content; max-width: 100%; margin-left: auto; }
-    .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; width: max-content; min-width: 110px; margin-left: auto; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; font-size: 12px; list-style: none; }
+    .menu-toggle { display: flex; align-items: center; justify-content: center; gap: 8px; width: 116px; min-width: 116px; height: 44px; margin-left: auto; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: transparent; font-size: 12px; list-style: none; }
     .menu-toggle::-webkit-details-marker, .help-toggle::-webkit-details-marker { display: none; }
     .menu-toggle svg { width: 16px; height: 16px; }
-    @media (max-width: 360px) { .menu-toggle svg, .site-top .signer-launch svg { display: none; } }
+    .menu-toggle .apple-tv-box { width: 22px; height: 22px; }
     .install-needs { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; line-height: 1.6; }
     .install-steps { padding-left: 24px; margin: 18px 0; }
     .install-steps li { padding-left: 4px; margin: 0 0 18px; font-size: 14px; line-height: 1.6; }
@@ -347,7 +347,15 @@
   <header class="site-top">
     <button class="notes-button signer-launch" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5 5 5M4 20l4-1 12-12a2.1 2.1 0 0 0-3-3L5 16l-1 4ZM13 20h7"/></svg>Web signer</button>
   <div class="site-menu">
-    <button class="menu-toggle" type="button" data-open-dialog="appletv-install" aria-haspopup="dialog" aria-controls="appletv-install"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Apple TV Guide</button>
+    <button class="menu-toggle" type="button" data-open-dialog="appletv-install" aria-label="Apple TV Guide" aria-haspopup="dialog" aria-controls="appletv-install">
+      <svg class="apple-tv-box" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <defs><linearGradient id="atv-shell" x1="16" y1="8" x2="16" y2="30" gradientUnits="userSpaceOnUse"><stop stop-color="#313134"/><stop offset="1" stop-color="#09090a"/></linearGradient><linearGradient id="atv-top" x1="8" y1="3" x2="25" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#29292c"/><stop offset="1" stop-color="#111113"/></linearGradient></defs>
+        <rect x="3" y="7" width="26" height="23" rx="5.5" fill="url(#atv-shell)" stroke="currentColor" stroke-opacity=".5"/>
+        <rect x="3" y="3" width="26" height="23" rx="5.5" fill="url(#atv-top)" stroke="currentColor" stroke-opacity=".6"/>
+        <g transform="translate(8.7 8.3) scale(.29)" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></g>
+        <text x="16.8" y="15.3" fill="currentColor" font-family="system-ui,-apple-system,sans-serif" font-size="6.3" font-weight="700">tv</text><circle cx="24.5" cy="27.7" r=".6" fill="currentColor"/>
+      </svg><span>Guide</span>
+    </button>
   </div>
     <a class="float-mark" href="#top" aria-label="Back to top">
       <img class="mark-logo" src="assets/apple-mark.svg?v=cream" width="24" height="24" alt="">
