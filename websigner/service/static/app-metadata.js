@@ -83,7 +83,7 @@ async function normalizeAppIcon(bytes){
   if(ihdr[8]!==8||![2,6].includes(ihdr[9])||ihdr[12]!==0)throw new Error('Unsupported optimized PNG');
   const channels=ihdr[9]===6?4:3,stride=info.width*channels;
   const idats=info.chunks.filter(c=>c.type==='IDAT').map(c=>c.data),total=idats.reduce((n,b)=>n+b.length,0),compressed=new Uint8Array(total);let at=0;for(const part of idats){compressed.set(part,at);at+=part.length;}
-  const raw=await decompressBounded(compressed,'deflate-raw',(stride+1)*info.height);
+  const raw=fflate.inflateSync(compressed,{out:new Uint8Array((stride+1)*info.height)});
   if(raw.length!==(stride+1)*info.height)throw new Error('Invalid icon pixels');
   const pixels=new Uint8Array(stride*info.height);
   const paeth=(a,b,c)=>{const p=a+b-c,pa=Math.abs(p-a),pb=Math.abs(p-b),pc=Math.abs(p-c);return pa<=pb&&pa<=pc?a:pb<=pc?b:c;};
@@ -96,7 +96,7 @@ async function normalizeAppIcon(bytes){
     const i=y*stride+x*channels,o=y*(stride+1)+1+x*channels,a=channels===4?pixels[i+3]:255;
     standard[o]=a?Math.min(255,Math.round(pixels[i+2]*255/a)):0;standard[o+1]=a?Math.min(255,Math.round(pixels[i+1]*255/a)):0;standard[o+2]=a?Math.min(255,Math.round(pixels[i]*255/a)):0;if(channels===4)standard[o+3]=a;
   }
-  const encoded=new Uint8Array(await new Response(new Blob([standard]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());
+  const encoded=fflate.zlibSync(standard,{level:1});
   const parts=[pngMagic,pngChunk('IHDR',ihdr),pngChunk('IDAT',encoded),pngChunk('IEND',new Uint8Array())],out=new Uint8Array(parts.reduce((n,b)=>n+b.length,0));at=0;for(const part of parts){out.set(part,at);at+=part.length;}return out;
 }
 async function readAppMetadata(file){
@@ -112,4 +112,8 @@ async function readAppMetadata(file){
   for(const candidate of candidates.slice(0,12)){try{const data=await readIPAEntry(file,candidate,2*1024**2),png=pngInfo(data);if(png.width*png.height>area){icon=data;area=png.width*png.height;}}catch{}}
   if(icon){try{icon=await normalizeAppIcon(icon);}catch{icon=null;}}
   return {name,bundle:text(info.CFBundleIdentifier),version:text(info.CFBundleShortVersionString),icon};
+}
+function appIconDataURL(bytes){
+  let binary='';for(let p=0;p<bytes.length;p+=32768)binary+=String.fromCharCode(...bytes.subarray(p,p+32768));
+  return 'data:image/png;base64,'+btoa(binary);
 }

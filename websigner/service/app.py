@@ -189,9 +189,9 @@ async def health(request):
 
 async def static(request):
     resource = request.path_params.get('resource', 'index.html')
-    if resource not in {'index.html','style.css','app.js','worker.js','zip-check.js','app-metadata.js','preview-worker.js','engine/zsign-mobile.js','engine/zsign-mobile.wasm','LICENSES.txt'}:
+    if resource not in {'index.html','style.css','app.js','worker.js','zip-check.js','app-metadata.js','preview-worker.js','vendor/fflate-0.8.3.js','app-icons/lineup.png','app-icons/nullsign.png','engine/zsign-mobile.js','engine/zsign-mobile.wasm','LICENSES.txt'}:
         return Response(status_code=404)
-    types = {'.html':'text/html', '.css':'text/css', '.js':'text/javascript', '.wasm':'application/wasm', '.txt':'text/plain'}
+    types = {'.html':'text/html', '.css':'text/css', '.js':'text/javascript', '.wasm':'application/wasm', '.txt':'text/plain', '.png':'image/png'}
     path = STATIC / resource
     if not path.is_file(): return Response(status_code=404)
     return FileResponse(path, media_type=types[path.suffix])

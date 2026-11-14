@@ -1,0 +1,20 @@
+{
+  "fflate": {
+    "version": "0.8.3",
+    "source": "https://github.com/101arrowz/fflate",
+    "tarball": "https://registry.npmjs.org/fflate/-/fflate-0.8.3.tgz",
+    "integrity": "sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==",
+    "vendoredSHA256": "f106cc078939c5e52f0e17bebaa14a6878a22d99c1c4c0fbe33eb0164b9270e1",
+    "usage": "Synchronous raw-DEFLATE with preallocated output and zlib PNG encoding; not ZIP parsing or streaming codecs."
+  },
+  "fallbackAppIcons": {
+    "lineup": {
+      "source": "https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/lineup.png",
+      "sha256": "706780ad47455cfc151802fea1a6efb743564812e11b2ba4107e8ebf0a615735"
+    },
+    "nullsign": {
+      "source": "https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/nullsign.png",
+      "sha256": "e8796e0af5295dcf5cf2a346a9f9dc06bc2b177d1f71047442a23ab985d5635c"
+    }
+  }
+}

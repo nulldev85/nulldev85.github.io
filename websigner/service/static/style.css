@@ -7,12 +7,14 @@ main { padding:2px; }
 p { margin:8px 0 14px; }
 .intro { margin-top:8px; }
 .app-preview { display:flex; align-items:center; gap:12px; padding:12px; margin:0 0 16px; border:1px solid var(--line); border-radius:12px; background:transparent; }
-.app-art { flex:0 0 56px; width:56px; height:56px; overflow:hidden; border:1px solid var(--line); border-radius:12px; }
-.app-art img, .app-art svg { display:block; width:100%; height:100%; object-fit:contain; }
+.app-art { position:relative; flex:0 0 56px; width:56px; height:56px; overflow:hidden; border:1px solid var(--line); border-radius:12px; }
+.app-art img, .app-art svg { position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:contain; }
+.app-art img { opacity:0; }
+.app-art img.is-decoded { opacity:1; }
 .app-art svg { padding:10px; }
 .app-info { min-width:0; }
 .app-info strong { font-size:16px; }
-.app-info strong, .app-info span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.app-info strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .signer-views { display:flex; gap:8px; margin:8px 0 16px; }
 .signer-views .button { flex:1; }
 .signer-views [aria-pressed=true] { border-color:rgba(224,185,108,.55); box-shadow:inset 0 -2px 0 rgba(224,185,108,.45); }
