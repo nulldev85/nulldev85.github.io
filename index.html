@@ -10,6 +10,7 @@
   <title>Null’s Apps</title>
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
   <link rel="preconnect" href="https://signer.mateomedia.link">
   <style>
     :root {
@@ -188,9 +189,11 @@
     @media (max-width: 600px) { .autumn-leaf:nth-child(n+9) { display: none; } }
     @media (prefers-reduced-motion: reduce), print { .autumn-leaves { display: none; } }
 
-    /* Motion */
-    .has-js [data-project-card] { opacity: 0; transform: translateY(10px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
-    .has-js [data-project-card].is-visible { opacity: 1; transform: none; }
+    /* Motion. Both cards are in view as the page opens, so they rise in from
+       the first paint, without waiting on script or flickering once it runs. */
+    [data-project-card] { animation: card-in .6s cubic-bezier(.2,.7,.2,1) backwards; }
+    [data-project-card] + [data-project-card] { animation-delay: .06s; }
+    @keyframes card-in { from { opacity: 0; transform: translateY(10px); } }
     @keyframes dialog-in { from { opacity: 0; transform: translateY(6px) scale(.99); } }
 
     /* Raised at rest, visibly depressed on touch, mouse and keyboard presses. */
@@ -344,17 +347,17 @@
     @media (prefers-reduced-motion: reduce) {
       html, body { scroll-behavior: auto; }
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-      .has-js [data-project-card] { opacity: 1; transform: none; }
+      [data-project-card] { animation: none; }
       :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle):is(.is-pointer-pressed, .is-key-pressed) { transform: translateY(3px); }
     }
   </style>
 </head>
 <body>
   <header class="site-top">
-    <button class="notes-button signer-launch" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer"><span class="device-image iphone-device" aria-hidden="true"><img src="assets/iphone-hardware.png" width="120" height="240" alt=""></span>Web signer</button>
+    <button class="notes-button signer-launch" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer"><span class="device-image iphone-device" aria-hidden="true"><img src="assets/iphone-hardware.png" width="60" height="120" alt=""></span>Web signer</button>
   <div class="site-menu">
     <button class="menu-toggle" type="button" data-open-dialog="appletv-install" aria-label="Apple TV Guide" aria-haspopup="dialog" aria-controls="appletv-install">
-      <span class="device-image apple-tv-box" aria-hidden="true"><img src="assets/apple-tv-device.png" width="160" height="160" alt=""></span><span>Guide</span>
+      <span class="device-image apple-tv-box" aria-hidden="true"><img src="assets/apple-tv-device.png" width="144" height="144" alt=""></span><span>Guide</span>
     </button>
   </div>
     <a class="float-mark" href="#top" aria-label="Back to top">
@@ -380,7 +383,7 @@
     <div class="apps">
       <article class="app" id="lineup" data-project-card aria-labelledby="lineup-name">
         <header class="app-head">
-          <span class="app-icon"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/lineup.png" alt="" width="56" height="56"></span>
+          <span class="app-icon"><img src="assets/lineup-icon.png" alt="" width="56" height="56"></span>
           <div class="app-title"><h2 class="app-name" id="lineup-name">Lineup</h2><p class="app-kind">Live sports · iPhone &amp; Apple TV</p></div>
         </header>
         <div class="app-body" id="lineup-details">
@@ -416,7 +419,7 @@
 
 <article class="app" id="nullsign" data-project-card aria-labelledby="nullsign-name">
         <header class="app-head">
-          <span class="app-icon"><img src="https://raw.githubusercontent.com/nulldev85/AppSource/main/icons/nullsign.png" alt="" width="56" height="56" loading="lazy"></span>
+          <span class="app-icon"><img src="assets/nullsign-icon.png" alt="" width="56" height="56"></span>
           <div class="app-title"><h2 class="app-name" id="nullsign-name">NullSign</h2><p class="app-kind">iOS signing &amp; install</p></div>
         </header>
         <div class="app-body" id="nullsign-details">
@@ -580,7 +583,6 @@
   <script src="release-notes.js?v=1"></script>
   <script>
     (() => {
-      document.documentElement.classList.add("has-js");
       const controls = ".download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle";
       // Explicit held state also works on touch browsers that omit :active.
       let heldPointer = null;
@@ -639,14 +641,6 @@
       document.querySelectorAll(".download").forEach(link => link.addEventListener("click", event => {
         if (!event.defaultPrevented && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) announceAction("Opening IPA download…");
       }));
-      const cards = [...document.querySelectorAll("[data-project-card]")];
-      if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        const observer = new IntersectionObserver(entries => entries.forEach(entry => {
-          if (entry.isIntersecting) { entry.target.classList.add("is-visible"); observer.unobserve(entry.target); }
-        }), { rootMargin: "0px 0px -8% 0px" });
-        cards.forEach(card => observer.observe(card));
-      } else cards.forEach(card => card.classList.add("is-visible"));
-
       const appSourceURL = "https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json";
       const formatReleaseTime = value => {
         const date = value instanceof Date ? value : new Date(value || "");
@@ -809,7 +803,8 @@
         });
       };
       const feedStatus = document.querySelector("[data-feed-status]");
-      fetch(appSourceURL, { cache: "no-store" }).then(response => {
+      // Always checked with GitHub, but an unchanged feed isn't downloaded again.
+      fetch(appSourceURL, { cache: "no-cache" }).then(response => {
         if (!response.ok) throw new Error("AppSource unavailable");
         return response.json();
       }).then(feed => {
