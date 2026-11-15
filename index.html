@@ -552,22 +552,27 @@
       <div class="dialog-body">
         <header class="dialog-head"><div><p class="dialog-kicker">NullSign on iPhone → Apple TV</p><h2 id="appletv-install-title" tabindex="-1" autofocus>Sideload onto Apple TV</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="Close Apple TV guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
         <div class="dialog-content">
-          <p class="install-needs">You need NullSign on your iPhone, a <strong>tvOS IPA</strong>, and a <strong>tvOS signing certificate and profile</strong> valid for your Apple TV. Your iPhone profile alone won’t work. Browse certificates: <a href="https://flarestore.vip/" target="_blank" rel="noopener noreferrer">Flarestore ↗</a> · <a href="https://arcticsign.app/" target="_blank" rel="noopener noreferrer">Arcticsign ↗</a>. Use your Apple TV’s UDID. Confirm tvOS support with Arcticsign before ordering.</p>
+          <p class="install-needs">You need <strong>NullSign 2.0</strong> on your iPhone, a <strong>tvOS IPA</strong>, and a <strong>tvOS signing certificate and profile</strong> valid for your Apple TV. Your iPhone profile alone won’t work. Browse certificates: <a href="https://flarestore.vip/" target="_blank" rel="noopener noreferrer">Flarestore ↗</a> · <a href="https://arcticsign.app/" target="_blank" rel="noopener noreferrer">Arcticsign ↗</a>. Use your Apple TV’s UDID. Confirm tvOS support with Arcticsign before ordering.</p>
           <ol class="install-steps">
-            <li><strong>Connect both devices.</strong><p>Put your iPhone and Apple TV on the same network. Keep Apple TV awake.</p></li>
+            <li><strong>Connect both devices.</strong><p>Put your iPhone and Apple TV on the same Wi-Fi network. Keep Apple TV awake.</p></li>
             <li><strong>Open pairing on Apple TV.</strong><p>Go to Settings → Remotes and Devices → Remote App and Devices. Leave that screen open.</p></li>
-            <li><strong>Pair in NullSign.</strong><p>On iPhone, open NullSign → Settings → Installation Method → Apple TV / Tunnel. Select your TV, enter its six-digit code and tap Pair.</p></li>
-            <li><strong>Add your TV certificate.</strong><p>In NullSign, open Settings → Certificates → +. Add your .p12, its tvOS .mobileprovision and password, then tap Save.</p></li>
-            <li><strong>Import a tvOS app.</strong><p>Download the Apple TV IPA for the app you want. In NullSign’s Signer tab, tap Import → Import from Files and select it.</p></li>
-            <li><strong>Install it.</strong><p>Tap the imported app’s Install action. Keep NullSign open until it finishes, then open the app on Apple TV.</p></li>
+            <li><strong>Pair in NullSign.</strong><p>On iPhone, open NullSign → Settings → Apple TV. Allow Local Network access when iOS asks. Tap your TV, enter the six-digit code it shows and tap Pair. NullSign remembers the pairing, so you only do this once.</p></li>
+            <li><strong>Add your TV certificate.</strong><p>Open Settings → Certificates → +. Add your .p12, its tvOS .mobileprovision and password, then tap Save. Certificates that can sign Apple TV apps show a tvOS tag.</p></li>
+            <li><strong>Get a tvOS app.</strong><p>For Lineup, open the Apps tab, find Lineup tvOS in Null’s Apps and tap Get. For any other app, download its Apple TV IPA, then in the Signer tab tap + → Import from Files and select it.</p></li>
+            <li><strong>Sign and install.</strong><p>In the Signer tab, tap Sign on the app. NullSign picks your tvOS certificate for Apple TV apps. Tap Start Signing: NullSign signs the app and installs it on your Apple TV over Wi-Fi. Keep NullSign open until the card says On Apple TV, then open the app from your Apple TV’s Home Screen.</p></li>
           </ol>
           <details class="install-trouble">
             <summary class="help-toggle">If your TV doesn’t appear</summary>
-            <p>Keep Remote App and Devices open on TV. Check both devices are on the same network, allow NullSign’s Local Network permission in iPhone Settings, then tap Scan or Refresh in NullSign.</p>
+            <p>Keep Remote App and Devices open on TV. Check both devices are on the same network, allow NullSign’s Local Network permission in iPhone Settings, then tap Scan or Refresh in Settings → Apple TV.</p>
             <p>Restarting your Apple TV and repeating the pairing steps can also help if NullSign still cannot find it.</p>
-            <p>Apple TV pairing does not need a VPN or an imported pairing file. Those controls are for the separate iPhone tunnel route.</p>
+            <p>Apple TV pairing does not need a VPN, a computer or an imported pairing file. Those are only for installing iPhone apps with the idevice installation type.</p>
           </details>
-          <p class="guide-note">Steps match NullSign 1.5.2. Use an Apple TV build of the app; an iPhone IPA won’t install on TV.</p>
+          <details class="install-trouble">
+            <summary class="help-toggle">If signing or installing stops</summary>
+            <p><strong>“Choose a certificate whose provisioning profile includes tvOS”:</strong> the selected certificate can’t sign Apple TV apps. On the Sign screen, tap the certificate and pick one with the tvOS tag, or add a tvOS certificate.</p>
+            <p><strong>“Pair an Apple TV in Settings”</strong> or <strong>“The paired Apple TV is offline”:</strong> open Settings → Apple TV. If it says Saved • looking nearby, wake your Apple TV and check it’s on the same Wi-Fi. If it still won’t connect, tap Forget and pair again.</p>
+          </details>
+          <p class="guide-note">Steps match NullSign 2.0. Use an Apple TV build of the app; an iPhone IPA won’t install on TV. iPhone apps keep installing on your iPhone as before.</p>
         </div>
       </div>
     </dialog>
