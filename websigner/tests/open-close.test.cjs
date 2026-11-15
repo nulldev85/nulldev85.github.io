@@ -4,7 +4,7 @@ const vm=require('node:vm');
 const assert=require('node:assert/strict');
 const {execFileSync}=require('node:child_process');
 const root=path.resolve(__dirname,'../..');
-const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const html=new TextDecoder('utf-8',{fatal:true}).decode(fs.readFileSync(path.join(root,'index.html')));
 const script=[...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].at(-1)[1];
 new vm.Script(script);
 assert.match(html,/<iframe[^>]+id="signer-frame"[^>]+src="https:\/\/signer\.mateomedia\.link\/"[^>]+loading="eager"/);
