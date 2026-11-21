@@ -178,23 +178,16 @@
     .menu-toggle .apple-tv-box { width: auto; height: 22px; }
     .apple-tv-box img { width: auto; height: 100%; }
 
-    /* Quiet intro header */
-    .page-intro {
-      margin-bottom: 24px;
-    }
-    .page-intro h1 {
-      margin: 0;
-      color: var(--text);
-      font-size: clamp(24px, 3vw, 30px);
-      font-weight: 650;
-      line-height: 1.2;
-      letter-spacing: -0.03em;
-    }
-    .page-intro p {
-      margin: 6px 0 0;
-      color: var(--text-2);
-      font-size: 15px;
-      line-height: 1.5;
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     /* Two-column app grid */
@@ -704,7 +697,7 @@
 
     /* Web Signer modal */
     #web-signer {
-      background: #0d0c0b;
+      background: var(--surface);
     }
     .signer-frame {
       display: block;
@@ -793,8 +786,6 @@
       .site-top-inner { min-height: 56px; gap: 8px; }
       .site-top .signer-launch,
       .menu-toggle { padding: 0 11px; gap: 6px; font-size: 12.5px; }
-      .page-intro { margin-bottom: 18px; }
-      .page-intro p { font-size: 14px; }
       .app { padding: 18px; border-radius: 14px; }
       .app-icon { width: 48px; height: 48px; border-radius: 12px; }
       .app-name { font-size: 19px; }
@@ -853,10 +844,7 @@
   </header>
 
   <main class="wrap" id="top">
-    <header class="page-intro">
-      <h1>Null’s Apps</h1>
-      <p>Lineup and NullSign for iPhone and Apple TV.</p>
-    </header>
+    <h1 class="sr-only">Null’s Apps</h1>
 
     <div class="apps">
       <article class="app" id="lineup" data-project-card aria-labelledby="lineup-name">
