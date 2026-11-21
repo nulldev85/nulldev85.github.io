@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#050609">
+  <meta name="theme-color" content="#09090b">
   <meta name="description" content="Lineup and NullSign for iPhone and Apple TV: what each app does, what changed in its latest build, and where to download it.">
   <meta property="og:title" content="Null’s Apps">
   <meta property="og:description" content="Lineup and NullSign for iPhone and Apple TV.">
@@ -15,30 +15,20 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #050609;
-      --bg-elevated: #0d1017;
-      --surface: rgba(18, 21, 30, 0.82);
-      --surface-solid: #11141d;
-      --surface-recessed: rgba(6, 8, 13, 0.62);
-      --surface-hover: rgba(255, 255, 255, 0.065);
-      --line: rgba(255, 255, 255, 0.085);
-      --line-strong: rgba(255, 255, 255, 0.15);
-      --line-hover: rgba(255, 255, 255, 0.24);
-      --text: #f5f7fb;
-      --text-body: #b8c0cf;
-      --text-2: #9ba5b8;
-      --text-3: #6f7a90;
-      --accent: #1c9bff;
-      --mint: #2bd9b8;
-      --crimson: #ff3b4e;
-      --focus: rgba(74, 174, 255, 0.9);
+      --bg: #09090b;
+      --surface: #111114;
+      --surface-subtle: #0d0d10;
+      --surface-hover: #1a1a1f;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-strong: rgba(255, 255, 255, 0.13);
+      --line-hover: rgba(255, 255, 255, 0.22);
+      --text: #f4f4f5;
+      --text-2: #a1a1aa;
+      --text-3: #71717a;
+      --focus: rgba(244, 244, 245, 0.75);
       --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui, "Segoe UI", sans-serif;
       --mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
-      --radius-card: 22px;
-      --radius-inner: 15px;
-      --radius-control: 11px;
-      --top: 72px;
+      --top: 64px;
     }
 
     * { box-sizing: border-box; }
@@ -58,44 +48,23 @@
       flex-direction: column;
       padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       color: var(--text);
-      background: var(--bg);
-      font: 450 15px/1.6 var(--sans);
+      background:
+        radial-gradient(65% 40% at 50% 0%, rgba(255, 255, 255, 0.04), transparent 72%),
+        var(--bg);
+      font: 400 15px/1.6 var(--sans);
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
 
-    /* Atmospheric dual-brand cinema backdrop + ultra-subtle studio grid */
-    .ambient-bg {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      overflow: hidden;
-      background:
-        radial-gradient(62% 48% at 16% -4%, rgba(255, 51, 71, 0.14), transparent 68%),
-        radial-gradient(58% 48% at 86% -2%, rgba(20, 139, 244, 0.15), transparent 68%),
-        radial-gradient(45% 40% at 50% 108%, rgba(43, 217, 184, 0.06), transparent 72%),
-        linear-gradient(180deg, #07090f 0%, #050609 42%, #050608 100%);
-    }
-    .ambient-bg::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px);
-      background-size: 28px 28px;
-      -webkit-mask-image: radial-gradient(ellipse 85% 65% at 50% 12%, #000 10%, transparent 82%);
-      mask-image: radial-gradient(ellipse 85% 65% at 50% 12%, #000 10%, transparent 82%);
-    }
-
-    ::selection { background: rgba(28, 155, 255, 0.34); color: #fff; }
+    ::selection { background: rgba(255, 255, 255, 0.2); color: #fff; }
     a { color: inherit; }
     button { font: inherit; color: inherit; }
     svg { flex: 0 0 auto; }
     img { -webkit-user-drag: none; user-select: none; }
 
     .wrap {
-      width: min(1100px, 100% - 40px);
+      width: min(980px, 100% - 40px);
       margin: 0 auto;
     }
 
@@ -103,68 +72,58 @@
       flex: 1 0 auto;
       display: flex;
       flex-direction: column;
-      padding-bottom: 36px;
+      justify-content: center;
+      padding: 28px 0 32px;
     }
 
-    /* Sticky glass navigation bar */
+    /* Minimal sticky top bar */
     .site-top {
       position: sticky;
       top: 0;
       z-index: 30;
       padding-top: env(safe-area-inset-top);
-      background: rgba(5, 6, 9, 0.72);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.065);
-      -webkit-backdrop-filter: blur(22px) saturate(160%);
-      backdrop-filter: blur(22px) saturate(160%);
+      background: rgba(9, 9, 11, 0.8);
+      border-bottom: 1px solid var(--line);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
     }
     .site-top-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      width: min(1100px, 100% - 40px);
-      min-height: 64px;
+      width: min(980px, 100% - 40px);
+      min-height: 60px;
       margin: 0 auto;
-      padding: 8px 0;
+      padding: 6px 0;
     }
     .float-mark {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
       min-height: 44px;
-      padding: 6px 12px 6px 6px;
-      border-radius: 12px;
+      padding: 4px 8px 4px 2px;
+      border-radius: 10px;
       text-decoration: none;
       color: var(--text);
-      font-family: var(--display);
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 600;
       letter-spacing: -0.02em;
-    }
-    .brand-badge {
-      display: grid;
-      place-items: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 4px 12px rgba(0, 0, 0, 0.35);
     }
     .mark-logo {
       display: block;
       width: 17px;
       height: 17px;
-      margin-top: -1px;
-      filter: brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+      margin-top: -2px;
+      filter: brightness(0) invert(1);
+      opacity: 0.92;
     }
-    .brand-word {
-      white-space: nowrap;
-    }
+    .brand-word { white-space: nowrap; }
+
     .site-nav-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
     .site-menu {
       position: relative;
@@ -177,28 +136,27 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      height: 40px;
+      height: 36px;
       min-height: 44px;
-      padding: 0 14px;
+      padding: 0 13px;
       border: 1px solid var(--line-strong);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.045);
+      border-radius: 10px;
+      background: transparent;
       color: var(--text);
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 500;
       letter-spacing: -0.01em;
       white-space: nowrap;
       list-style: none;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 14px rgba(0, 0, 0, 0.25);
     }
     @media (hover: hover) {
       .site-top .signer-launch:hover,
       .menu-toggle:hover {
-        background: rgba(255, 255, 255, 0.095);
+        background: var(--surface-hover);
         border-color: var(--line-hover);
       }
       .float-mark:hover {
-        background: rgba(255, 255, 255, 0.05);
+        opacity: 0.85;
       }
     }
     .menu-toggle::-webkit-details-marker,
@@ -215,171 +173,73 @@
       max-width: none;
       height: auto;
     }
-    .iphone-device { width: 15px; height: 26px; }
+    .iphone-device { width: 14px; height: 24px; }
     .iphone-device img { width: 100%; height: 100%; object-fit: contain; }
-    .menu-toggle .apple-tv-box { width: auto; height: 24px; }
+    .menu-toggle .apple-tv-box { width: auto; height: 22px; }
     .apple-tv-box img { width: auto; height: 100%; }
 
-    /* Compact editorial hero */
-    .hero {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 36px 0 28px;
+    /* Quiet intro header */
+    .page-intro {
+      margin-bottom: 24px;
     }
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(255, 255, 255, 0.035);
-      color: var(--text-2);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-    }
-    .live-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--mint);
-      box-shadow: 0 0 10px rgba(43, 217, 184, 0.85);
-    }
-    .hero-title {
+    .page-intro h1 {
       margin: 0;
-      font-family: var(--display);
-      font-size: clamp(32px, 4.4vw, 46px);
-      font-weight: 750;
-      line-height: 1.08;
-      letter-spacing: -0.038em;
-      background: linear-gradient(180deg, #ffffff 0%, #c8d2e3 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      color: var(--text);
+      font-size: clamp(24px, 3vw, 30px);
+      font-weight: 650;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
     }
-    .hero-lead {
-      max-width: 600px;
-      margin: 0;
+    .page-intro p {
+      margin: 6px 0 0;
       color: var(--text-2);
-      font-size: 16px;
-      font-weight: 450;
-      line-height: 1.55;
-      letter-spacing: -0.008em;
+      font-size: 15px;
+      line-height: 1.5;
     }
 
-    /* Flagship two-column app grid */
+    /* Two-column app grid */
     .apps {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       align-items: stretch;
-      gap: 24px;
-      padding: 0 0 24px;
+      gap: 20px;
     }
     .app {
-      --app-accent: #1c9bff;
-      --app-accent-2: #0870d8;
-      --app-accent-soft: rgba(28, 155, 255, 0.13);
-      --app-accent-border: rgba(28, 155, 255, 0.32);
-      --app-glow: rgba(28, 155, 255, 0.14);
-      --mx: 50%;
-      --my: 0%;
-      position: relative;
       display: flex;
       flex-direction: column;
       min-width: 0;
-      padding: 26px;
+      padding: 24px;
       border: 1px solid var(--line);
-      border-radius: var(--radius-card);
-      background:
-        radial-gradient(65% 42% at 50% -8%, var(--app-accent-soft), transparent 72%),
-        linear-gradient(180deg, rgba(21, 25, 35, 0.9) 0%, rgba(12, 14, 21, 0.96) 100%);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.085),
-        0 22px 54px rgba(0, 0, 0, 0.5);
-      overflow: hidden;
+      border-radius: 16px;
+      background: var(--surface);
       scroll-margin-top: calc(var(--top) + 12px);
-      transition: border-color 0.22s ease, transform 0.22s cubic-bezier(.2, .8, .2, 1), box-shadow 0.22s ease;
-    }
-    #lineup {
-      --app-accent: #ff3b4e;
-      --app-accent-2: #d61c32;
-      --app-accent-soft: rgba(255, 59, 78, 0.14);
-      --app-accent-border: rgba(255, 59, 78, 0.34);
-      --app-glow: rgba(255, 59, 78, 0.15);
-    }
-    #nullsign {
-      --app-accent: #1c9bff;
-      --app-accent-2: #0a73dc;
-      --app-accent-soft: rgba(28, 155, 255, 0.14);
-      --app-accent-border: rgba(28, 155, 255, 0.34);
-      --app-glow: rgba(28, 155, 255, 0.15);
-    }
-    /* Specular signature accent top-edge hairline */
-    .app::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 14%;
-      right: 14%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--app-accent), transparent);
-      opacity: 0.7;
-      pointer-events: none;
-    }
-    /* Subtle pointer spotlight on desktop */
-    .app::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: radial-gradient(380px circle at var(--mx) var(--my), var(--app-glow), transparent 65%);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.28s ease;
+      transition: border-color 0.18s ease;
     }
     @media (hover: hover) {
-      .app:hover {
-        border-color: rgba(255, 255, 255, 0.16);
-        box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.12),
-          0 28px 66px rgba(0, 0, 0, 0.62);
-      }
-      .app:hover::after {
-        opacity: 1;
-      }
-    }
-    .app > * {
-      position: relative;
-      z-index: 1;
+      .app:hover { border-color: var(--line-strong); }
     }
 
     .app-head {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
     .app-icon {
       position: relative;
       display: block;
       flex: 0 0 auto;
-      width: 62px;
-      height: 62px;
+      width: 52px;
+      height: 52px;
       overflow: hidden;
-      border-radius: 15px;
-      background: #12141a;
-      box-shadow:
-        0 10px 26px rgba(0, 0, 0, 0.55),
-        0 0 28px -4px var(--app-accent-soft);
+      border-radius: 13px;
+      background: #141418;
     }
     .app-icon::after {
       content: "";
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
       pointer-events: none;
     }
     .app-icon img {
@@ -388,47 +248,19 @@
       height: 100%;
       object-fit: cover;
     }
-    .app-title {
-      min-width: 0;
-      flex: 1 1 auto;
-    }
-    .app-title-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px 10px;
-    }
+    .app-title { min-width: 0; }
     .app-name {
       margin: 0;
       color: var(--text);
-      font-family: var(--display);
-      font-size: 26px;
-      font-weight: 750;
-      line-height: 1.15;
-      letter-spacing: -0.028em;
-    }
-    .platform-pills {
-      display: inline-flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .platform-pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 9px;
-      border-radius: 999px;
-      border: 1px solid var(--app-accent-border);
-      background: var(--app-accent-soft);
-      color: #fff;
-      font-size: 11px;
+      font-size: 21px;
       font-weight: 650;
-      letter-spacing: 0.01em;
+      line-height: 1.2;
+      letter-spacing: -0.025em;
     }
     .app-kind {
-      margin: 4px 0 0;
+      margin: 2px 0 0;
       color: var(--text-2);
       font-size: 13.5px;
-      font-weight: 500;
       line-height: 1.4;
     }
 
@@ -438,77 +270,64 @@
       flex-direction: column;
     }
     .app-summary {
-      margin: 18px 0 0;
-      color: var(--text-body);
-      font-size: 14.5px;
-      font-weight: 450;
-      line-height: 1.62;
+      margin: 16px 0 0;
+      color: var(--text-2);
+      font-size: 14px;
+      line-height: 1.6;
     }
 
-    /* Recessed build tray */
+    /* Clean builds list */
     .builds {
       margin-top: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.075);
-      border-radius: var(--radius-inner);
-      background: var(--surface-recessed);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-subtle);
       overflow: hidden;
     }
     .build {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      padding: 16px;
+      padding: 15px 16px;
     }
     .build + .build {
-      border-top: 1px solid rgba(255, 255, 255, 0.075);
+      border-top: 1px solid var(--line);
     }
     .build-info {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .build-top {
+      display: flex;
       align-items: baseline;
       justify-content: space-between;
-      gap: 4px 12px;
+      gap: 10px;
     }
     .build h3 {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
       margin: 0;
       color: var(--text);
-      font-size: 15px;
-      font-weight: 650;
-      letter-spacing: -0.015em;
-    }
-    .build h3 svg {
-      width: 15px;
-      height: 15px;
-      color: var(--app-accent);
+      font-size: 14.5px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
     }
     .build-meta {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
+      align-items: baseline;
       justify-content: space-between;
       gap: 4px 10px;
-      flex-basis: 100%;
-      margin: 2px 0 0;
+      margin: 0;
       color: var(--text-3);
       font-size: 12.5px;
-      font-weight: 500;
       line-height: 1.45;
       font-variant-numeric: tabular-nums;
     }
     .build-meta .build-number {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.04);
-      color: #dbe3f0;
+      color: var(--text-2);
       font-family: var(--mono);
-      font-size: 11.5px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 500;
     }
     .build-meta .sep { display: none; }
     .build-meta time {
@@ -526,31 +345,23 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 7px;
       min-height: 44px;
-      padding: 10px 16px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: var(--radius-control);
-      background: linear-gradient(180deg, var(--app-accent) 0%, var(--app-accent-2) 100%);
-      color: #ffffff;
+      padding: 9px 14px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: var(--text);
+      color: #09090b;
       font-size: 13.5px;
-      font-weight: 650;
+      font-weight: 600;
       letter-spacing: -0.01em;
       text-decoration: none;
       white-space: nowrap;
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.28),
-        0 8px 20px -6px var(--app-accent-border);
     }
     @media (hover: hover) {
-      .download:hover {
-        filter: brightness(1.09);
-        box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.34),
-          0 12px 26px -6px var(--app-accent-border);
-      }
+      .download:hover { background: #ffffff; }
     }
-    .download svg { width: 15px; height: 15px; }
+    .download svg { width: 14px; height: 14px; }
     .download-compact { display: none; }
 
     .notes-button {
@@ -558,152 +369,56 @@
       flex: 1 1 0;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 7px;
       min-width: 0;
       min-height: 44px;
-      padding: 10px 14px;
+      padding: 9px 13px;
       border: 1px solid var(--line-strong);
-      border-radius: var(--radius-control);
-      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      background: transparent;
       color: var(--text);
       font-size: 13.5px;
-      font-weight: 600;
+      font-weight: 500;
       letter-spacing: -0.01em;
       white-space: nowrap;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
     @media (hover: hover) {
       .notes-button:hover {
         border-color: var(--line-hover);
-        background: rgba(255, 255, 255, 0.09);
+        background: var(--surface-hover);
       }
     }
-    .notes-button svg { width: 15px; height: 15px; color: var(--text-2); }
+    .notes-button svg { width: 14px; height: 14px; color: var(--text-2); }
 
     .build-actions .ipa-copy {
       flex: 0 0 auto;
-      min-width: 112px;
-      padding: 10px 13px;
+      min-width: 106px;
+      padding: 9px 12px;
       font-size: 13px;
     }
-    .build-actions .ipa-copy svg { display: block; width: 15px; height: 15px; }
+    .build-actions .ipa-copy svg { display: block; width: 14px; height: 14px; }
     .ipa-copy-label { display: inline-block; min-width: 7.5ch; text-align: center; }
-
-    /* Companion quick-tools tile inside NullSign card to balance dual-card height & add utility */
-    .quick-tools {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .quick-tool {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 4px;
-      min-height: 44px;
-      padding: 13px 14px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 13px;
-      background: rgba(255, 255, 255, 0.028);
-      text-align: left;
-      cursor: pointer;
-    }
-    @media (hover: hover) {
-      .quick-tool:hover {
-        border-color: var(--app-accent-border);
-        background: rgba(28, 155, 255, 0.08);
-      }
-    }
-    .quick-tool-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      gap: 6px;
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 650;
-    }
-    .quick-tool-head svg {
-      width: 14px;
-      height: 14px;
-      color: var(--app-accent);
-    }
-    .quick-tool-sub {
-      color: var(--text-3);
-      font-size: 12px;
-      font-weight: 450;
-      line-height: 1.4;
-    }
 
     .app-actions {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       margin-top: auto;
       padding-top: 16px;
     }
 
-    /* Elevated AppSource Repository Dock */
+    /* Quiet AppSource copy bar */
     .source-section {
-      padding: 0 0 12px;
-    }
-    .source-card {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      padding: 22px 24px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-card);
-      background:
-        radial-gradient(45% 80% at 100% 0%, rgba(43, 217, 184, 0.08), transparent 70%),
-        linear-gradient(180deg, rgba(19, 23, 33, 0.88) 0%, rgba(11, 13, 20, 0.95) 100%);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.075), 0 18px 46px rgba(0, 0, 0, 0.42);
-    }
-    .source-header {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px 16px;
-    }
-    .source-title-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .source-badge-icon {
-      display: grid;
-      place-items: center;
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      border: 1px solid rgba(43, 217, 184, 0.28);
-      background: rgba(43, 217, 184, 0.11);
-      color: var(--mint);
-    }
-    .source-badge-icon svg { width: 17px; height: 17px; }
-    .source-title {
-      margin: 0;
-      font-family: var(--display);
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    .source-sub {
-      margin: 1px 0 0;
-      color: var(--text-2);
-      font-size: 13px;
+      margin-top: 24px;
     }
     .source {
       display: flex;
       align-items: stretch;
-      min-height: 50px;
+      max-width: 680px;
+      min-height: 46px;
       overflow: hidden;
       border: 1px solid var(--line-strong);
-      border-radius: 13px;
-      background: rgba(5, 7, 11, 0.72);
+      border-radius: 11px;
+      background: var(--surface);
     }
     .source-label {
       display: flex;
@@ -711,19 +426,17 @@
       padding: 0 14px;
       border-right: 1px solid var(--line);
       color: var(--text-3);
-      font-size: 12px;
-      font-weight: 650;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      font-size: 12.5px;
+      font-weight: 500;
     }
     .source-url {
       flex: 1 1 auto;
       min-width: 0;
       align-self: center;
-      padding: 0 16px;
+      padding: 0 14px;
       overflow: hidden;
-      color: #dbe4f3;
-      font: 500 13.5px var(--mono);
+      color: var(--text-2);
+      font: 400 13px var(--mono);
       white-space: nowrap;
       text-overflow: ellipsis;
     }
@@ -732,62 +445,57 @@
       flex: 0 0 auto;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      min-width: 118px;
-      padding: 0 18px;
+      gap: 7px;
+      min-width: 96px;
+      padding: 0 15px;
       border: 0;
       border-left: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.08);
-      color: #ffffff;
+      background: transparent;
+      color: var(--text);
       font-size: 13px;
-      font-weight: 650;
+      font-weight: 500;
       white-space: nowrap;
       cursor: pointer;
     }
     @media (hover: hover) {
-      .copy-repo:hover { background: rgba(255, 255, 255, 0.14); }
+      .copy-repo:hover { background: var(--surface-hover); }
     }
-    .copy-repo:focus-visible { outline-offset: -3px; border-radius: 0 12px 12px 0; }
-    .copy-repo svg { width: 15px; height: 15px; color: var(--text-2); }
-    .copy-repo .icon-done { display: none; color: var(--mint); }
-    .copy-repo.is-copied {
-      background: rgba(43, 217, 184, 0.16);
-      color: #d9fff7;
-    }
+    .copy-repo:focus-visible { outline-offset: -3px; border-radius: 0 10px 10px 0; }
+    .copy-repo svg { width: 14px; height: 14px; color: var(--text-2); }
+    .copy-repo .icon-done { display: none; color: var(--text); }
     .copy-repo.is-copied .icon-copy { display: none; }
     .copy-repo.is-copied .icon-done { display: block; }
     .source-hint {
-      margin: 0;
+      max-width: 680px;
+      margin: 10px 0 0;
       color: var(--text-3);
       font-size: 13px;
       line-height: 1.5;
     }
     .feed-status:not(:empty)::before { content: " "; }
 
-    /* Elevated native modals */
+    /* Minimal modals */
     .release-dialog {
-      --dialog-height: min(860px, calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
-      width: min(600px, 100% - 32px);
+      --dialog-height: min(840px, calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+      width: min(560px, 100% - 32px);
       max-width: none;
       max-height: var(--dialog-height);
       margin: auto;
       padding: 0;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 22px;
+      border: 1px solid var(--line-strong);
+      border-radius: 18px;
       color: var(--text);
-      background: linear-gradient(180deg, #131722 0%, #0b0d14 100%);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.11),
-        0 34px 90px rgba(0, 0, 0, 0.78);
+      background: var(--surface);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72);
     }
     .release-dialog[open] {
-      animation: dialog-in 0.22s cubic-bezier(.2, .8, .2, 1);
+      animation: dialog-in 0.18s cubic-bezier(.2, .8, .2, 1);
     }
     .release-dialog::backdrop {
-      background: rgba(3, 4, 8, 0.74);
-      -webkit-backdrop-filter: blur(12px);
-      backdrop-filter: blur(12px);
+      background: rgba(0, 0, 0, 0.7);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
     }
     .dialog-body {
       display: flex;
@@ -801,38 +509,28 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 16px;
-      padding: 22px 26px 18px;
+      padding: 20px 24px 16px;
       border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.02);
     }
     .dialog-content {
       min-height: 0;
       overflow: auto;
-      padding: 18px 26px 28px;
+      padding: 18px 24px 26px;
       overscroll-behavior: none contain;
       scrollbar-width: thin;
-      scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+      scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
     }
     .dialog-kicker {
-      margin: 0 0 4px;
+      margin: 0 0 3px;
       color: var(--text-3);
-      font-size: 12px;
-      font-weight: 650;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      font-size: 12.5px;
+      font-weight: 500;
     }
-    #lineup-release .dialog-kicker,
-    #lineup-features .dialog-kicker { color: #ff6b7a; }
-    #nullsign-release .dialog-kicker,
-    #nullsign-features .dialog-kicker,
-    #appletv-install .dialog-kicker { color: #54b6ff; }
-    #web-signer .dialog-kicker { color: #e8be6c; }
     .dialog-head h2 {
       margin: 0;
-      font-family: var(--display);
-      font-size: 24px;
-      font-weight: 750;
-      letter-spacing: -0.025em;
+      font-size: 21px;
+      font-weight: 650;
+      letter-spacing: -0.02em;
     }
     .dialog-head h2:focus { outline: none; }
     .dialog-close {
@@ -840,60 +538,53 @@
       width: 44px;
       height: 44px;
       flex: 0 0 auto;
-      margin: -4px -6px 0 0;
+      margin: -6px -8px 0 0;
       place-items: center;
       border: 1px solid var(--line);
-      border-radius: 12px;
+      border-radius: 10px;
       color: var(--text-2);
-      background: rgba(255, 255, 255, 0.04);
+      background: transparent;
       cursor: pointer;
     }
     @media (hover: hover) {
       .dialog-close:hover {
         color: var(--text);
         border-color: var(--line-hover);
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--surface-hover);
       }
     }
-    .dialog-close svg { width: 16px; height: 16px; }
+    .dialog-close svg { width: 15px; height: 15px; }
     .dialog-intro {
       margin: 0;
       color: var(--text-2);
-      font-size: 14.5px;
+      font-size: 14px;
       line-height: 1.6;
     }
 
-    /* Release notes styling */
+    /* Release notes */
     .release-build {
       margin-top: 20px;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 15px;
-      background: rgba(255, 255, 255, 0.025);
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
     }
     .release-build-head {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
+      align-items: baseline;
       justify-content: space-between;
-      gap: 8px 12px;
+      gap: 6px 12px;
     }
     .release-build-head h3 {
       margin: 0;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.015em;
+      font-size: 15px;
+      font-weight: 600;
     }
     .release-build-version {
-      padding: 3px 9px;
-      border-radius: 7px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(255, 255, 255, 0.05);
-      color: #dbe3f0;
-      font: 600 12px var(--mono);
+      color: var(--text-2);
+      font: 500 12.5px var(--mono);
     }
     .release-build-info {
-      margin: 6px 0 0;
+      margin: 3px 0 0;
       color: var(--text-3);
       font-size: 12.5px;
       line-height: 1.5;
@@ -905,105 +596,73 @@
     }
     .release-list li {
       position: relative;
-      padding-left: 18px;
-      color: #d6deec;
-      font-size: 14.5px;
-      font-weight: 450;
+      padding-left: 16px;
+      color: #d4d4d8;
+      font-size: 14px;
       line-height: 1.62;
     }
     .release-list li::before {
       content: "";
       position: absolute;
-      top: 0.66em;
+      top: 0.68em;
       left: 2px;
-      width: 6px;
-      height: 6px;
+      width: 4px;
+      height: 4px;
       border-radius: 50%;
-      background: var(--accent);
+      background: var(--text-3);
     }
-    #lineup-release .release-list li::before { background: var(--crimson); }
-    #nullsign-release .release-list li::before { background: var(--accent); }
-    .release-list li + li { margin-top: 11px; }
+    .release-list li + li { margin-top: 10px; }
     .notes-pending { margin: 14px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
 
-    /* Features cards inside modal */
-    .feature-list {
-      display: grid;
-      gap: 12px;
-    }
+    /* Features */
+    .feature-list { margin-top: 2px; }
     .feature {
-      padding: 16px 18px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.025);
+      padding: 15px 0 16px;
+      border-top: 1px solid var(--line);
     }
+    .feature:first-child { padding-top: 0; border-top: 0; }
+    .feature:last-child { padding-bottom: 0; }
     .feature h3 {
-      margin: 0 0 6px;
+      margin: 0 0 5px;
       color: var(--text);
-      font-size: 15px;
-      font-weight: 650;
-      letter-spacing: -0.015em;
+      font-size: 14.5px;
+      font-weight: 600;
     }
     .feature p {
       margin: 0;
-      color: var(--text-body);
+      color: var(--text-2);
       font-size: 14px;
-      line-height: 1.62;
+      line-height: 1.6;
     }
 
-    /* Apple TV guide modal */
+    /* Apple TV guide */
     .install-needs {
       margin: 0;
-      padding: 14px 16px;
-      border: 1px solid rgba(28, 155, 255, 0.25);
-      border-radius: 13px;
-      background: rgba(28, 155, 255, 0.08);
-      color: #d9e7f7;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-subtle);
+      color: var(--text-2);
       font-size: 13.5px;
       line-height: 1.6;
     }
-    .install-needs strong { color: #ffffff; }
+    .install-needs strong { color: var(--text); font-weight: 600; }
     .install-steps {
-      counter-reset: step;
-      list-style: none;
-      padding: 0;
-      margin: 20px 0;
+      padding-left: 22px;
+      margin: 18px 0;
     }
     .install-steps li {
-      position: relative;
-      counter-increment: step;
-      padding: 0 0 18px 38px;
+      padding-left: 4px;
+      margin: 0 0 16px;
+      color: var(--text-2);
       font-size: 14px;
       line-height: 1.6;
-      color: var(--text-body);
     }
-    .install-steps li:last-child { padding-bottom: 4px; }
-    .install-steps li::before {
-      content: counter(step);
-      position: absolute;
-      top: 1px;
-      left: 0;
-      display: grid;
-      place-items: center;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 1px solid rgba(28, 155, 255, 0.36);
-      background: rgba(28, 155, 255, 0.14);
-      color: #7cc6ff;
-      font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .install-steps strong {
-      display: block;
-      margin-bottom: 3px;
-      color: var(--text);
-      font-weight: 650;
-    }
+    .install-steps li::marker { color: var(--text-3); font-family: var(--mono); font-size: 12.5px; }
+    .install-steps strong { display: block; margin-bottom: 3px; color: var(--text); font-weight: 600; }
     .install-steps p { margin: 0; }
     .guide-note {
-      margin: 18px 0 0;
+      margin: 16px 0 0;
       color: var(--text-3);
       font-size: 12.5px;
       line-height: 1.6;
@@ -1011,48 +670,41 @@
     .guide-note a,
     .install-needs a,
     .install-trouble a {
-      color: #79c4ff;
+      color: var(--text);
       text-underline-offset: 3px;
     }
     .install-trouble {
       margin-top: 12px;
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      background: rgba(255, 255, 255, 0.025);
-      overflow: hidden;
+      border-top: 1px solid var(--line);
     }
     .help-toggle {
       display: flex;
       align-items: center;
-      padding: 12px 16px;
+      padding: 10px 2px;
       gap: 10px;
       list-style: none;
       color: var(--text);
       font-size: 13.5px;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
     }
     .help-toggle::after {
       content: "+";
       margin-left: auto;
-      color: var(--text-2);
-      font: 600 18px/1 var(--sans);
+      color: var(--text-3);
+      font: 500 18px/1 var(--sans);
     }
     .install-trouble[open] > .help-toggle::after { content: "−"; }
     .install-trouble p {
-      margin: 0 16px 14px;
-      color: var(--text-body);
+      margin: 0 0 12px;
+      color: var(--text-2);
       font-size: 13.5px;
       line-height: 1.6;
     }
 
-    /* Web Signer modal: warm-obsidian backing so the transparent signer.mateomedia.link iframe pops cleanly */
+    /* Web Signer modal */
     #web-signer {
-      background: linear-gradient(180deg, #13110e 0%, #0a0908 100%);
-      border-color: rgba(224, 185, 108, 0.24);
-    }
-    #web-signer .dialog-head {
-      border-bottom-color: rgba(224, 185, 108, 0.14);
+      background: #0d0c0b;
     }
     .signer-frame {
       display: block;
@@ -1067,56 +719,40 @@
 
     /* Minimal footer */
     .site-footer {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px 24px;
-      padding: 18px 0 28px;
-      border-top: 1px solid rgba(255, 255, 255, 0.065);
+      padding: 16px 0 22px;
+      border-top: 1px solid var(--line);
       color: var(--text-3);
       font-size: 13px;
     }
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .site-footer a {
-      color: var(--text-2);
-      text-decoration: none;
-      transition: color 0.15s ease;
-    }
-    .site-footer a:hover { color: var(--text); }
 
     /* Motion */
-    [data-project-card] { animation: card-in 0.55s cubic-bezier(.2, .8, .2, 1) backwards; }
-    [data-project-card] + [data-project-card] { animation-delay: 0.07s; }
-    @keyframes card-in { from { opacity: 0; transform: translateY(14px); } }
-    @keyframes dialog-in { from { opacity: 0; transform: translateY(10px) scale(0.985); } }
+    [data-project-card] { animation: card-in 0.45s cubic-bezier(.2, .8, .2, 1) backwards; }
+    [data-project-card] + [data-project-card] { animation-delay: 0.05s; }
+    @keyframes card-in { from { opacity: 0; transform: translateY(8px); } }
+    @keyframes dialog-in { from { opacity: 0; transform: translateY(6px) scale(0.99); } }
 
-    /* Tactile pointer/keyboard press states */
-    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle, .quick-tool) {
+    /* Tactile press feedback */
+    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle) {
       min-height: 44px;
       min-width: 44px;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       cursor: pointer;
-      transition: transform 0.14s cubic-bezier(.2, .8, .2, 1), background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+      transition: transform 0.12s cubic-bezier(.2, .8, .2, 1), background 0.14s ease, border-color 0.14s ease, opacity 0.14s ease;
     }
-    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle, .quick-tool):is(.is-pointer-pressed, .is-key-pressed) {
-      transform: translateY(2px) scale(0.975);
+    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle):is(.is-pointer-pressed, .is-key-pressed) {
+      transform: translateY(1px) scale(0.98);
       transition-duration: 0.04s;
     }
-    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle, .quick-tool):focus-visible {
+    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle):focus-visible {
       outline: 2px solid var(--focus);
-      outline-offset: 3px;
+      outline-offset: 2px;
     }
 
     body:has(.release-dialog[open]) { overflow: hidden; }
 
-    /* Floating glass status toast */
+    /* Status toast */
     .action-status {
       position: fixed;
       left: 50%;
@@ -1125,112 +761,64 @@
       width: max-content;
       max-width: calc(100% - 32px);
       margin: 0;
-      padding: 11px 18px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
       border-radius: 999px;
       color: var(--text);
-      background: rgba(15, 19, 28, 0.9);
-      -webkit-backdrop-filter: blur(18px);
-      backdrop-filter: blur(18px);
-      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+      background: rgba(17, 17, 20, 0.94);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 500;
       text-align: center;
       pointer-events: none;
       opacity: 0;
-      transform: translate(-50%, 10px);
-      transition: opacity 0.18s ease, transform 0.18s ease;
+      transform: translate(-50%, 8px);
+      transition: opacity 0.16s ease, transform 0.16s ease;
     }
     .action-status.is-visible {
       opacity: 1;
       transform: translate(-50%, 0);
     }
 
-    /* Responsive tablet & mobile layout */
-    @media (max-width: 860px) {
-      .apps {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 18px;
-      }
-      .hero {
-        padding: 26px 0 22px;
-      }
+    /* Tablet & mobile */
+    @media (max-width: 820px) {
+      main.wrap { justify-content: flex-start; padding: 22px 0 28px; }
+      .apps { grid-template-columns: minmax(0, 1fr); gap: 16px; }
     }
     @media (max-width: 600px) {
       .wrap,
-      .site-top-inner {
-        width: calc(100% - 28px);
-      }
-      .site-top-inner {
-        min-height: 58px;
-        gap: 8px;
-      }
-      .float-mark {
-        padding: 4px 6px 4px 0;
-        gap: 8px;
-        font-size: 15px;
-      }
-      .site-nav-actions {
-        gap: 8px;
-      }
+      .site-top-inner { width: calc(100% - 28px); }
+      .site-top-inner { min-height: 56px; gap: 8px; }
       .site-top .signer-launch,
-      .menu-toggle {
-        padding: 0 11px;
-        gap: 6px;
-        font-size: 12.5px;
-      }
-      .hero {
-        padding: 20px 0 18px;
-        gap: 10px;
-      }
-      .hero-lead {
-        font-size: 14.5px;
-      }
-      .app {
-        padding: 20px 18px;
-        border-radius: 20px;
-      }
-      .app-icon {
-        width: 54px;
-        height: 54px;
-        border-radius: 13px;
-      }
-      .app-name {
-        font-size: 23px;
-      }
-      .build {
-        padding: 14px;
-      }
-      .build-actions .ipa-copy {
-        min-width: 46px;
-        width: 46px;
-        padding: 10px;
-      }
+      .menu-toggle { padding: 0 11px; gap: 6px; font-size: 12.5px; }
+      .page-intro { margin-bottom: 18px; }
+      .page-intro p { font-size: 14px; }
+      .app { padding: 18px; border-radius: 14px; }
+      .app-icon { width: 48px; height: 48px; border-radius: 12px; }
+      .app-name { font-size: 19px; }
+      .build { padding: 13px 14px; }
+      .build-actions .ipa-copy { min-width: 44px; width: 44px; padding: 9px; }
       .ipa-copy-label { display: none; }
-      .quick-tools {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .source-card {
-        padding: 18px;
-        border-radius: 20px;
-      }
+      .source-section { margin-top: 18px; }
       .source-label { display: none; }
-      .source-url { padding: 0 12px; font-size: 12.5px; }
-      .copy-repo { min-width: 96px; padding: 0 14px; }
+      .source-url { padding: 0 12px; font-size: 12px; }
+      .copy-repo { min-width: 86px; padding: 0 12px; }
       .release-dialog {
-        --dialog-height: calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        --dialog-height: calc(100dvh - 18px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         width: calc(100% - 16px);
-        margin: auto auto calc(10px + env(safe-area-inset-bottom));
-        border-radius: 22px;
+        margin: auto auto calc(8px + env(safe-area-inset-bottom));
+        border-radius: 18px;
       }
       .release-dialog[open] { animation-name: sheet-in; }
-      .dialog-head { padding: 18px 20px 14px; }
-      .dialog-content { padding: 16px 20px calc(24px + env(safe-area-inset-bottom)); }
+      .dialog-head { padding: 16px 20px 14px; }
+      .dialog-content { padding: 14px 20px calc(22px + env(safe-area-inset-bottom)); }
     }
     @media (max-width: 415px) {
       .brand-word { display: none; }
     }
-    @keyframes sheet-in { from { opacity: 0; transform: translateY(24px); } }
+    @keyframes sheet-in { from { opacity: 0; transform: translateY(20px); } }
 
     @media (prefers-reduced-motion: reduce) {
       html, body { scroll-behavior: auto; }
@@ -1242,17 +830,15 @@
       [data-project-card] { animation: none; }
     }
     @media print {
-      .ambient-bg, .site-top { display: none; }
+      .site-top { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="ambient-bg" aria-hidden="true"></div>
-
   <header class="site-top">
     <div class="site-top-inner">
       <a class="float-mark" href="#top" aria-label="Back to top">
-        <span class="brand-badge" aria-hidden="true"><img class="mark-logo" src="assets/apple-mark.svg?v=cream" width="24" height="24" alt=""></span>
+        <img class="mark-logo" src="assets/apple-mark.svg?v=cream" width="24" height="24" alt="">
         <span class="brand-word">Null’s Apps</span>
       </a>
       <div class="site-nav-actions">
@@ -1267,25 +853,18 @@
   </header>
 
   <main class="wrap" id="top">
-    <section class="hero" aria-label="Overview">
-      <span class="hero-eyebrow"><span class="live-dot" aria-hidden="true"></span>iPhone &amp; Apple TV · Direct Builds</span>
-      <h1 class="hero-title">Null’s Apps</h1>
-      <p class="hero-lead">Lineup and NullSign: official unsigned IPAs, live release notes, and one-tap AppSource updates straight from main.</p>
-    </section>
+    <header class="page-intro">
+      <h1>Null’s Apps</h1>
+      <p>Lineup and NullSign for iPhone and Apple TV.</p>
+    </header>
 
     <div class="apps">
       <article class="app" id="lineup" data-project-card aria-labelledby="lineup-name">
         <header class="app-head">
-          <span class="app-icon"><img src="assets/lineup-icon.png" alt="" width="62" height="62"></span>
+          <span class="app-icon"><img src="assets/lineup-icon.png" alt="" width="52" height="52"></span>
           <div class="app-title">
-            <div class="app-title-row">
-              <h2 class="app-name" id="lineup-name">Lineup</h2>
-              <span class="platform-pills" aria-hidden="true">
-                <span class="platform-pill">iPhone</span>
-                <span class="platform-pill">Apple TV</span>
-              </span>
-            </div>
-            <p class="app-kind">Live sports, IPTV &amp; media library</p>
+            <h2 class="app-name" id="lineup-name">Lineup</h2>
+            <p class="app-kind">Live sports · iPhone &amp; Apple TV</p>
           </div>
         </header>
         <div class="app-body" id="lineup-details">
@@ -1293,10 +872,9 @@
           <div class="builds">
             <section class="build" data-bundle="com.nulldev85.NullSports.iOS" aria-labelledby="iphone-build-title">
               <div class="build-info">
-                <h3 id="iphone-build-title">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.8"/><path d="M10.5 5.5h3"/></svg>
-                  iPhone
-                </h3>
+                <div class="build-top">
+                  <h3 id="iphone-build-title">iPhone</h3>
+                </div>
                 <p class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>1224</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-21T03:50:40Z">Nov 21, 2026, 3:50 AM UTC</time></p>
               </div>
               <div class="build-actions">
@@ -1306,10 +884,9 @@
             </section>
             <section class="build" data-bundle="com.nulldev85.NullSports" aria-labelledby="tvos-build-title">
               <div class="build-info">
-                <h3 id="tvos-build-title">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="12.5" rx="2.2"/><path d="M8 20h8"/></svg>
-                  Apple TV
-                </h3>
+                <div class="build-top">
+                  <h3 id="tvos-build-title">Apple TV</h3>
+                </div>
                 <p class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>964</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-21T03:37:18Z">Nov 21, 2026, 3:37 AM UTC</time></p>
               </div>
               <div class="build-actions">
@@ -1327,16 +904,10 @@
 
       <article class="app" id="nullsign" data-project-card aria-labelledby="nullsign-name">
         <header class="app-head">
-          <span class="app-icon"><img src="assets/nullsign-icon.png" alt="" width="62" height="62"></span>
+          <span class="app-icon"><img src="assets/nullsign-icon.png" alt="" width="52" height="52"></span>
           <div class="app-title">
-            <div class="app-title-row">
-              <h2 class="app-name" id="nullsign-name">NullSign</h2>
-              <span class="platform-pills" aria-hidden="true">
-                <span class="platform-pill">iOS</span>
-                <span class="platform-pill">tvOS Sender</span>
-              </span>
-            </div>
-            <p class="app-kind">On-device signing &amp; sideloading</p>
+            <h2 class="app-name" id="nullsign-name">NullSign</h2>
+            <p class="app-kind">iOS signing &amp; install</p>
           </div>
         </header>
         <div class="app-body" id="nullsign-details">
@@ -1344,10 +915,9 @@
           <div class="builds">
             <section class="build" data-bundle="com.elmat.NullSign" aria-label="Latest NullSign build">
               <div class="build-info">
-                <h3>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.8"/><path d="M10.5 5.5h3"/></svg>
-                  iOS
-                </h3>
+                <div class="build-top">
+                  <h3>iOS</h3>
+                </div>
                 <p class="build-meta"><span class="build-number">v<span data-version-number>2.0.0</span> · Build <span data-build-number>75</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-20T10:45:26Z">Nov 20, 2026, 2:45 AM PST</time></p>
               </div>
               <div class="build-actions">
@@ -1355,16 +925,6 @@
                 <button class="notes-button ipa-copy" type="button" data-copy-ipa aria-label="Copy the NullSign IPA link" title="Copy IPA link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span class="ipa-copy-label">Copy link</span></button>
               </div>
             </section>
-          </div>
-          <div class="quick-tools" aria-label="Signing tools">
-            <button class="quick-tool" type="button" data-open-dialog="web-signer" aria-haspopup="dialog" aria-controls="web-signer">
-              <span class="quick-tool-head">Sign in browser <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
-              <span class="quick-tool-sub">First-time install using the local Web Signer</span>
-            </button>
-            <button class="quick-tool" type="button" data-open-dialog="appletv-install" aria-haspopup="dialog" aria-controls="appletv-install">
-              <span class="quick-tool-head">Apple TV Guide <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
-              <span class="quick-tool-sub">Install tvOS apps over Wi-Fi from NullSign 2.0</span>
-            </button>
           </div>
           <div class="app-actions">
             <button class="notes-button" type="button" data-open-dialog="nullsign-features" aria-haspopup="dialog" aria-controls="nullsign-features"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg>Features</button>
@@ -1375,29 +935,16 @@
     </div>
 
     <section class="source-section" aria-label="App source">
-      <div class="source-card">
-        <div class="source-header">
-          <div class="source-title-group">
-            <span class="source-badge-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1.5"/></svg>
-            </span>
-            <div>
-              <h2 class="source-title">AppSource Repository</h2>
-              <p class="source-sub">Add this URL to NullSign or any AltStore-compatible signer for automatic updates.</p>
-            </div>
-          </div>
-        </div>
-        <div class="source">
-          <span class="source-label">Source</span>
-          <code class="source-url" title="https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json">raw.githubusercontent.com/nulldev85/AppSource/main/apps.json</code>
-          <button class="copy-repo" id="repo-copy" type="button" aria-label="Copy the AppSource URL for your signer">
-            <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
-            <svg class="icon-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
-            <span id="repo-copy-label">Copy</span>
-          </button>
-        </div>
-        <p class="source-hint">Every IPA here is unsigned, so install it through a compatible signer.<span class="feed-status" data-feed-status></span></p>
+      <div class="source">
+        <span class="source-label">Source</span>
+        <code class="source-url" title="https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json">raw.githubusercontent.com/nulldev85/AppSource/main/apps.json</code>
+        <button class="copy-repo" id="repo-copy" type="button" aria-label="Copy the AppSource URL for your signer">
+          <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
+          <svg class="icon-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+          <span id="repo-copy-label">Copy</span>
+        </button>
       </div>
+      <p class="source-hint">Every IPA here is unsigned, so install it through a compatible signer.<span class="feed-status" data-feed-status></span></p>
     </section>
 
     <dialog class="release-dialog" id="lineup-release" aria-labelledby="lineup-release-title">
@@ -1525,17 +1072,13 @@
 
   <footer class="site-footer wrap">
     <span>© Null’s Apps</span>
-    <div class="footer-links">
-      <a href="https://raw.githubusercontent.com/nulldev85/AppSource/main/apps.json" target="_blank" rel="noopener noreferrer">AppSource JSON</a>
-      <a href="https://github.com/nulldev85/AppSource" target="_blank" rel="noopener noreferrer">GitHub</a>
-    </div>
   </footer>
 
   <p class="action-status" id="action-status" role="status" aria-live="polite" aria-atomic="true"></p>
   <script src="release-notes.js?v=1"></script>
   <script>
     (() => {
-      const controls = ".download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle, .quick-tool";
+      const controls = ".download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle";
       // Explicit held state also works on touch browsers that omit :active.
       let heldPointer = null;
       const releasePointerPress = () => {
@@ -1699,17 +1242,6 @@
           resetLabel = setTimeout(() => { label.textContent = "Copy link"; }, 1900);
         });
       });
-
-      // Subtle pointer spotlight tracking on desktop app cards.
-      if (window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-        document.querySelectorAll("[data-project-card]").forEach(card => {
-          card.addEventListener("pointermove", event => {
-            const rect = card.getBoundingClientRect();
-            card.style.setProperty("--mx", (event.clientX - rect.left).toFixed(1) + "px");
-            card.style.setProperty("--my", (event.clientY - rect.top).toFixed(1) + "px");
-          }, { passive: true });
-        });
-      }
 
       const updateBuild = (release, container) => {
         if (!release || !release.downloadURL || !release.version || !release.buildVersion) return;
