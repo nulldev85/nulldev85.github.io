@@ -84,7 +84,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 36px 0 40px;
+      padding: 24px 0 24px;
     }
 
     /* Featherlight top navigation bar */
@@ -422,7 +422,7 @@
 
     /* Slim pill AppSource bar */
     .source-section {
-      margin-top: 22px;
+      margin-top: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -737,7 +737,7 @@
 
     /* Minimal footer */
     .site-footer {
-      padding: 16px 0 22px;
+      padding: 10px 0 16px;
       color: var(--text-3);
       font-size: 12px;
       text-align: center;
@@ -800,29 +800,46 @@
 
     /* Responsive tablet & mobile */
     @media (max-width: 800px) {
-      main.wrap { justify-content: flex-start; padding: 20px 0 28px; }
-      .apps { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      main.wrap { justify-content: flex-start; padding: 14px 0 14px; }
+      .apps { grid-template-columns: minmax(0, 1fr); gap: 12px; }
     }
     @media (max-width: 600px) {
       .wrap,
       .site-top-inner { width: calc(100% - 28px); }
-      .site-top-inner { height: 52px; }
+      .site-top-inner { height: 48px; }
       .site-top .signer-launch,
       .menu-toggle { padding: 0 9px; gap: 6px; font-size: 12.5px; }
-      .app { padding: 20px 18px 16px; border-radius: 18px; }
-      .app-icon { width: 48px; height: 48px; border-radius: 12px; }
-      .app-name { font-size: 18.5px; }
-      .app-summary { font-size: 13.5px; }
-      .build { gap: 10px; padding: 13px 0; }
-      .build-meta { flex-direction: column; gap: 1px; }
+      .app { padding: 14px 15px 10px; border-radius: 16px; }
+      .app-head { gap: 12px; }
+      .app-icon { width: 42px; height: 42px; border-radius: 11px; }
+      .app-name { font-size: 17.5px; }
+      .app-kind { font-size: 12px; }
+      .app-summary {
+        margin-top: 9px;
+        font-size: 12.75px;
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+      }
+      .builds { margin-top: 11px; }
+      .build { gap: 10px; padding: 9px 0; }
+      .build h3 { font-size: 13.5px; }
+      .build-meta { flex-direction: column; gap: 0; margin-top: 1px; }
       .build-meta .sep { display: none; }
-      .download { height: 34px; padding: 0 12px; font-size: 12px; }
-      .ipa-copy { width: 34px; height: 34px; }
-      .source-section { margin-top: 18px; }
-      .source { height: 38px; padding: 3px 3px 3px 12px; }
-      .source-label { display: none; }
-      .source-url { font-size: 11.5px; }
-      .copy-repo { height: 30px; padding: 0 11px; }
+      .build-meta .build-number, .build-meta time { font-size: 11px; line-height: 1.35; }
+      .download { height: 32px; padding: 0 12px; font-size: 12px; }
+      .ipa-copy { width: 32px; height: 32px; }
+      .app-actions { padding-top: 8px; }
+      .notes-button { height: 28px; font-size: 12px; }
+      .source-section { margin-top: 12px; }
+      .source { height: 36px; padding: 3px 3px 3px 11px; gap: 8px; }
+      .source-label { font-size: 10.5px; }
+      .source-url { font-size: 11px; }
+      .copy-repo { height: 28px; padding: 0 10px; font-size: 11.5px; }
+      .source-hint { margin-top: 6px; font-size: 11.5px; }
+      .site-footer { padding: 6px 0 12px; }
       .release-dialog {
         --dialog-height: calc(100dvh - 18px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         width: calc(100% - 16px);
