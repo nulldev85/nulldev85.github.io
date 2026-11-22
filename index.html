@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#09090b">
+  <meta name="theme-color" content="#070709">
   <meta name="description" content="Lineup and NullSign for iPhone and Apple TV: what each app does, what changed in its latest build, and where to download it.">
   <meta property="og:title" content="Null’s Apps">
   <meta property="og:description" content="Lineup and NullSign for iPhone and Apple TV.">
@@ -15,20 +15,19 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #09090b;
-      --surface: #111114;
-      --surface-subtle: #0d0d10;
-      --surface-hover: #1a1a1f;
-      --line: rgba(255, 255, 255, 0.08);
+      --bg: #070709;
+      --surface: rgba(255, 255, 255, 0.028);
+      --surface-elevated: #111115;
+      --surface-hover: rgba(255, 255, 255, 0.065);
+      --line: rgba(255, 255, 255, 0.075);
       --line-strong: rgba(255, 255, 255, 0.13);
-      --line-hover: rgba(255, 255, 255, 0.22);
-      --text: #f4f4f5;
-      --text-2: #a1a1aa;
-      --text-3: #71717a;
-      --focus: rgba(244, 244, 245, 0.75);
+      --text: #f3f3f5;
+      --text-2: #9b9ba4;
+      --text-3: #686873;
+      --focus: rgba(243, 243, 245, 0.72);
       --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui, "Segoe UI", sans-serif;
       --mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --top: 64px;
+      --top: 58px;
     }
 
     * { box-sizing: border-box; }
@@ -49,22 +48,34 @@
       padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       color: var(--text);
       background:
-        radial-gradient(65% 40% at 50% 0%, rgba(255, 255, 255, 0.04), transparent 72%),
+        radial-gradient(56% 36% at 50% -4%, rgba(255, 255, 255, 0.045), transparent 74%),
         var(--bg);
-      font: 400 15px/1.6 var(--sans);
+      font: 400 14.5px/1.6 var(--sans);
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
 
-    ::selection { background: rgba(255, 255, 255, 0.2); color: #fff; }
+    ::selection { background: rgba(255, 255, 255, 0.18); color: #fff; }
     a { color: inherit; }
     button { font: inherit; color: inherit; }
     svg { flex: 0 0 auto; }
     img { -webkit-user-drag: none; user-select: none; }
 
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     .wrap {
-      width: min(980px, 100% - 40px);
+      width: min(920px, 100% - 40px);
       margin: 0 auto;
     }
 
@@ -73,57 +84,56 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 28px 0 32px;
+      padding: 36px 0 40px;
     }
 
-    /* Minimal sticky top bar */
+    /* Featherlight top navigation bar */
     .site-top {
       position: sticky;
       top: 0;
       z-index: 30;
       padding-top: env(safe-area-inset-top);
-      background: rgba(9, 9, 11, 0.8);
+      background: rgba(7, 7, 9, 0.76);
       border-bottom: 1px solid var(--line);
-      -webkit-backdrop-filter: blur(16px);
-      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      backdrop-filter: blur(18px) saturate(140%);
     }
     .site-top-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      width: min(980px, 100% - 40px);
-      min-height: 60px;
+      width: min(920px, 100% - 40px);
+      height: 56px;
       margin: 0 auto;
-      padding: 6px 0;
     }
     .float-mark {
       display: inline-flex;
       align-items: center;
-      gap: 9px;
-      min-height: 44px;
-      padding: 4px 8px 4px 2px;
-      border-radius: 10px;
+      gap: 8px;
+      height: 34px;
+      padding: 0 6px 0 0;
+      border-radius: 999px;
       text-decoration: none;
       color: var(--text);
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 600;
       letter-spacing: -0.02em;
     }
     .mark-logo {
       display: block;
-      width: 17px;
-      height: 17px;
+      width: 15px;
+      height: 15px;
       margin-top: -2px;
       filter: brightness(0) invert(1);
-      opacity: 0.92;
+      opacity: 0.9;
     }
     .brand-word { white-space: nowrap; }
 
     .site-nav-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
     }
     .site-menu {
       position: relative;
@@ -135,14 +145,13 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      height: 36px;
-      min-height: 44px;
-      padding: 0 13px;
-      border: 1px solid var(--line-strong);
-      border-radius: 10px;
+      gap: 7px;
+      height: 32px;
+      padding: 0 11px;
+      border: 1px solid transparent;
+      border-radius: 999px;
       background: transparent;
-      color: var(--text);
+      color: var(--text-2);
       font-size: 13px;
       font-weight: 500;
       letter-spacing: -0.01em;
@@ -152,11 +161,11 @@
     @media (hover: hover) {
       .site-top .signer-launch:hover,
       .menu-toggle:hover {
+        color: var(--text);
         background: var(--surface-hover);
-        border-color: var(--line-hover);
       }
       .float-mark:hover {
-        opacity: 0.85;
+        opacity: 0.82;
       }
     }
     .menu-toggle::-webkit-details-marker,
@@ -173,24 +182,12 @@
       max-width: none;
       height: auto;
     }
-    .iphone-device { width: 14px; height: 24px; }
+    .iphone-device { width: 12px; height: 20px; opacity: 0.9; }
     .iphone-device img { width: 100%; height: 100%; object-fit: contain; }
-    .menu-toggle .apple-tv-box { width: auto; height: 22px; }
+    .menu-toggle .apple-tv-box { width: auto; height: 18px; opacity: 0.9; }
     .apple-tv-box img { width: auto; height: 100%; }
 
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    /* Two-column app grid */
+    /* Two-column editorial app cards */
     .apps {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -201,38 +198,42 @@
       display: flex;
       flex-direction: column;
       min-width: 0;
-      padding: 24px;
+      padding: 26px 26px 20px;
       border: 1px solid var(--line);
-      border-radius: 16px;
-      background: var(--surface);
-      scroll-margin-top: calc(var(--top) + 12px);
-      transition: border-color 0.18s ease;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.036) 0%, rgba(255, 255, 255, 0.018) 100%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      scroll-margin-top: calc(var(--top) + 14px);
+      transition: border-color 0.2s ease, background 0.2s ease;
     }
     @media (hover: hover) {
-      .app:hover { border-color: var(--line-strong); }
+      .app:hover {
+        border-color: var(--line-strong);
+      }
     }
 
     .app-head {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 15px;
     }
     .app-icon {
       position: relative;
       display: block;
       flex: 0 0 auto;
-      width: 52px;
-      height: 52px;
+      width: 54px;
+      height: 54px;
       overflow: hidden;
-      border-radius: 13px;
-      background: #141418;
+      border-radius: 14px;
+      background: #131317;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
     }
     .app-icon::after {
       content: "";
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.11);
       pointer-events: none;
     }
     .app-icon img {
@@ -245,15 +246,16 @@
     .app-name {
       margin: 0;
       color: var(--text);
-      font-size: 21px;
+      font-size: 20px;
       font-weight: 650;
       line-height: 1.2;
-      letter-spacing: -0.025em;
+      letter-spacing: -0.028em;
     }
     .app-kind {
       margin: 2px 0 0;
-      color: var(--text-2);
-      font-size: 13.5px;
+      color: var(--text-3);
+      font-size: 13px;
+      font-weight: 450;
       line-height: 1.4;
     }
 
@@ -265,171 +267,192 @@
     .app-summary {
       margin: 16px 0 0;
       color: var(--text-2);
-      font-size: 14px;
-      line-height: 1.6;
+      font-size: 13.75px;
+      line-height: 1.62;
     }
 
-    /* Clean builds list */
+    /* Hairline horizontal build rows — no nested box */
     .builds {
       margin-top: 20px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--surface-subtle);
-      overflow: hidden;
+      border-top: 1px solid var(--line);
     }
     .build {
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 15px 16px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 0;
     }
     .build + .build {
       border-top: 1px solid var(--line);
     }
     .build-info {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
+      min-width: 0;
+      flex: 1 1 auto;
     }
     .build-top {
       display: flex;
+      flex-wrap: wrap;
       align-items: baseline;
-      justify-content: space-between;
-      gap: 10px;
+      gap: 4px 8px;
     }
     .build h3 {
       margin: 0;
       color: var(--text);
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 600;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.012em;
     }
     .build-meta {
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
-      justify-content: space-between;
-      gap: 4px 10px;
-      margin: 0;
+      gap: 2px 8px;
+      margin: 2px 0 0;
       color: var(--text-3);
-      font-size: 12.5px;
+      font-size: 12px;
       line-height: 1.45;
       font-variant-numeric: tabular-nums;
     }
     .build-meta .build-number {
       color: var(--text-2);
       font-family: var(--mono);
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 500;
     }
-    .build-meta .sep { display: none; }
+    .build-meta .sep {
+      color: var(--text-3);
+      opacity: 0.6;
+    }
     .build-meta time {
       color: var(--text-3);
-      font-size: 12px;
+      font-size: 11.5px;
     }
 
+    /* Compact, jewel-like action pills */
     .build-actions {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: stretch;
-      gap: 8px;
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 6px;
     }
     .download {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
-      min-height: 44px;
-      padding: 9px 14px;
-      border: 1px solid transparent;
-      border-radius: 10px;
-      background: var(--text);
+      gap: 6px;
+      height: 32px;
+      padding: 0 13px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      background: #ececef;
       color: #09090b;
-      font-size: 13.5px;
+      font-size: 12.5px;
       font-weight: 600;
       letter-spacing: -0.01em;
       text-decoration: none;
       white-space: nowrap;
     }
     @media (hover: hover) {
-      .download:hover { background: #ffffff; }
+      .download:hover {
+        background: #ffffff;
+      }
     }
-    .download svg { width: 14px; height: 14px; }
+    .download svg { width: 13px; height: 13px; }
     .download-compact { display: none; }
 
-    .notes-button {
+    .ipa-copy {
       display: inline-flex;
-      flex: 1 1 0;
       align-items: center;
       justify-content: center;
-      gap: 7px;
-      min-width: 0;
-      min-height: 44px;
-      padding: 9px 13px;
+      width: 32px;
+      height: 32px;
+      padding: 0;
       border: 1px solid var(--line-strong);
-      border-radius: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-2);
+      cursor: pointer;
+    }
+    @media (hover: hover) {
+      .ipa-copy:hover {
+        color: var(--text);
+        border-color: rgba(255, 255, 255, 0.24);
+        background: var(--surface-hover);
+      }
+    }
+    .ipa-copy svg { width: 13.5px; height: 13.5px; }
+    .ipa-copy .icon-done { display: none; color: var(--text); }
+    .ipa-copy.is-copied { border-color: rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.1); }
+    .ipa-copy.is-copied .icon-copy { display: none; }
+    .ipa-copy.is-copied .icon-done { display: block; }
+
+    /* Weightless card footer links */
+    .app-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    .notes-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 30px;
+      padding: 0 11px;
+      border: 0;
+      border-radius: 999px;
       background: transparent;
-      color: var(--text);
-      font-size: 13.5px;
+      color: var(--text-2);
+      font-size: 12.5px;
       font-weight: 500;
       letter-spacing: -0.01em;
       white-space: nowrap;
     }
     @media (hover: hover) {
       .notes-button:hover {
-        border-color: var(--line-hover);
+        color: var(--text);
         background: var(--surface-hover);
       }
     }
-    .notes-button svg { width: 14px; height: 14px; color: var(--text-2); }
+    .notes-button svg { width: 13.5px; height: 13.5px; opacity: 0.78; }
 
-    .build-actions .ipa-copy {
-      flex: 0 0 auto;
-      min-width: 106px;
-      padding: 9px 12px;
-      font-size: 13px;
-    }
-    .build-actions .ipa-copy svg { display: block; width: 14px; height: 14px; }
-    .ipa-copy-label { display: inline-block; min-width: 7.5ch; text-align: center; }
-
-    .app-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: auto;
-      padding-top: 16px;
-    }
-
-    /* Quiet AppSource copy bar */
+    /* Slim pill AppSource bar */
     .source-section {
-      margin-top: 24px;
+      margin-top: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .source {
       display: flex;
-      align-items: stretch;
-      max-width: 680px;
-      min-height: 46px;
-      overflow: hidden;
-      border: 1px solid var(--line-strong);
-      border-radius: 11px;
+      align-items: center;
+      width: 100%;
+      max-width: 640px;
+      height: 40px;
+      padding: 4px 4px 4px 14px;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
       background: var(--surface);
     }
     .source-label {
-      display: flex;
-      align-items: center;
-      padding: 0 14px;
-      border-right: 1px solid var(--line);
+      flex: 0 0 auto;
       color: var(--text-3);
-      font-size: 12.5px;
-      font-weight: 500;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
     }
     .source-url {
       flex: 1 1 auto;
       min-width: 0;
-      align-self: center;
-      padding: 0 14px;
       overflow: hidden;
       color: var(--text-2);
-      font: 400 13px var(--mono);
+      font: 400 12px var(--mono);
       white-space: nowrap;
       text-overflow: ellipsis;
     }
@@ -438,57 +461,60 @@
       flex: 0 0 auto;
       align-items: center;
       justify-content: center;
-      gap: 7px;
-      min-width: 96px;
-      padding: 0 15px;
-      border: 0;
-      border-left: 1px solid var(--line);
-      background: transparent;
+      gap: 6px;
+      height: 30px;
+      padding: 0 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
       color: var(--text);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       white-space: nowrap;
       cursor: pointer;
     }
     @media (hover: hover) {
-      .copy-repo:hover { background: var(--surface-hover); }
+      .copy-repo:hover {
+        background: rgba(255, 255, 255, 0.11);
+        border-color: rgba(255, 255, 255, 0.22);
+      }
     }
-    .copy-repo:focus-visible { outline-offset: -3px; border-radius: 0 10px 10px 0; }
-    .copy-repo svg { width: 14px; height: 14px; color: var(--text-2); }
+    .copy-repo svg { width: 13px; height: 13px; color: var(--text-2); }
     .copy-repo .icon-done { display: none; color: var(--text); }
+    .copy-repo.is-copied { background: rgba(255, 255, 255, 0.14); }
     .copy-repo.is-copied .icon-copy { display: none; }
     .copy-repo.is-copied .icon-done { display: block; }
     .source-hint {
-      max-width: 680px;
       margin: 10px 0 0;
       color: var(--text-3);
-      font-size: 13px;
+      font-size: 12px;
       line-height: 1.5;
+      text-align: center;
     }
     .feed-status:not(:empty)::before { content: " "; }
 
-    /* Minimal modals */
+    /* Minimal elevated modals */
     .release-dialog {
-      --dialog-height: min(840px, calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
-      width: min(560px, 100% - 32px);
+      --dialog-height: min(820px, calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+      width: min(540px, 100% - 32px);
       max-width: none;
       max-height: var(--dialog-height);
       margin: auto;
       padding: 0;
       overflow: hidden;
       border: 1px solid var(--line-strong);
-      border-radius: 18px;
+      border-radius: 20px;
       color: var(--text);
-      background: var(--surface);
+      background: var(--surface-elevated);
       box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72);
     }
     .release-dialog[open] {
       animation: dialog-in 0.18s cubic-bezier(.2, .8, .2, 1);
     }
     .release-dialog::backdrop {
-      background: rgba(0, 0, 0, 0.7);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.68);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
     }
     .dialog-body {
       display: flex;
@@ -499,42 +525,41 @@
     .dialog-head {
       display: flex;
       flex: 0 0 auto;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: 16px;
-      padding: 20px 24px 16px;
+      padding: 18px 22px 15px;
       border-bottom: 1px solid var(--line);
     }
     .dialog-content {
       min-height: 0;
       overflow: auto;
-      padding: 18px 24px 26px;
+      padding: 18px 22px 24px;
       overscroll-behavior: none contain;
       scrollbar-width: thin;
       scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
     }
     .dialog-kicker {
-      margin: 0 0 3px;
+      margin: 0 0 2px;
       color: var(--text-3);
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 500;
     }
     .dialog-head h2 {
       margin: 0;
-      font-size: 21px;
+      font-size: 19px;
       font-weight: 650;
       letter-spacing: -0.02em;
     }
     .dialog-head h2:focus { outline: none; }
     .dialog-close {
       display: grid;
-      width: 44px;
-      height: 44px;
+      width: 32px;
+      height: 32px;
       flex: 0 0 auto;
-      margin: -6px -8px 0 0;
       place-items: center;
       border: 1px solid var(--line);
-      border-radius: 10px;
+      border-radius: 999px;
       color: var(--text-2);
       background: transparent;
       cursor: pointer;
@@ -542,22 +567,22 @@
     @media (hover: hover) {
       .dialog-close:hover {
         color: var(--text);
-        border-color: var(--line-hover);
+        border-color: var(--line-strong);
         background: var(--surface-hover);
       }
     }
-    .dialog-close svg { width: 15px; height: 15px; }
+    .dialog-close svg { width: 14px; height: 14px; }
     .dialog-intro {
       margin: 0;
       color: var(--text-2);
-      font-size: 14px;
+      font-size: 13.75px;
       line-height: 1.6;
     }
 
     /* Release notes */
     .release-build {
-      margin-top: 20px;
-      padding-top: 18px;
+      margin-top: 18px;
+      padding-top: 16px;
       border-top: 1px solid var(--line);
     }
     .release-build-head {
@@ -569,29 +594,29 @@
     }
     .release-build-head h3 {
       margin: 0;
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 600;
     }
     .release-build-version {
       color: var(--text-2);
-      font: 500 12.5px var(--mono);
+      font: 500 12px var(--mono);
     }
     .release-build-info {
-      margin: 3px 0 0;
+      margin: 2px 0 0;
       color: var(--text-3);
-      font-size: 12.5px;
+      font-size: 12px;
       line-height: 1.5;
     }
     .release-list {
-      margin: 14px 0 0;
+      margin: 12px 0 0;
       padding: 0;
       list-style: none;
     }
     .release-list li {
       position: relative;
-      padding-left: 16px;
+      padding-left: 15px;
       color: #d4d4d8;
-      font-size: 14px;
+      font-size: 13.75px;
       line-height: 1.62;
     }
     .release-list li::before {
@@ -604,27 +629,27 @@
       border-radius: 50%;
       background: var(--text-3);
     }
-    .release-list li + li { margin-top: 10px; }
-    .notes-pending { margin: 14px 0 0; color: var(--text-2); font-size: 14px; line-height: 1.6; }
+    .release-list li + li { margin-top: 9px; }
+    .notes-pending { margin: 14px 0 0; color: var(--text-2); font-size: 13.75px; line-height: 1.6; }
 
     /* Features */
     .feature-list { margin-top: 2px; }
     .feature {
-      padding: 15px 0 16px;
+      padding: 14px 0 15px;
       border-top: 1px solid var(--line);
     }
     .feature:first-child { padding-top: 0; border-top: 0; }
     .feature:last-child { padding-bottom: 0; }
     .feature h3 {
-      margin: 0 0 5px;
+      margin: 0 0 4px;
       color: var(--text);
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 600;
     }
     .feature p {
       margin: 0;
       color: var(--text-2);
-      font-size: 14px;
+      font-size: 13.5px;
       line-height: 1.6;
     }
 
@@ -633,31 +658,31 @@
       margin: 0;
       padding: 12px 14px;
       border: 1px solid var(--line);
-      border-radius: 10px;
-      background: var(--surface-subtle);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.025);
       color: var(--text-2);
-      font-size: 13.5px;
+      font-size: 13px;
       line-height: 1.6;
     }
     .install-needs strong { color: var(--text); font-weight: 600; }
     .install-steps {
-      padding-left: 22px;
-      margin: 18px 0;
+      padding-left: 20px;
+      margin: 16px 0;
     }
     .install-steps li {
       padding-left: 4px;
-      margin: 0 0 16px;
+      margin: 0 0 14px;
       color: var(--text-2);
-      font-size: 14px;
+      font-size: 13.5px;
       line-height: 1.6;
     }
-    .install-steps li::marker { color: var(--text-3); font-family: var(--mono); font-size: 12.5px; }
-    .install-steps strong { display: block; margin-bottom: 3px; color: var(--text); font-weight: 600; }
+    .install-steps li::marker { color: var(--text-3); font-family: var(--mono); font-size: 12px; }
+    .install-steps strong { display: block; margin-bottom: 2px; color: var(--text); font-weight: 600; }
     .install-steps p { margin: 0; }
     .guide-note {
-      margin: 16px 0 0;
+      margin: 14px 0 0;
       color: var(--text-3);
-      font-size: 12.5px;
+      font-size: 12px;
       line-height: 1.6;
     }
     .guide-note a,
@@ -667,7 +692,7 @@
       text-underline-offset: 3px;
     }
     .install-trouble {
-      margin-top: 12px;
+      margin-top: 10px;
       border-top: 1px solid var(--line);
     }
     .help-toggle {
@@ -677,7 +702,7 @@
       gap: 10px;
       list-style: none;
       color: var(--text);
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 500;
       cursor: pointer;
     }
@@ -685,19 +710,19 @@
       content: "+";
       margin-left: auto;
       color: var(--text-3);
-      font: 500 18px/1 var(--sans);
+      font: 500 17px/1 var(--sans);
     }
     .install-trouble[open] > .help-toggle::after { content: "−"; }
     .install-trouble p {
-      margin: 0 0 12px;
+      margin: 0 0 10px;
       color: var(--text-2);
-      font-size: 13.5px;
+      font-size: 13px;
       line-height: 1.6;
     }
 
     /* Web Signer modal */
     #web-signer {
-      background: var(--surface);
+      background: var(--surface-elevated);
     }
     .signer-frame {
       display: block;
@@ -713,39 +738,37 @@
     /* Minimal footer */
     .site-footer {
       padding: 16px 0 22px;
-      border-top: 1px solid var(--line);
       color: var(--text-3);
-      font-size: 13px;
+      font-size: 12px;
+      text-align: center;
     }
 
     /* Motion */
-    [data-project-card] { animation: card-in 0.45s cubic-bezier(.2, .8, .2, 1) backwards; }
+    [data-project-card] { animation: card-in 0.42s cubic-bezier(.2, .8, .2, 1) backwards; }
     [data-project-card] + [data-project-card] { animation-delay: 0.05s; }
-    @keyframes card-in { from { opacity: 0; transform: translateY(8px); } }
+    @keyframes card-in { from { opacity: 0; transform: translateY(6px); } }
     @keyframes dialog-in { from { opacity: 0; transform: translateY(6px) scale(0.99); } }
 
     /* Tactile press feedback */
-    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle) {
-      min-height: 44px;
-      min-width: 44px;
+    :is(.download, .ipa-copy, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle) {
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       cursor: pointer;
-      transition: transform 0.12s cubic-bezier(.2, .8, .2, 1), background 0.14s ease, border-color 0.14s ease, opacity 0.14s ease;
+      transition: transform 0.12s cubic-bezier(.2, .8, .2, 1), background 0.14s ease, border-color 0.14s ease, color 0.14s ease, opacity 0.14s ease;
     }
-    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle):is(.is-pointer-pressed, .is-key-pressed) {
-      transform: translateY(1px) scale(0.98);
+    :is(.download, .ipa-copy, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle):is(.is-pointer-pressed, .is-key-pressed) {
+      transform: scale(0.96);
       transition-duration: 0.04s;
     }
-    :is(.download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle):focus-visible {
+    :is(.download, .ipa-copy, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle):focus-visible {
       outline: 2px solid var(--focus);
       outline-offset: 2px;
     }
 
     body:has(.release-dialog[open]) { overflow: hidden; }
 
-    /* Status toast */
+    /* Subtle status pill toast */
     .action-status {
       position: fixed;
       left: 50%;
@@ -754,15 +777,15 @@
       width: max-content;
       max-width: calc(100% - 32px);
       margin: 0;
-      padding: 10px 16px;
+      padding: 8px 14px;
       border: 1px solid var(--line-strong);
       border-radius: 999px;
       color: var(--text);
-      background: rgba(17, 17, 20, 0.94);
+      background: rgba(17, 17, 21, 0.92);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-      font-size: 13px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+      font-size: 12.5px;
       font-weight: 500;
       text-align: center;
       pointer-events: none;
@@ -775,38 +798,42 @@
       transform: translate(-50%, 0);
     }
 
-    /* Tablet & mobile */
-    @media (max-width: 820px) {
-      main.wrap { justify-content: flex-start; padding: 22px 0 28px; }
+    /* Responsive tablet & mobile */
+    @media (max-width: 800px) {
+      main.wrap { justify-content: flex-start; padding: 20px 0 28px; }
       .apps { grid-template-columns: minmax(0, 1fr); gap: 16px; }
     }
     @media (max-width: 600px) {
       .wrap,
       .site-top-inner { width: calc(100% - 28px); }
-      .site-top-inner { min-height: 56px; gap: 8px; }
+      .site-top-inner { height: 52px; }
       .site-top .signer-launch,
-      .menu-toggle { padding: 0 11px; gap: 6px; font-size: 12.5px; }
-      .app { padding: 18px; border-radius: 14px; }
+      .menu-toggle { padding: 0 9px; gap: 6px; font-size: 12.5px; }
+      .app { padding: 20px 18px 16px; border-radius: 18px; }
       .app-icon { width: 48px; height: 48px; border-radius: 12px; }
-      .app-name { font-size: 19px; }
-      .build { padding: 13px 14px; }
-      .build-actions .ipa-copy { min-width: 44px; width: 44px; padding: 9px; }
-      .ipa-copy-label { display: none; }
+      .app-name { font-size: 18.5px; }
+      .app-summary { font-size: 13.5px; }
+      .build { gap: 10px; padding: 13px 0; }
+      .build-meta { flex-direction: column; gap: 1px; }
+      .build-meta .sep { display: none; }
+      .download { height: 34px; padding: 0 12px; font-size: 12px; }
+      .ipa-copy { width: 34px; height: 34px; }
       .source-section { margin-top: 18px; }
+      .source { height: 38px; padding: 3px 3px 3px 12px; }
       .source-label { display: none; }
-      .source-url { padding: 0 12px; font-size: 12px; }
-      .copy-repo { min-width: 86px; padding: 0 12px; }
+      .source-url { font-size: 11.5px; }
+      .copy-repo { height: 30px; padding: 0 11px; }
       .release-dialog {
         --dialog-height: calc(100dvh - 18px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         width: calc(100% - 16px);
         margin: auto auto calc(8px + env(safe-area-inset-bottom));
-        border-radius: 18px;
+        border-radius: 20px;
       }
       .release-dialog[open] { animation-name: sheet-in; }
-      .dialog-head { padding: 16px 20px 14px; }
-      .dialog-content { padding: 14px 20px calc(22px + env(safe-area-inset-bottom)); }
+      .dialog-head { padding: 16px 18px 13px; }
+      .dialog-content { padding: 14px 18px calc(22px + env(safe-area-inset-bottom)); }
     }
-    @media (max-width: 415px) {
+    @media (max-width: 390px) {
       .brand-word { display: none; }
     }
     @keyframes sheet-in { from { opacity: 0; transform: translateY(20px); } }
@@ -849,7 +876,7 @@
     <div class="apps">
       <article class="app" id="lineup" data-project-card aria-labelledby="lineup-name">
         <header class="app-head">
-          <span class="app-icon"><img src="assets/lineup-icon.png" alt="" width="52" height="52"></span>
+          <span class="app-icon"><img src="assets/lineup-icon.png" alt="" width="54" height="54"></span>
           <div class="app-title">
             <h2 class="app-name" id="lineup-name">Lineup</h2>
             <p class="app-kind">Live sports · iPhone &amp; Apple TV</p>
@@ -863,11 +890,11 @@
                 <div class="build-top">
                   <h3 id="iphone-build-title">iPhone</h3>
                 </div>
-                <p class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>1231</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-21T23:17:42Z">Nov 21, 2026, 11:17 PM UTC</time></p>
+                <p class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> (<span data-build-number>1231</span>)</span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-21T23:17:42Z">Nov 21, 2026, 11:17 PM UTC</time></p>
               </div>
               <div class="build-actions">
-                <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-44958861235/Lineup-iPhone-0.19.0-1231.ipa" aria-label="Download the latest Lineup iPhone IPA"><span class="download-full">Download IPA</span><span class="download-compact">Download</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
-                <button class="notes-button ipa-copy" type="button" data-copy-ipa aria-label="Copy the Lineup iPhone IPA link" title="Copy IPA link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span class="ipa-copy-label">Copy link</span></button>
+                <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-44958861235/Lineup-iPhone-0.19.0-1231.ipa" aria-label="Download the latest Lineup iPhone IPA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v14m-5.5-5.5L12 18l5.5-5.5"/></svg><span class="download-full">IPA</span><span class="download-compact">IPA</span></a>
+                <button class="ipa-copy" type="button" data-copy-ipa aria-label="Copy the Lineup iPhone IPA link" title="Copy IPA link"><svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><svg class="icon-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="sr-only ipa-copy-label">Copy link</span></button>
               </div>
             </section>
             <section class="build" data-bundle="com.nulldev85.NullSports" aria-labelledby="tvos-build-title">
@@ -875,11 +902,11 @@
                 <div class="build-top">
                   <h3 id="tvos-build-title">Apple TV</h3>
                 </div>
-                <p class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> · Build <span data-build-number>969</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-21T23:15:23Z">Nov 21, 2026, 11:15 PM UTC</time></p>
+                <p class="build-meta"><span class="build-number">v<span data-version-number>0.19.0</span> (<span data-build-number>969</span>)</span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-21T23:15:23Z">Nov 21, 2026, 11:15 PM UTC</time></p>
               </div>
               <div class="build-actions">
-                <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-44958861305-1/Lineup-tvOS-0.19.0-969.ipa" aria-label="Download the latest Lineup Apple TV IPA"><span class="download-full">Download IPA</span><span class="download-compact">Download</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
-                <button class="notes-button ipa-copy" type="button" data-copy-ipa aria-label="Copy the Lineup Apple TV IPA link" title="Copy IPA link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span class="ipa-copy-label">Copy link</span></button>
+                <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsports-source-tvos-44958861305-1/Lineup-tvOS-0.19.0-969.ipa" aria-label="Download the latest Lineup Apple TV IPA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v14m-5.5-5.5L12 18l5.5-5.5"/></svg><span class="download-full">IPA</span><span class="download-compact">IPA</span></a>
+                <button class="ipa-copy" type="button" data-copy-ipa aria-label="Copy the Lineup Apple TV IPA link" title="Copy IPA link"><svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><svg class="icon-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="sr-only ipa-copy-label">Copy link</span></button>
               </div>
             </section>
           </div>
@@ -892,7 +919,7 @@
 
       <article class="app" id="nullsign" data-project-card aria-labelledby="nullsign-name">
         <header class="app-head">
-          <span class="app-icon"><img src="assets/nullsign-icon.png" alt="" width="52" height="52"></span>
+          <span class="app-icon"><img src="assets/nullsign-icon.png" alt="" width="54" height="54"></span>
           <div class="app-title">
             <h2 class="app-name" id="nullsign-name">NullSign</h2>
             <p class="app-kind">iOS signing &amp; install</p>
@@ -906,11 +933,11 @@
                 <div class="build-top">
                   <h3>iOS</h3>
                 </div>
-                <p class="build-meta"><span class="build-number">v<span data-version-number>2.0.0</span> · Build <span data-build-number>75</span></span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-20T10:45:26Z">Nov 20, 2026, 2:45 AM PST</time></p>
+                <p class="build-meta"><span class="build-number">v<span data-version-number>2.0.0</span> (<span data-build-number>75</span>)</span><span class="sep" aria-hidden="true">·</span><time class="release-time" data-release-time datetime="2026-11-20T10:45:26Z">Nov 20, 2026, 2:45 AM PST</time></p>
               </div>
               <div class="build-actions">
-                <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-44720012641/NullSign-2.0.0-75.ipa" aria-label="Download the latest NullSign IPA"><span class="download-full">Download IPA</span><span class="download-compact">Download</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a>
-                <button class="notes-button ipa-copy" type="button" data-copy-ipa aria-label="Copy the NullSign IPA link" title="Copy IPA link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span class="ipa-copy-label">Copy link</span></button>
+                <a class="download" data-download href="https://github.com/nulldev85/AppSource/releases/download/dist-nullsign-source-44720012641/NullSign-2.0.0-75.ipa" aria-label="Download the latest NullSign IPA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v14m-5.5-5.5L12 18l5.5-5.5"/></svg><span class="download-full">IPA</span><span class="download-compact">IPA</span></a>
+                <button class="ipa-copy" type="button" data-copy-ipa aria-label="Copy the NullSign IPA link" title="Copy IPA link"><svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><svg class="icon-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="sr-only ipa-copy-label">Copy link</span></button>
               </div>
             </section>
           </div>
@@ -1069,7 +1096,7 @@
   <script src="release-notes.js?v=1"></script>
   <script>
     (() => {
-      const controls = ".download, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle";
+      const controls = ".download, .ipa-copy, .notes-button, .copy-repo, .dialog-close, .float-mark, .menu-toggle, .help-toggle";
       // Explicit held state also works on touch browsers that omit :active.
       let heldPointer = null;
       const releasePointerPress = () => {
@@ -1227,10 +1254,14 @@
           const link = button.closest(".build-actions")?.querySelector("a.download");
           if (!link) return;
           const copied = await copyText(link.href);
-          label.textContent = copied ? "Copied" : "Try again";
+          if (label) label.textContent = copied ? "Copied" : "Try again";
+          button.classList.toggle("is-copied", copied);
           announceAction(copied ? "IPA link copied" : "Couldn’t copy. Try again.");
           clearTimeout(resetLabel);
-          resetLabel = setTimeout(() => { label.textContent = "Copy link"; }, 1900);
+          resetLabel = setTimeout(() => {
+            if (label) label.textContent = "Copy link";
+            button.classList.remove("is-copied");
+          }, 1900);
         });
       });
 
