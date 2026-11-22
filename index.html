@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#070709">
+  <meta name="theme-color" content="#080708">
   <meta name="description" content="Lineup and NullSign for iPhone and Apple TV: what each app does, what changed in its latest build, and where to download it.">
   <meta property="og:title" content="Null’s Apps">
   <meta property="og:description" content="Lineup and NullSign for iPhone and Apple TV.">
@@ -15,16 +15,16 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #070709;
-      --surface: rgba(255, 255, 255, 0.028);
-      --surface-elevated: #111115;
-      --surface-hover: rgba(255, 255, 255, 0.065);
-      --line: rgba(255, 255, 255, 0.075);
-      --line-strong: rgba(255, 255, 255, 0.13);
-      --text: #f3f3f5;
-      --text-2: #9b9ba4;
-      --text-3: #686873;
-      --focus: rgba(243, 243, 245, 0.72);
+      --bg: #080708;
+      --surface: rgba(255, 242, 220, 0.028);
+      --surface-elevated: #121110;
+      --surface-hover: rgba(255, 240, 215, 0.07);
+      --line: rgba(245, 220, 180, 0.085);
+      --line-strong: rgba(245, 220, 180, 0.145);
+      --text: #f5f1ea;
+      --text-2: #a49e94;
+      --text-3: #736d65;
+      --focus: rgba(237, 190, 103, 0.78);
       --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui, "Segoe UI", sans-serif;
       --mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       --top: 58px;
@@ -48,7 +48,8 @@
       padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       color: var(--text);
       background:
-        radial-gradient(56% 36% at 50% -4%, rgba(255, 255, 255, 0.045), transparent 74%),
+        radial-gradient(62% 38% at 50% -4%, rgba(214, 146, 46, 0.13), transparent 74%),
+        radial-gradient(40% 30% at 88% 18%, rgba(186, 86, 30, 0.055), transparent 68%),
         var(--bg);
       font: 400 14.5px/1.6 var(--sans);
       text-rendering: optimizeLegibility;
@@ -93,7 +94,7 @@
       top: 0;
       z-index: 30;
       padding-top: env(safe-area-inset-top);
-      background: rgba(7, 7, 9, 0.76);
+      background: rgba(8, 7, 8, 0.76);
       border-bottom: 1px solid var(--line);
       -webkit-backdrop-filter: blur(18px) saturate(140%);
       backdrop-filter: blur(18px) saturate(140%);
@@ -125,8 +126,7 @@
       width: 15px;
       height: 15px;
       margin-top: -2px;
-      filter: brightness(0) invert(1);
-      opacity: 0.9;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
     }
     .brand-word { white-space: nowrap; }
 
@@ -343,10 +343,10 @@
       gap: 6px;
       height: 32px;
       padding: 0 13px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 240, 215, 0.16);
       border-radius: 999px;
-      background: #ececef;
-      color: #09090b;
+      background: #f2ece1;
+      color: #0a0908;
       font-size: 12.5px;
       font-weight: 600;
       letter-spacing: -0.01em;
@@ -743,6 +743,17 @@
       text-align: center;
     }
 
+    /* Translucent, noninteractive autumn leaves. Only transforms animate. */
+    .autumn-leaves { position: fixed; inset: 0; z-index: 26; overflow: hidden; pointer-events: none; }
+    .autumn-leaf { position: absolute; top: -64px; left: var(--x); width: var(--size); height: var(--size); opacity: var(--opacity); animation: leaf-fall var(--duration) var(--delay) linear infinite; }
+    .leaf-sway { display: block; width: 100%; height: 100%; animation: leaf-sway var(--sway) var(--delay) ease-in-out infinite alternate; }
+    .autumn-leaf img { display: block; width: 100%; height: 100%; animation: leaf-turn var(--turn) var(--delay) ease-in-out infinite alternate; }
+    @keyframes leaf-fall { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(28px, calc(100dvh + 128px), 0); } }
+    @keyframes leaf-sway { from { transform: translateX(-24px) rotate(-18deg); } to { transform: translateX(24px) rotate(22deg); } }
+    @keyframes leaf-turn { from { transform: rotate(-35deg) rotateY(0deg); } to { transform: rotate(145deg) rotateY(65deg); } }
+    @media (max-width: 600px) { .autumn-leaf:nth-child(n+9) { display: none; } }
+    @media (prefers-reduced-motion: reduce), print { .autumn-leaves { display: none; } }
+
     /* Motion */
     [data-project-card] { animation: card-in 0.42s cubic-bezier(.2, .8, .2, 1) backwards; }
     [data-project-card] + [data-project-card] { animation-delay: 0.05s; }
@@ -886,6 +897,21 @@
       </div>
     </div>
   </header>
+
+  <div class="autumn-leaves" aria-hidden="true">
+    <span class="autumn-leaf" style="--x:4%;--size:30px;--duration:22s;--delay:-3s;--opacity:0.32;--sway:4s;--turn:7s"><span class="leaf-sway"><img src="assets/leaf-maple.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:13%;--size:24px;--duration:27s;--delay:-17s;--opacity:0.28;--sway:5s;--turn:8s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:22%;--size:38px;--duration:25s;--delay:-10s;--opacity:0.33;--sway:6s;--turn:9s"><span class="leaf-sway"><img src="assets/leaf-rust.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:31%;--size:22px;--duration:30s;--delay:-24s;--opacity:0.28;--sway:7s;--turn:10s"><span class="leaf-sway"><img src="assets/leaf-maple.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:40%;--size:28px;--duration:24s;--delay:-7s;--opacity:0.36;--sway:4s;--turn:11s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:49%;--size:34px;--duration:29s;--delay:-20s;--opacity:0.3;--sway:5s;--turn:7s"><span class="leaf-sway"><img src="assets/leaf-rust.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:61%;--size:26px;--duration:23s;--delay:-14s;--opacity:0.32;--sway:6s;--turn:8s"><span class="leaf-sway"><img src="assets/leaf-maple.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:77%;--size:36px;--duration:28s;--delay:-4s;--opacity:0.34;--sway:7s;--turn:9s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:88%;--size:28px;--duration:26s;--delay:-18s;--opacity:0.3;--sway:4s;--turn:10s"><span class="leaf-sway"><img src="assets/leaf-rust.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:96%;--size:24px;--duration:32s;--delay:-26s;--opacity:0.28;--sway:5s;--turn:11s"><span class="leaf-sway"><img src="assets/leaf-maple.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:56%;--size:22px;--duration:31s;--delay:-12s;--opacity:0.25;--sway:6s;--turn:7s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
+    <span class="autumn-leaf" style="--x:8%;--size:34px;--duration:33s;--delay:-29s;--opacity:0.3;--sway:7s;--turn:8s"><span class="leaf-sway"><img src="assets/leaf-rust.svg" alt="" width="48" height="64"></span></span>
+  </div>
 
   <main class="wrap" id="top">
     <h1 class="sr-only">Null’s Apps</h1>
