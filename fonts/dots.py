@@ -7,10 +7,11 @@ Every letter is drawn on a grid of round dots, five wide and seven tall for
 capitals, with two more rows below for descenders. Each dot in a font is the
 same small circle, placed by reference, which keeps the files small.
 
-  dots.woff2          one dot for each point of the grid
-  dots-display.woff2  the same single-line strokes with slightly larger circles
+  dots.woff2       Null Dots, regular: one dot for each point of the grid
+  dots-bold.woff2  Null Dots, bold: the same single-line strokes, bigger dots
 
-Both have the same metrics, so either can stand in for the other.
+Bold is never extra rows of dots, only bigger ones. Both have the same
+metrics, so either can stand in for the other.
 """
 
 import math
@@ -140,6 +141,9 @@ LETTERS = {
     "→": (1, ["..#..", "...#.", "#####", "...#.", "..#.."]),  # →
     "©": (CAPS, [".#####.", "#.....#", "#.###.#", "#.#...#", "#.###.#", "#.....#", ".#####."]),  # ©
     "é": (CAPS, ["...#.", "..#..", ".###.", "#...#", "#####", "#....", ".###."]),  # é
+    "ñ": (CAPS, [".##.#", "#..#.", "####.", "#...#", "#...#", "#...#", "#...#"]),  # ñ
+    '"': (CAPS, ["#.#", "#.#"]),
+    "↗": (1, ["..###", "...##", "..#.#", ".#...", "#...."]),  # ↗
 }
 SPACE = 4          # columns, the gap after it included
 PITCH = 100        # font units from one dot to the next
@@ -164,7 +168,7 @@ def dot(radius):
     return pen.glyph()
 
 
-def build(path, family, dot_size=.42):
+def build(path, family, dot_size=.38, bold=False):
     step = PITCH
     radius = step * dot_size
     names, glyphs, metrics, cmap = [".notdef", "space", "dot"], {}, {}, {32: "space"}
@@ -201,16 +205,19 @@ def build(path, family, dot_size=.42):
     font.setupGlyf(glyphs)
     font.setupHorizontalMetrics(metrics)
     font.setupHorizontalHeader(ascent=800, descent=-200)
-    font.setupNameTable({"familyName": family, "styleName": "Regular"})
+    font.setupNameTable({"familyName": family, "styleName": "Bold" if bold else "Regular"})
     font.setupOS2(sTypoAscender=800, sTypoDescender=-200, sTypoLineGap=0, usWinAscent=900, usWinDescent=300,
-                  sxHeight=500, sCapHeight=700, achVendID="NULL")
+                  sxHeight=500, sCapHeight=700, achVendID="NULL", usWeightClass=700 if bold else 400,
+                  fsSelection=0x20 if bold else 0x40)
     font.setupPost()
+    if bold:
+        font.font["head"].macStyle = 1
     font.font.flavor = "woff2"
     font.save(path)
     return path
 
 
 if __name__ == "__main__":
-    for file, family, dot_size in [("dots.woff2", "Null Dots", .42), ("dots-display.woff2", "Null Dots Display", .46)]:
-        out = build(HERE / file, family, dot_size)
+    for file, dot_size, bold in [("dots.woff2", .38, False), ("dots-bold.woff2", .47, True)]:
+        out = build(HERE / file, "Null Dots", dot_size, bold)
         print(out.name, out.stat().st_size, "bytes")
