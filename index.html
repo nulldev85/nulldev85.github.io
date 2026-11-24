@@ -780,43 +780,28 @@
       mask-image: radial-gradient(ellipse 95% 90% at 50% 45%, #000 55%, transparent 100%);
     }
     main.wrap, .site-footer { position: relative; z-index: 1; }
+    /* A streak: teal tail into a coral head, gliding along one grid line.
+       About three are out at a time; the script below sends them. */
     .streak {
       position: absolute;
-      border-radius: 1px;
+      top: 0;
+      left: 0;
       opacity: 0;
+      border-radius: 1px;
+      pointer-events: none;
       will-change: transform, opacity;
-      animation-timing-function: linear;
-      animation-iteration-count: infinite;
     }
     .streak.down {
-      top: 0;
-      left: calc(50% - var(--grid) / 2 + var(--col) * var(--grid));
       width: 1px;
-      height: 150px;
-      background: linear-gradient(to bottom, transparent, var(--tint) 70%, rgba(255, 255, 255, 0.95));
-      box-shadow: 0 0 10px var(--tint);
-      animation-name: streak-down;
+      height: var(--length);
+      background: linear-gradient(to bottom, transparent, rgba(45, 212, 191, 0.85) 22%, rgba(255, 98, 77, 0.9) 62%, #ff7a63);
+      box-shadow: 0 0 6px rgba(255, 98, 77, 0.45);
     }
     .streak.across {
-      left: 0;
-      top: calc(var(--grid) / 2 + var(--row) * var(--grid));
-      width: 170px;
+      width: var(--length);
       height: 1px;
-      background: linear-gradient(to right, transparent, var(--tint) 70%, rgba(255, 255, 255, 0.95));
-      box-shadow: 0 0 10px var(--tint);
-      animation-name: streak-across;
-    }
-    @keyframes streak-down {
-      0% { transform: translateY(-160px); opacity: 0; }
-      8% { opacity: 1; }
-      85% { opacity: 1; }
-      100% { transform: translateY(calc(100vh + 20px)); opacity: 0; }
-    }
-    @keyframes streak-across {
-      0% { transform: translateX(-180px); opacity: 0; }
-      8% { opacity: 1; }
-      85% { opacity: 1; }
-      100% { transform: translateX(calc(100vw + 180px)); opacity: 0; }
+      background: linear-gradient(to right, transparent, rgba(45, 212, 191, 0.85) 22%, rgba(255, 98, 77, 0.9) 62%, #ff7a63);
+      box-shadow: 0 0 6px rgba(255, 98, 77, 0.45);
     }
     @media (max-width: 600px) { .grid-field { --grid: 88px; } }
     @media (prefers-reduced-motion: reduce), print { .streak { display: none; } }
@@ -1011,21 +996,6 @@
   </header>
 
   <div class="grid-field" aria-hidden="true">
-    <span class="streak down" style="--col:-6;--tint:#ff624d;animation-duration:15s;animation-delay:-3s"></span>
-    <span class="streak down" style="--col:-4;--tint:#f472b6;animation-duration:18s;animation-delay:-11s"></span>
-    <span class="streak down" style="--col:-2;--tint:#ff624d;animation-duration:13s;animation-delay:-2s"></span>
-    <span class="streak down" style="--col:-1;--tint:#2dd4bf;animation-duration:16s;animation-delay:-9s"></span>
-    <span class="streak down" style="--col:0;--tint:#a78bfa;animation-duration:19s;animation-delay:-14s"></span>
-    <span class="streak down" style="--col:1;--tint:#a78bfa;animation-duration:14s;animation-delay:-5s"></span>
-    <span class="streak down" style="--col:2;--tint:#f472b6;animation-duration:17s;animation-delay:-12s"></span>
-    <span class="streak down" style="--col:4;--tint:#2dd4bf;animation-duration:15s;animation-delay:-7s"></span>
-    <span class="streak down" style="--col:6;--tint:#a78bfa;animation-duration:18s;animation-delay:-1s"></span>
-    <span class="streak across" style="--row:0;--tint:#2dd4bf;animation-duration:14s;animation-delay:-4s"></span>
-    <span class="streak across" style="--row:2;--tint:#ff624d;animation-duration:18s;animation-delay:-11s"></span>
-    <span class="streak across" style="--row:3;--tint:#f472b6;animation-duration:16s;animation-delay:-1s"></span>
-    <span class="streak across" style="--row:5;--tint:#a78bfa;animation-duration:15s;animation-delay:-7s"></span>
-    <span class="streak across" style="--row:6;--tint:#2dd4bf;animation-duration:19s;animation-delay:-15s"></span>
-    <span class="streak across" style="--row:8;--tint:#ff624d;animation-duration:17s;animation-delay:-9s"></span>
   </div>
 
   <main class="wrap" id="top">
@@ -1553,6 +1523,54 @@
       }
       deleting = true;
       wait(2800);
+    })();
+  </script>
+  <script>
+    // Grid streaks: one sent along a random grid line every so often, at a
+    // brisk pace, so about three are out at once. None for reduced motion.
+    (() => {
+      const field = document.querySelector(".grid-field");
+      if (!field || !field.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const atOnce = 3, speed = 420;
+      let lastLine = "";
+      function lines() {
+        const grid = parseFloat(getComputedStyle(field).getPropertyValue("--grid")) || 112;
+        const width = field.clientWidth, height = field.clientHeight;
+        const found = [];
+        for (let x = width / 2 - grid / 2; x > 0; x -= grid) found.push({ down: true, at: x });
+        for (let x = width / 2 + grid / 2; x < width; x += grid) found.push({ down: true, at: x });
+        for (let y = grid / 2; y < height; y += grid) found.push({ down: false, at: y });
+        return { found, width, height };
+      }
+      function send() {
+        const { found, width, height } = lines();
+        let line;
+        do { line = found[Math.floor(Math.random() * found.length)]; } while (found.length > 1 && line.down + ":" + line.at === lastLine);
+        lastLine = line.down + ":" + line.at;
+        const length = Math.round((line.down ? height : width) * (0.14 + Math.random() * 0.08));
+        const travel = (line.down ? height : width) + length;
+        const streak = document.createElement("span");
+        streak.className = "streak " + (line.down ? "down" : "across");
+        streak.style.setProperty("--length", length + "px");
+        streak.style[line.down ? "left" : "top"] = Math.round(line.at) + "px";
+        field.appendChild(streak);
+        const move = line.down ? (d) => `translate3d(0, ${d}px, 0)` : (d) => `translate3d(${d}px, 0, 0)`;
+        const duration = travel / (speed * (0.85 + Math.random() * 0.3)) * 1000;
+        streak.animate([
+          { transform: move(-length), opacity: 0 },
+          { opacity: 1, offset: 0.08 },
+          { opacity: 1, offset: 0.88 },
+          { transform: move(travel - length), opacity: 0 },
+        ], { duration, easing: "linear" }).onfinish = () => streak.remove();
+        return duration;
+      }
+      function loop() {
+        const duration = document.hidden ? 1500 : send();
+        setTimeout(loop, duration / atOnce * (0.6 + Math.random() * 0.8));
+      }
+      send();
+      setTimeout(send, 500);
+      setTimeout(loop, 1100);
     })();
   </script>
 </body>
