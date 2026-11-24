@@ -215,7 +215,9 @@
       padding: 26px 26px 20px;
       border: 1px solid var(--line);
       border-radius: 20px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.036) 0%, rgba(255, 255, 255, 0.018) 100%);
+      background: linear-gradient(180deg, rgba(24, 22, 21, 0.8) 0%, rgba(16, 15, 15, 0.8) 100%);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
       scroll-margin-top: calc(var(--top) + 14px);
       transition: border-color 0.2s ease, background 0.2s ease;
@@ -447,7 +449,9 @@
       gap: 10px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: var(--surface);
+      background: rgba(18, 17, 16, 0.8);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
     }
     .source-label {
       flex: 0 0 auto;
@@ -766,12 +770,8 @@
     /* Grid field: faint lines with light gliding along them */
     .grid-field {
       --grid: 112px;
-      --field: 660px;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: var(--field);
+      position: fixed;
+      inset: 0;
       z-index: 0;
       overflow: hidden;
       pointer-events: none;
@@ -780,8 +780,8 @@
         linear-gradient(to bottom, rgba(245, 220, 180, 0.05) 1px, transparent 1px);
       background-size: var(--grid) var(--grid);
       background-position: calc(50% - var(--grid) / 2) calc(var(--grid) / 2);
-      -webkit-mask-image: radial-gradient(ellipse 75% 100% at 50% 0%, #000 45%, transparent 96%);
-      mask-image: radial-gradient(ellipse 75% 100% at 50% 0%, #000 45%, transparent 96%);
+      -webkit-mask-image: radial-gradient(ellipse 95% 90% at 50% 45%, #000 55%, transparent 100%);
+      mask-image: radial-gradient(ellipse 95% 90% at 50% 45%, #000 55%, transparent 100%);
     }
     main.wrap, .site-footer { position: relative; z-index: 1; }
     .streak {
@@ -814,7 +814,7 @@
       0% { transform: translateY(-160px); opacity: 0; }
       8% { opacity: 1; }
       85% { opacity: 1; }
-      100% { transform: translateY(calc(var(--field) + 20px)); opacity: 0; }
+      100% { transform: translateY(calc(100vh + 20px)); opacity: 0; }
     }
     @keyframes streak-across {
       0% { transform: translateX(-180px); opacity: 0; }
@@ -822,7 +822,7 @@
       85% { opacity: 1; }
       100% { transform: translateX(calc(100vw + 180px)); opacity: 0; }
     }
-    @media (max-width: 600px) { .grid-field { --grid: 88px; --field: 600px; } }
+    @media (max-width: 600px) { .grid-field { --grid: 88px; } }
     @media (prefers-reduced-motion: reduce), print { .streak { display: none; } }
 
     /* Hero: a word typed, held, taken back, and the next one typed */
@@ -1011,13 +1011,21 @@
   </header>
 
   <div class="grid-field" aria-hidden="true">
-    <span class="streak down" style="--col:-3;--tint:#f0a24f;animation-duration:11s;animation-delay:-2s"></span>
-    <span class="streak down" style="--col:-1;--tint:#e2683f;animation-duration:14s;animation-delay:-9s"></span>
-    <span class="streak down" style="--col:1;--tint:#f7d488;animation-duration:12s;animation-delay:-5s"></span>
-    <span class="streak down" style="--col:3;--tint:#cf5574;animation-duration:16s;animation-delay:-12s"></span>
-    <span class="streak across" style="--row:1;--tint:#e2683f;animation-duration:13s;animation-delay:-4s"></span>
-    <span class="streak across" style="--row:3;--tint:#f0a24f;animation-duration:17s;animation-delay:-11s"></span>
-    <span class="streak across" style="--row:4;--tint:#f7d488;animation-duration:15s;animation-delay:-7s"></span>
+    <span class="streak down" style="--col:-6;--tint:#f0a24f;animation-duration:15s;animation-delay:-3s"></span>
+    <span class="streak down" style="--col:-4;--tint:#cf5574;animation-duration:18s;animation-delay:-11s"></span>
+    <span class="streak down" style="--col:-2;--tint:#f0a24f;animation-duration:13s;animation-delay:-2s"></span>
+    <span class="streak down" style="--col:-1;--tint:#e2683f;animation-duration:16s;animation-delay:-9s"></span>
+    <span class="streak down" style="--col:0;--tint:#f7d488;animation-duration:19s;animation-delay:-14s"></span>
+    <span class="streak down" style="--col:1;--tint:#f7d488;animation-duration:14s;animation-delay:-5s"></span>
+    <span class="streak down" style="--col:2;--tint:#cf5574;animation-duration:17s;animation-delay:-12s"></span>
+    <span class="streak down" style="--col:4;--tint:#e2683f;animation-duration:15s;animation-delay:-7s"></span>
+    <span class="streak down" style="--col:6;--tint:#f7d488;animation-duration:18s;animation-delay:-1s"></span>
+    <span class="streak across" style="--row:0;--tint:#e2683f;animation-duration:14s;animation-delay:-4s"></span>
+    <span class="streak across" style="--row:2;--tint:#f0a24f;animation-duration:18s;animation-delay:-11s"></span>
+    <span class="streak across" style="--row:3;--tint:#cf5574;animation-duration:16s;animation-delay:-1s"></span>
+    <span class="streak across" style="--row:5;--tint:#f7d488;animation-duration:15s;animation-delay:-7s"></span>
+    <span class="streak across" style="--row:6;--tint:#e2683f;animation-duration:19s;animation-delay:-15s"></span>
+    <span class="streak across" style="--row:8;--tint:#f0a24f;animation-duration:17s;animation-delay:-9s"></span>
   </div>
 
   <div class="autumn-leaves" aria-hidden="true">
@@ -1526,33 +1534,39 @@
       let words;
       try { words = JSON.parse(word.dataset.words); } catch { return; }
       if (!words.length || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      let index = 0, shown = words[0].length, deleting = false;
+      let index = 0, shown = words[0].length, deleting = false, fresh = true;
       const wait = (ms) => setTimeout(step, ms);
+      const between = (low, high) => low + Math.random() * (high - low);
       function step() {
         const target = words[index];
+        line.classList.add("is-typing");
         if (!deleting) {
           shown += 1;
           word.textContent = target.slice(0, shown);
           if (shown >= target.length) {
             line.classList.remove("is-typing");
             deleting = true;
-            return wait(2300);
+            fresh = true;
+            return wait(between(2600, 3200));
           }
-          line.classList.add("is-typing");
-          return wait(70 + Math.random() * 50);
+          // A key at a time, now and then a beat to find the next one.
+          return wait(between(130, 230) + (Math.random() < 0.18 ? between(120, 260) : 0));
         }
-        line.classList.add("is-typing");
         shown -= 1;
         word.textContent = target.slice(0, Math.max(shown, 0));
         if (shown <= 0) {
           deleting = false;
+          line.classList.remove("is-typing");
           index = (index + 1) % words.length;
-          return wait(360);
+          return wait(between(650, 900));
         }
-        return wait(38);
+        // Backspace: a first press, then a steady run.
+        const gap = fresh ? between(170, 220) : between(85, 120);
+        fresh = false;
+        return wait(gap);
       }
       deleting = true;
-      wait(2300);
+      wait(2800);
     })();
   </script>
 </body>
