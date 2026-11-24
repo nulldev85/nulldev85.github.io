@@ -49,12 +49,12 @@
       --violet: #a78bfa;
       --sky: #60a5fa;
       --teal: #2dd4bf;
-      /* The typed word's colours, always drifting; the download buttons wear
-         them too. */
+      /* The typed word's colours, which change with each new word; the
+         download buttons wear them too. */
       --blend-a: var(--coral);
       --blend-b: var(--pink);
       --blend-c: var(--violet);
-      animation: blend-drift 10s ease-in-out infinite;
+      transition: --blend-a 1.6s ease-in-out, --blend-b 1.6s ease-in-out, --blend-c 1.6s ease-in-out;
       --sans: "Null Dots", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
       --mono: "Null Dots", "SF Mono", ui-monospace, Menlo, monospace;
       --top: 58px;
@@ -835,23 +835,12 @@
       background-clip: text;
       color: transparent;
     }
-    /* While typing, the word's box glides to each new width, so the line
-       eases sideways instead of jumping, and a new letter is uncovered as
-       its room opens. */
-    .typed-word.is-gliding {
-      display: inline-block;
-      white-space: pre;
-      text-align: left;
-      clip-path: inset(-0.4em 0 -0.4em -0.4em);
-      transition: width 0.16s cubic-bezier(.25, .8, .3, 1);
-    }
-    @keyframes blend-drift {
-      0%, 100% { --blend-a: var(--coral); --blend-b: var(--pink); --blend-c: var(--violet); }
-      25% { --blend-a: var(--violet); --blend-b: var(--pink); --blend-c: var(--coral); }
-      50% { --blend-a: var(--sky); --blend-b: var(--violet); --blend-c: var(--pink); }
-      75% { --blend-a: var(--teal); --blend-b: var(--sky); --blend-c: var(--violet); }
-    }
-    @media (prefers-reduced-motion: reduce) { :root { animation: none; } }
+    /* A letter lands at once, like a key press; the line then drifts back
+       to centre instead of jumping there. */
+    .typed-line { display: inline-block; white-space: nowrap; }
+    :root[data-blend="1"] { --blend-a: var(--violet); --blend-b: var(--pink); --blend-c: var(--coral); }
+    :root[data-blend="2"] { --blend-a: var(--sky); --blend-b: var(--violet); --blend-c: var(--pink); }
+    :root[data-blend="3"] { --blend-a: var(--teal); --blend-b: var(--sky); --blend-c: var(--violet); }
     .typed-caret {
       display: inline-block;
       width: 3px;
@@ -1514,31 +1503,31 @@
       let index = 0, shown = words[0].length, deleting = false, fresh = true;
       const wait = (ms) => setTimeout(step, ms);
       const between = (low, high) => low + Math.random() * (high - low);
-      // A hidden copy measures each width, so the box can glide to it. An
-      // empty word holds a zero-width space to keep its line height.
-      const ruler = word.cloneNode(false);
-      ruler.removeAttribute("data-typed");
-      ruler.className = "typed-word is-gliding";
-      ruler.style.cssText = "position:absolute;visibility:hidden;width:auto;transition:none;left:-9999px";
-      word.parentNode.appendChild(ruler);
-      const widthOf = (text) => { ruler.textContent = text || "\u200b"; return ruler.getBoundingClientRect().width; };
-      function show(text) {
-        word.textContent = text || "\u200b";
-        word.style.width = widthOf(text) + "px";
-      }
       // The gradient spans the longest word, so a letter keeps its colour
       // as the word grows.
       function fit() {
-        word.style.setProperty("--word-span", Math.max(...words.map(widthOf)) + "px");
-        word.style.transition = "none";
-        show(words[index].slice(0, Math.max(shown, 0)));
-        word.getBoundingClientRect();
-        word.style.transition = "";
+        const now = word.textContent;
+        word.style.setProperty("--word-span", Math.max(...words.map(text => {
+          word.textContent = text;
+          return word.getBoundingClientRect().width;
+        })) + "px");
+        word.textContent = now;
       }
-      word.classList.add("is-gliding");
       fit();
       (document.fonts ? document.fonts.ready : Promise.resolve()).then(fit);
       addEventListener("resize", fit);
+      // Change the word with the start of the line held where it was, so the
+      // letter appears at the cursor, then ease the line back to centre.
+      function show(text) {
+        const before = line.getBoundingClientRect().left;
+        line.getAnimations().forEach(drift => drift.cancel());
+        word.textContent = text;
+        const shift = before - line.getBoundingClientRect().left;
+        if (Math.abs(shift) > 0.1) {
+          line.animate([{ transform: `translateX(${shift}px)` }, { transform: "none" }],
+                       { duration: 420, easing: "cubic-bezier(.33, 0, .2, 1)" });
+        }
+      }
       function step() {
         const target = words[index];
         line.classList.add("is-typing");
@@ -1560,6 +1549,7 @@
           deleting = false;
           line.classList.remove("is-typing");
           index = (index + 1) % words.length;
+          document.documentElement.dataset.blend = String(index % 4);
           return wait(between(650, 900));
         }
         // Backspace: a first press, then a steady run.
