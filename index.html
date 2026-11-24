@@ -830,10 +830,20 @@
       color: var(--text);
     }
     .typed-word {
-      background: linear-gradient(90deg, var(--blend-a), var(--blend-b) 55%, var(--blend-c));
+      background: linear-gradient(90deg, var(--blend-a), var(--blend-b) 55%, var(--blend-c)) 0 0 / var(--word-span, 100%) 100% no-repeat;
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+    }
+    /* While typing, the word's box glides to each new width, so the line
+       eases sideways instead of jumping, and a new letter is uncovered as
+       its room opens. */
+    .typed-word.is-gliding {
+      display: inline-block;
+      white-space: pre;
+      text-align: left;
+      clip-path: inset(-0.4em 0 -0.4em -0.4em);
+      transition: width 0.16s cubic-bezier(.25, .8, .3, 1);
     }
     @keyframes blend-drift {
       0%, 100% { --blend-a: var(--coral); --blend-b: var(--pink); --blend-c: var(--violet); }
@@ -1504,23 +1514,48 @@
       let index = 0, shown = words[0].length, deleting = false, fresh = true;
       const wait = (ms) => setTimeout(step, ms);
       const between = (low, high) => low + Math.random() * (high - low);
+      // A hidden copy measures each width, so the box can glide to it. An
+      // empty word holds a zero-width space to keep its line height.
+      const ruler = word.cloneNode(false);
+      ruler.removeAttribute("data-typed");
+      ruler.className = "typed-word is-gliding";
+      ruler.style.cssText = "position:absolute;visibility:hidden;width:auto;transition:none;left:-9999px";
+      word.parentNode.appendChild(ruler);
+      const widthOf = (text) => { ruler.textContent = text || "\u200b"; return ruler.getBoundingClientRect().width; };
+      function show(text) {
+        word.textContent = text || "\u200b";
+        word.style.width = widthOf(text) + "px";
+      }
+      // The gradient spans the longest word, so a letter keeps its colour
+      // as the word grows.
+      function fit() {
+        word.style.setProperty("--word-span", Math.max(...words.map(widthOf)) + "px");
+        word.style.transition = "none";
+        show(words[index].slice(0, Math.max(shown, 0)));
+        word.getBoundingClientRect();
+        word.style.transition = "";
+      }
+      word.classList.add("is-gliding");
+      fit();
+      (document.fonts ? document.fonts.ready : Promise.resolve()).then(fit);
+      addEventListener("resize", fit);
       function step() {
         const target = words[index];
         line.classList.add("is-typing");
         if (!deleting) {
           shown += 1;
-          word.textContent = target.slice(0, shown);
+          show(target.slice(0, shown));
           if (shown >= target.length) {
             line.classList.remove("is-typing");
             deleting = true;
             fresh = true;
             return wait(between(2600, 3200));
           }
-          // A key at a time, now and then a beat to find the next one.
-          return wait(between(130, 230) + (Math.random() < 0.18 ? between(120, 260) : 0));
+          // A key at a time at an even, human pace, now and then a short beat.
+          return wait(between(150, 200) + (Math.random() < 0.12 ? between(90, 160) : 0));
         }
         shown -= 1;
-        word.textContent = target.slice(0, Math.max(shown, 0));
+        show(target.slice(0, Math.max(shown, 0)));
         if (shown <= 0) {
           deleting = false;
           line.classList.remove("is-typing");
@@ -1528,7 +1563,7 @@
           return wait(between(650, 900));
         }
         // Backspace: a first press, then a steady run.
-        const gap = fresh ? between(170, 220) : between(85, 120);
+        const gap = fresh ? 190 : between(95, 115);
         fresh = false;
         return wait(gap);
       }
