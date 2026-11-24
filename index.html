@@ -54,7 +54,7 @@
       --blend-a: var(--coral);
       --blend-b: var(--pink);
       --blend-c: var(--violet);
-      transition: --blend-a 1.6s ease-in-out, --blend-b 1.6s ease-in-out, --blend-c 1.6s ease-in-out;
+      transition: --blend-a 0.35s ease-out, --blend-b 0.35s ease-out, --blend-c 0.35s ease-out;
       --sans: "Null Dots", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
       --mono: "Null Dots", "SF Mono", ui-monospace, Menlo, monospace;
       --top: 58px;
@@ -1533,6 +1533,8 @@
         line.classList.add("is-typing");
         if (!deleting) {
           shown += 1;
+          // The new word's colours arrive with its first letter.
+          if (shown === 1) document.documentElement.dataset.blend = String(index % 4);
           show(target.slice(0, shown));
           if (shown >= target.length) {
             line.classList.remove("is-typing");
@@ -1549,7 +1551,6 @@
           deleting = false;
           line.classList.remove("is-typing");
           index = (index + 1) % words.length;
-          document.documentElement.dataset.blend = String(index % 4);
           return wait(between(650, 900));
         }
         // Backspace: a first press, then a steady run.
