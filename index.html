@@ -30,16 +30,22 @@
     }
     :root {
       color-scheme: dark;
-      --bg: #080708;
-      --surface: rgba(255, 242, 220, 0.028);
-      --surface-elevated: #121110;
-      --surface-hover: rgba(255, 240, 215, 0.07);
-      --line: rgba(245, 220, 180, 0.085);
-      --line-strong: rgba(245, 220, 180, 0.145);
-      --text: #f5f1ea;
-      --text-2: #a49e94;
-      --text-3: #736d65;
-      --focus: rgba(237, 190, 103, 0.78);
+      --bg: #141416;
+      --surface: rgba(255, 255, 255, 0.035);
+      --surface-elevated: #1c1c20;
+      --surface-hover: rgba(255, 255, 255, 0.075);
+      --line: rgba(255, 255, 255, 0.085);
+      --line-strong: rgba(255, 255, 255, 0.15);
+      --text: #f4f4f5;
+      --text-2: #a1a1aa;
+      --text-3: #71717a;
+      --focus: rgba(255, 98, 77, 0.8);
+      --coral: #ff624d;
+      --coral-deep: #f03a24;
+      --pink: #f472b6;
+      --violet: #a78bfa;
+      --sky: #60a5fa;
+      --teal: #2dd4bf;
       --sans: "Null Dots", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
       --mono: "Null Dots", "SF Mono", ui-monospace, Menlo, monospace;
       --top: 58px;
@@ -63,8 +69,8 @@
       padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       color: var(--text);
       background:
-        radial-gradient(62% 38% at 50% -4%, rgba(214, 146, 46, 0.13), transparent 74%),
-        radial-gradient(40% 30% at 88% 18%, rgba(186, 86, 30, 0.055), transparent 68%),
+        radial-gradient(55% 45% at 8% 22%, rgba(255, 98, 77, 0.11), transparent 72%),
+        radial-gradient(55% 45% at 94% 30%, rgba(45, 212, 191, 0.09), transparent 72%),
         var(--bg);
       font: 400 15.5px/1.6 var(--sans);
       font-synthesis: none;
@@ -110,7 +116,7 @@
       top: 0;
       z-index: 30;
       padding-top: env(safe-area-inset-top);
-      background: rgba(8, 7, 8, 0.76);
+      background: rgba(20, 20, 22, 0.78);
       border-bottom: 1px solid var(--line);
       -webkit-backdrop-filter: blur(18px) saturate(140%);
       backdrop-filter: blur(18px) saturate(140%);
@@ -215,7 +221,7 @@
       padding: 26px 26px 20px;
       border: 1px solid var(--line);
       border-radius: 20px;
-      background: linear-gradient(180deg, rgba(24, 22, 21, 0.8) 0%, rgba(16, 15, 15, 0.8) 100%);
+      background: linear-gradient(180deg, rgba(36, 36, 41, 0.8) 0%, rgba(26, 26, 30, 0.8) 100%);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -241,7 +247,7 @@
       height: 54px;
       overflow: hidden;
       border-radius: 14px;
-      background: #131317;
+      background: #1e1e22;
       box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
     }
     .app-icon::after {
@@ -357,10 +363,11 @@
       gap: 6px;
       height: 32px;
       padding: 0 13px;
-      border: 1px solid rgba(255, 240, 215, 0.16);
+      border: 1px solid rgba(255, 140, 120, 0.35);
       border-radius: 999px;
-      background: #f2ece1;
-      color: #0a0908;
+      background: linear-gradient(90deg, var(--coral), var(--coral-deep));
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(240, 58, 36, 0.22);
       font-size: 13.5px;
       font-weight: 600;
       text-decoration: none;
@@ -368,7 +375,7 @@
     }
     @media (hover: hover) {
       .download:hover {
-        background: #ffffff;
+        background: linear-gradient(90deg, #ff7663, #f4492f);
       }
     }
     .download svg { width: 13px; height: 13px; }
@@ -449,7 +456,7 @@
       gap: 10px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(18, 17, 16, 0.8);
+      background: rgba(28, 28, 32, 0.8);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
     }
@@ -776,8 +783,8 @@
       overflow: hidden;
       pointer-events: none;
       background-image:
-        linear-gradient(to right, rgba(245, 220, 180, 0.05) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(245, 220, 180, 0.05) 1px, transparent 1px);
+        linear-gradient(to right, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
       background-size: var(--grid) var(--grid);
       background-position: calc(50% - var(--grid) / 2) calc(var(--grid) / 2);
       -webkit-mask-image: radial-gradient(ellipse 95% 90% at 50% 45%, #000 55%, transparent 100%);
@@ -797,7 +804,7 @@
       left: calc(50% - var(--grid) / 2 + var(--col) * var(--grid));
       width: 1px;
       height: 150px;
-      background: linear-gradient(to bottom, transparent, var(--tint) 70%, rgba(255, 244, 226, 0.95));
+      background: linear-gradient(to bottom, transparent, var(--tint) 70%, rgba(255, 255, 255, 0.95));
       box-shadow: 0 0 10px var(--tint);
       animation-name: streak-down;
     }
@@ -806,7 +813,7 @@
       top: calc(var(--grid) / 2 + var(--row) * var(--grid));
       width: 170px;
       height: 1px;
-      background: linear-gradient(to right, transparent, var(--tint) 70%, rgba(255, 244, 226, 0.95));
+      background: linear-gradient(to right, transparent, var(--tint) 70%, rgba(255, 255, 255, 0.95));
       box-shadow: 0 0 10px var(--tint);
       animation-name: streak-across;
     }
@@ -840,11 +847,15 @@
       color: var(--text);
     }
     .typed-word {
-      background: linear-gradient(90deg, #f7d488 0%, #f0a24f 38%, #e2683f 70%, #cf5574 100%);
+      --blend: linear-gradient(90deg, var(--coral) 0%, var(--pink) 55%, var(--violet) 100%);
+      background: var(--blend);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
+    .typed-word[data-blend="1"] { --blend: linear-gradient(90deg, var(--violet) 0%, var(--pink) 60%, var(--coral) 100%); }
+    .typed-word[data-blend="2"] { --blend: linear-gradient(90deg, var(--sky) 0%, var(--violet) 50%, var(--pink) 100%); }
+    .typed-word[data-blend="3"] { --blend: linear-gradient(90deg, var(--teal) 0%, var(--sky) 50%, var(--violet) 100%); }
     .typed-caret {
       display: inline-block;
       width: 3px;
@@ -852,8 +863,8 @@
       margin: 0 0.14em 0 0.06em;
       vertical-align: -0.1em;
       border-radius: 2px;
-      background: linear-gradient(to bottom, #f7d488, #e2683f);
-      box-shadow: 0 0 12px rgba(240, 162, 79, 0.55);
+      background: linear-gradient(to bottom, var(--pink), var(--teal));
+      box-shadow: 0 0 12px rgba(244, 114, 182, 0.5);
       animation: caret-blink 1.05s steps(1) infinite;
     }
     .typed-line.is-typing .typed-caret { animation: none; opacity: 1; }
@@ -1011,21 +1022,21 @@
   </header>
 
   <div class="grid-field" aria-hidden="true">
-    <span class="streak down" style="--col:-6;--tint:#f0a24f;animation-duration:15s;animation-delay:-3s"></span>
-    <span class="streak down" style="--col:-4;--tint:#cf5574;animation-duration:18s;animation-delay:-11s"></span>
-    <span class="streak down" style="--col:-2;--tint:#f0a24f;animation-duration:13s;animation-delay:-2s"></span>
-    <span class="streak down" style="--col:-1;--tint:#e2683f;animation-duration:16s;animation-delay:-9s"></span>
-    <span class="streak down" style="--col:0;--tint:#f7d488;animation-duration:19s;animation-delay:-14s"></span>
-    <span class="streak down" style="--col:1;--tint:#f7d488;animation-duration:14s;animation-delay:-5s"></span>
-    <span class="streak down" style="--col:2;--tint:#cf5574;animation-duration:17s;animation-delay:-12s"></span>
-    <span class="streak down" style="--col:4;--tint:#e2683f;animation-duration:15s;animation-delay:-7s"></span>
-    <span class="streak down" style="--col:6;--tint:#f7d488;animation-duration:18s;animation-delay:-1s"></span>
-    <span class="streak across" style="--row:0;--tint:#e2683f;animation-duration:14s;animation-delay:-4s"></span>
-    <span class="streak across" style="--row:2;--tint:#f0a24f;animation-duration:18s;animation-delay:-11s"></span>
-    <span class="streak across" style="--row:3;--tint:#cf5574;animation-duration:16s;animation-delay:-1s"></span>
-    <span class="streak across" style="--row:5;--tint:#f7d488;animation-duration:15s;animation-delay:-7s"></span>
-    <span class="streak across" style="--row:6;--tint:#e2683f;animation-duration:19s;animation-delay:-15s"></span>
-    <span class="streak across" style="--row:8;--tint:#f0a24f;animation-duration:17s;animation-delay:-9s"></span>
+    <span class="streak down" style="--col:-6;--tint:#ff624d;animation-duration:15s;animation-delay:-3s"></span>
+    <span class="streak down" style="--col:-4;--tint:#f472b6;animation-duration:18s;animation-delay:-11s"></span>
+    <span class="streak down" style="--col:-2;--tint:#ff624d;animation-duration:13s;animation-delay:-2s"></span>
+    <span class="streak down" style="--col:-1;--tint:#2dd4bf;animation-duration:16s;animation-delay:-9s"></span>
+    <span class="streak down" style="--col:0;--tint:#a78bfa;animation-duration:19s;animation-delay:-14s"></span>
+    <span class="streak down" style="--col:1;--tint:#a78bfa;animation-duration:14s;animation-delay:-5s"></span>
+    <span class="streak down" style="--col:2;--tint:#f472b6;animation-duration:17s;animation-delay:-12s"></span>
+    <span class="streak down" style="--col:4;--tint:#2dd4bf;animation-duration:15s;animation-delay:-7s"></span>
+    <span class="streak down" style="--col:6;--tint:#a78bfa;animation-duration:18s;animation-delay:-1s"></span>
+    <span class="streak across" style="--row:0;--tint:#2dd4bf;animation-duration:14s;animation-delay:-4s"></span>
+    <span class="streak across" style="--row:2;--tint:#ff624d;animation-duration:18s;animation-delay:-11s"></span>
+    <span class="streak across" style="--row:3;--tint:#f472b6;animation-duration:16s;animation-delay:-1s"></span>
+    <span class="streak across" style="--row:5;--tint:#a78bfa;animation-duration:15s;animation-delay:-7s"></span>
+    <span class="streak across" style="--row:6;--tint:#2dd4bf;animation-duration:19s;animation-delay:-15s"></span>
+    <span class="streak across" style="--row:8;--tint:#ff624d;animation-duration:17s;animation-delay:-9s"></span>
   </div>
 
   <div class="autumn-leaves" aria-hidden="true">
@@ -1558,6 +1569,7 @@
           deleting = false;
           line.classList.remove("is-typing");
           index = (index + 1) % words.length;
+          word.dataset.blend = String(index % 4);
           return wait(between(650, 900));
         }
         // Backspace: a first press, then a steady run.
