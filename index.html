@@ -763,6 +763,109 @@
     @media (max-width: 600px) { .autumn-leaf:nth-child(n+9) { display: none; } }
     @media (prefers-reduced-motion: reduce), print { .autumn-leaves { display: none; } }
 
+    /* Grid field: faint lines with light gliding along them */
+    .grid-field {
+      --grid: 112px;
+      --field: 660px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--field);
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(245, 220, 180, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(245, 220, 180, 0.05) 1px, transparent 1px);
+      background-size: var(--grid) var(--grid);
+      background-position: calc(50% - var(--grid) / 2) calc(var(--grid) / 2);
+      -webkit-mask-image: radial-gradient(ellipse 75% 100% at 50% 0%, #000 45%, transparent 96%);
+      mask-image: radial-gradient(ellipse 75% 100% at 50% 0%, #000 45%, transparent 96%);
+    }
+    main.wrap, .site-footer { position: relative; z-index: 1; }
+    .streak {
+      position: absolute;
+      border-radius: 1px;
+      opacity: 0;
+      will-change: transform, opacity;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+    .streak.down {
+      top: 0;
+      left: calc(50% - var(--grid) / 2 + var(--col) * var(--grid));
+      width: 1px;
+      height: 150px;
+      background: linear-gradient(to bottom, transparent, var(--tint) 70%, rgba(255, 244, 226, 0.95));
+      box-shadow: 0 0 10px var(--tint);
+      animation-name: streak-down;
+    }
+    .streak.across {
+      left: 0;
+      top: calc(var(--grid) / 2 + var(--row) * var(--grid));
+      width: 170px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--tint) 70%, rgba(255, 244, 226, 0.95));
+      box-shadow: 0 0 10px var(--tint);
+      animation-name: streak-across;
+    }
+    @keyframes streak-down {
+      0% { transform: translateY(-160px); opacity: 0; }
+      8% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { transform: translateY(calc(var(--field) + 20px)); opacity: 0; }
+    }
+    @keyframes streak-across {
+      0% { transform: translateX(-180px); opacity: 0; }
+      8% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { transform: translateX(calc(100vw + 180px)); opacity: 0; }
+    }
+    @media (max-width: 600px) { .grid-field { --grid: 88px; --field: 600px; } }
+    @media (prefers-reduced-motion: reduce), print { .streak { display: none; } }
+
+    /* Hero: a word typed, held, taken back, and the next one typed */
+    .hero {
+      text-align: center;
+      margin: clamp(8px, 4vw, 36px) auto clamp(26px, 5vw, 44px);
+      max-width: 760px;
+    }
+    .hero-title {
+      margin: 0;
+      font-weight: 800;
+      font-size: clamp(31px, 7.4vw, 58px);
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .typed-word {
+      background: linear-gradient(90deg, #f7d488 0%, #f0a24f 38%, #e2683f 70%, #cf5574 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .typed-caret {
+      display: inline-block;
+      width: 3px;
+      height: 0.92em;
+      margin: 0 0.14em 0 0.06em;
+      vertical-align: -0.1em;
+      border-radius: 2px;
+      background: linear-gradient(to bottom, #f7d488, #e2683f);
+      box-shadow: 0 0 12px rgba(240, 162, 79, 0.55);
+      animation: caret-blink 1.05s steps(1) infinite;
+    }
+    .typed-line.is-typing .typed-caret { animation: none; opacity: 1; }
+    @keyframes caret-blink { 50% { opacity: 0; } }
+    .hero-sub {
+      margin: 14px auto 0;
+      max-width: 560px;
+      color: var(--text-2);
+      font-size: clamp(15.5px, 2.4vw, 18px);
+      line-height: 1.55;
+    }
+
     /* Motion */
     [data-project-card] { animation: card-in 0.42s cubic-bezier(.2, .8, .2, 1) backwards; }
     [data-project-card] + [data-project-card] { animation-delay: 0.05s; }
@@ -907,6 +1010,16 @@
     </div>
   </header>
 
+  <div class="grid-field" aria-hidden="true">
+    <span class="streak down" style="--col:-3;--tint:#f0a24f;animation-duration:11s;animation-delay:-2s"></span>
+    <span class="streak down" style="--col:-1;--tint:#e2683f;animation-duration:14s;animation-delay:-9s"></span>
+    <span class="streak down" style="--col:1;--tint:#f7d488;animation-duration:12s;animation-delay:-5s"></span>
+    <span class="streak down" style="--col:3;--tint:#cf5574;animation-duration:16s;animation-delay:-12s"></span>
+    <span class="streak across" style="--row:1;--tint:#e2683f;animation-duration:13s;animation-delay:-4s"></span>
+    <span class="streak across" style="--row:3;--tint:#f0a24f;animation-duration:17s;animation-delay:-11s"></span>
+    <span class="streak across" style="--row:4;--tint:#f7d488;animation-duration:15s;animation-delay:-7s"></span>
+  </div>
+
   <div class="autumn-leaves" aria-hidden="true">
     <span class="autumn-leaf" style="--x:4%;--size:30px;--duration:22s;--delay:-3s;--opacity:0.32;--sway:4s;--turn:7s"><span class="leaf-sway"><img src="assets/leaf-maple.svg" alt="" width="48" height="64"></span></span>
     <span class="autumn-leaf" style="--x:13%;--size:24px;--duration:27s;--delay:-17s;--opacity:0.28;--sway:5s;--turn:8s"><span class="leaf-sway"><img src="assets/leaf-gold.svg" alt="" width="48" height="64"></span></span>
@@ -924,6 +1037,14 @@
 
   <main class="wrap" id="top">
     <h1 class="sr-only">Null’s Apps</h1>
+
+    <section class="hero" aria-label="Null’s Apps">
+      <h2 class="hero-title">
+        <span class="sr-only">Watch, stream, follow and sign it your way.</span>
+        <span class="typed-line" aria-hidden="true"><span class="typed-word" data-typed data-words='["Watch","Stream","Follow","Sign"]'>Watch</span><span class="typed-caret"></span> it your way</span>
+      </h2>
+      <p class="hero-sub">Lineup for live sports, TV and your media servers. NullSign for signing apps on your iPhone. Unsigned IPAs, ready for your signer.</p>
+    </section>
 
     <div class="apps">
       <article class="app" id="lineup" data-project-card aria-labelledby="lineup-name">
@@ -1393,6 +1514,45 @@
         // The page keeps its last-known direct download links.
         if (feedStatus) feedStatus.textContent = "The source couldn’t be reached, so these are the last builds saved here.";
       });
+    })();
+  </script>
+  <script>
+    // The hero's word: typed a letter at a time, held, taken back, and the
+    // next one typed. Still, with the first word, for reduced motion.
+    (() => {
+      const word = document.querySelector("[data-typed]");
+      if (!word) return;
+      const line = word.closest(".typed-line");
+      let words;
+      try { words = JSON.parse(word.dataset.words); } catch { return; }
+      if (!words.length || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      let index = 0, shown = words[0].length, deleting = false;
+      const wait = (ms) => setTimeout(step, ms);
+      function step() {
+        const target = words[index];
+        if (!deleting) {
+          shown += 1;
+          word.textContent = target.slice(0, shown);
+          if (shown >= target.length) {
+            line.classList.remove("is-typing");
+            deleting = true;
+            return wait(2300);
+          }
+          line.classList.add("is-typing");
+          return wait(70 + Math.random() * 50);
+        }
+        line.classList.add("is-typing");
+        shown -= 1;
+        word.textContent = target.slice(0, Math.max(shown, 0));
+        if (shown <= 0) {
+          deleting = false;
+          index = (index + 1) % words.length;
+          return wait(360);
+        }
+        return wait(38);
+      }
+      deleting = true;
+      wait(2300);
     })();
   </script>
 </body>
