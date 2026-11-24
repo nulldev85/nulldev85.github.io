@@ -794,13 +794,13 @@
     .streak.down {
       width: 1px;
       height: var(--length);
-      background: linear-gradient(to bottom, transparent, rgba(45, 212, 191, 0.25) 30%, rgba(45, 212, 191, 0.8) 58%, rgba(255, 98, 77, 0.92) 84%, #ff7a63);
+      background: linear-gradient(to bottom, transparent, rgba(45, 212, 191, 0.12) 25%, rgba(45, 212, 191, 0.45) 52%, rgba(45, 212, 191, 0.85) 72%, rgba(255, 98, 77, 0.92) 90%, #ff7a63);
       box-shadow: 0 0 6px rgba(255, 98, 77, 0.45);
     }
     .streak.across {
       width: var(--length);
       height: 1px;
-      background: linear-gradient(to right, transparent, rgba(45, 212, 191, 0.25) 30%, rgba(45, 212, 191, 0.8) 58%, rgba(255, 98, 77, 0.92) 84%, #ff7a63);
+      background: linear-gradient(to right, transparent, rgba(45, 212, 191, 0.12) 25%, rgba(45, 212, 191, 0.45) 52%, rgba(45, 212, 191, 0.85) 72%, rgba(255, 98, 77, 0.92) 90%, #ff7a63);
       box-shadow: 0 0 6px rgba(255, 98, 77, 0.45);
     }
     @media (max-width: 600px) { .grid-field { --grid: 88px; } }
@@ -1531,7 +1531,7 @@
     (() => {
       const field = document.querySelector(".grid-field");
       if (!field || !field.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      const atOnce = 3, speed = 310;
+      const atOnce = 3, speed = 230;
       let lastLine = "";
       function lines() {
         const grid = parseFloat(getComputedStyle(field).getPropertyValue("--grid")) || 112;
@@ -1547,7 +1547,7 @@
         let line;
         do { line = found[Math.floor(Math.random() * found.length)]; } while (found.length > 1 && line.down + ":" + line.at === lastLine);
         lastLine = line.down + ":" + line.at;
-        const length = Math.round((line.down ? height : width) * (0.32 + Math.random() * 0.1));
+        const length = Math.round((line.down ? height : width) * (0.5 + Math.random() * 0.12));
         const travel = (line.down ? height : width) + length;
         const streak = document.createElement("span");
         streak.className = "streak " + (line.down ? "down" : "across");
