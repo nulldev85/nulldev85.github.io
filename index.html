@@ -545,16 +545,21 @@
       border: 1px solid var(--line-strong);
       border-radius: 20px;
       color: var(--text);
-      background: var(--surface-elevated);
-      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72);
+      /* The same glass as the cards: the grid and its streaks show through. */
+      background: linear-gradient(180deg, rgba(36, 36, 41, 0.56) 0%, rgba(26, 26, 30, 0.56) 100%);
+      -webkit-backdrop-filter: blur(1.5px);
+      backdrop-filter: blur(1.5px);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
     }
+    /* With a window open, the page's own content steps back, leaving the
+       grid behind the window rather than cards and text to read through. */
+    :is(.site-top, .site-footer, main.wrap > :not(dialog)) { transition: opacity 0.2s ease; }
+    body:has(dialog[open]) :is(.site-top, .site-footer, main.wrap > :not(dialog)) { opacity: 0; }
     .release-dialog[open] {
       animation: dialog-in 0.18s cubic-bezier(.2, .8, .2, 1);
     }
     .release-dialog::backdrop {
-      background: rgba(0, 0, 0, 0.68);
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.18);
     }
     .dialog-body {
       display: flex;
@@ -757,7 +762,7 @@
 
     /* Web Signer modal */
     #web-signer {
-      background: var(--surface-elevated);
+      background: linear-gradient(180deg, rgba(36, 36, 41, 0.56) 0%, rgba(26, 26, 30, 0.56) 100%);
     }
     /* One height for both tabs. The signer reports its own height, so the
        sheet grew for Tutorial and shrank for Signer, and its edge jumped
