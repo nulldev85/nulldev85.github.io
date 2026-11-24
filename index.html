@@ -312,10 +312,10 @@
       line-height: 1.62;
     }
 
-    /* Hairline horizontal build rows — no nested box */
+    /* Build rows, set apart by space alone: the grid shows through the
+       card, and hairlines on top of it crowded the design. */
     .builds {
       margin-top: 20px;
-      border-top: 1px solid var(--line);
     }
     .build {
       display: flex;
@@ -323,9 +323,6 @@
       justify-content: space-between;
       gap: 14px;
       padding: 14px 0;
-    }
-    .build + .build {
-      border-top: 1px solid var(--line);
     }
     .build-info {
       min-width: 0;
@@ -437,7 +434,6 @@
       gap: 6px;
       margin-top: auto;
       padding-top: 14px;
-      border-top: 1px solid var(--line);
     }
     .notes-button {
       display: inline-flex;
