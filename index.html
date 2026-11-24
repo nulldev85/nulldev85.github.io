@@ -1600,8 +1600,10 @@
         const grid = parseFloat(getComputedStyle(field).getPropertyValue("--grid")) || 112;
         const width = field.clientWidth, height = field.clientHeight;
         const found = [];
-        for (let x = width / 2 - grid / 2; x > 0; x -= grid) found.push({ down: true, at: x });
-        for (let x = width / 2 + grid / 2; x < width; x += grid) found.push({ down: true, at: x });
+        // On the lines the grid draws: one at the middle of the window, the
+        // rest a square apart either way.
+        for (let x = width / 2; x > 0; x -= grid) found.push({ down: true, at: x });
+        for (let x = width / 2 + grid; x < width; x += grid) found.push({ down: true, at: x });
         for (let y = grid / 2; y < height; y += grid) found.push({ down: false, at: y });
         return { found, width, height };
       }
