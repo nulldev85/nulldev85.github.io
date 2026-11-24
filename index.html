@@ -756,6 +756,12 @@
     #web-signer {
       background: var(--surface-elevated);
     }
+    /* One height for both tabs. The signer reports its own height, so the
+       sheet grew for Tutorial and shrank for Signer, and its edge jumped
+       with every switch; now each tab scrolls inside the same frame. */
+    #web-signer[open] { height: var(--dialog-height); }
+    #web-signer .dialog-body { height: 100%; max-height: none; }
+    #web-signer .dialog-content { flex: 1 1 auto; scrollbar-gutter: stable; }
     .signer-frame {
       display: block;
       width: 100%;
