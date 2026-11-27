@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#080708">
+  <meta name="theme-color" content="#0a1119">
   <meta name="description" content="Lineup and NullSign for iPhone and Apple TV: what each app does, what changed in its latest build, and where to download it.">
   <meta property="og:title" content="Null’s Apps">
   <meta property="og:description" content="Lineup and NullSign for iPhone and Apple TV.">
@@ -42,9 +42,9 @@
     @property --blend-c { syntax: "<color>"; inherits: true; initial-value: #a78bfa; }
     :root {
       color-scheme: dark;
-      --bg: #141416;
+      --bg: #0a1119;
       --surface: rgba(255, 255, 255, 0.035);
-      --surface-elevated: #1c1c20;
+      --surface-elevated: #121b26;
       --surface-hover: rgba(255, 255, 255, 0.075);
       --line: rgba(255, 255, 255, 0.085);
       --line-strong: rgba(255, 255, 255, 0.15);
@@ -87,10 +87,7 @@
       flex-direction: column;
       padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       color: var(--text);
-      background:
-        radial-gradient(55% 45% at 8% 22%, rgba(255, 98, 77, 0.11), transparent 72%),
-        radial-gradient(55% 45% at 94% 30%, rgba(45, 212, 191, 0.09), transparent 72%),
-        var(--bg);
+      background: var(--bg);
       font: 400 15.5px/1.6 var(--sans);
       font-synthesis: none;
       text-rendering: optimizeLegibility;
@@ -135,7 +132,7 @@
       top: 0;
       z-index: 30;
       padding-top: env(safe-area-inset-top);
-      background: rgba(20, 20, 22, 0.78);
+      background: rgba(10, 17, 25, 0.74);
       border-bottom: 1px solid var(--line);
       -webkit-backdrop-filter: blur(18px) saturate(140%);
       backdrop-filter: blur(18px) saturate(140%);
@@ -240,8 +237,8 @@
       padding: 26px 26px 20px;
       border: 1px solid var(--line);
       border-radius: 20px;
-      /* See-through enough for the grid and its streaks to show faintly. */
-      background: linear-gradient(180deg, rgba(36, 36, 41, 0.56) 0%, rgba(26, 26, 30, 0.56) 100%);
+      /* See-through enough for the hex grid and glow to show faintly. */
+      background: linear-gradient(180deg, rgba(18, 29, 42, 0.56) 0%, rgba(12, 20, 30, 0.6) 100%);
       -webkit-backdrop-filter: blur(1.5px);
       backdrop-filter: blur(1.5px);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -475,7 +472,7 @@
       gap: 10px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(28, 28, 32, 0.56);
+      background: rgba(14, 23, 34, 0.58);
       -webkit-backdrop-filter: blur(1.5px);
       backdrop-filter: blur(1.5px);
     }
@@ -545,8 +542,8 @@
       border: 1px solid var(--line-strong);
       border-radius: 20px;
       color: var(--text);
-      /* The same glass as the cards: the grid and its streaks show through. */
-      background: linear-gradient(180deg, rgba(36, 36, 41, 0.56) 0%, rgba(26, 26, 30, 0.56) 100%);
+      /* The same glass as the cards: the hex grid and glow show through. */
+      background: linear-gradient(180deg, rgba(18, 29, 42, 0.56) 0%, rgba(12, 20, 30, 0.6) 100%);
       -webkit-backdrop-filter: blur(1.5px);
       backdrop-filter: blur(1.5px);
       box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
@@ -770,7 +767,7 @@
 
     /* Web Signer modal */
     #web-signer {
-      background: linear-gradient(180deg, rgba(36, 36, 41, 0.56) 0%, rgba(26, 26, 30, 0.56) 100%);
+      background: linear-gradient(180deg, rgba(18, 29, 42, 0.56) 0%, rgba(12, 20, 30, 0.6) 100%);
     }
     /* One height for both tabs. The signer reports its own height, so the
        sheet grew for Tutorial and shrank for Signer, and its edge jumped
@@ -797,48 +794,46 @@
       text-align: center;
     }
 
-    /* Grid field: faint lines with light gliding along them */
+    /* Hexagonal grid field with soft cyan-to-navy ambient fade */
     .grid-field {
-      --grid: 112px;
+      --hex-w: 52px;
+      --hex-h: 90px;
       position: fixed;
       inset: 0;
       z-index: 0;
       overflow: hidden;
       pointer-events: none;
-      background-image:
-        linear-gradient(to right, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
-      background-size: var(--grid) var(--grid);
-      background-position: calc(50% - var(--grid) / 2) calc(var(--grid) / 2);
-      -webkit-mask-image: radial-gradient(ellipse 95% 90% at 50% 45%, #000 55%, transparent 100%);
-      mask-image: radial-gradient(ellipse 95% 90% at 50% 45%, #000 55%, transparent 100%);
+      background:
+        radial-gradient(62% 52% at 88% 2%, rgba(20, 174, 204, 0.16) 0%, rgba(15, 128, 160, 0.075) 38%, transparent 72%),
+        radial-gradient(50% 38% at 56% 0%, rgba(24, 154, 188, 0.085) 0%, transparent 68%),
+        radial-gradient(56% 48% at 6% 96%, rgba(45, 118, 210, 0.12) 0%, rgba(30, 82, 165, 0.045) 42%, transparent 74%),
+        var(--bg);
+    }
+    .grid-field::before,
+    .grid-field::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-repeat: repeat;
+      background-size: var(--hex-w) var(--hex-h);
+      background-position: center top;
+    }
+    .grid-field::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='90' viewBox='0 0 52 90'%3E%3Cpath d='M-13 7.5L13 22.5 39 7.5 65 22.5M13 22.5V52.5M-13 67.5L13 52.5 39 67.5 65 52.5M39 67.5V97.5M39-7.5V7.5' fill='none' stroke='rgba(155,212,240,0.085)' stroke-width='1'/%3E%3C/svg%3E");
+      -webkit-mask-image: radial-gradient(ellipse 105% 88% at 54% 38%, rgba(0, 0, 0, 0.92) 32%, rgba(0, 0, 0, 0.42) 72%, rgba(0, 0, 0, 0.14) 100%);
+      mask-image: radial-gradient(ellipse 105% 88% at 54% 38%, rgba(0, 0, 0, 0.92) 32%, rgba(0, 0, 0, 0.42) 72%, rgba(0, 0, 0, 0.14) 100%);
+    }
+    .grid-field::after {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='90' viewBox='0 0 52 90'%3E%3Cpath d='M-13 7.5L13 22.5 39 7.5 65 22.5M13 22.5V52.5M-13 67.5L13 52.5 39 67.5 65 52.5M39 67.5V97.5M39-7.5V7.5' fill='none' stroke='rgba(110,215,245,0.14)' stroke-width='1'/%3E%3C/svg%3E");
+      -webkit-mask-image:
+        radial-gradient(ellipse 68% 55% at 86% 6%, #000 0%, rgba(0, 0, 0, 0.45) 40%, transparent 74%),
+        radial-gradient(ellipse 52% 45% at 8% 94%, rgba(0, 0, 0, 0.65) 0%, transparent 68%);
+      mask-image:
+        radial-gradient(ellipse 68% 55% at 86% 6%, #000 0%, rgba(0, 0, 0, 0.45) 40%, transparent 74%),
+        radial-gradient(ellipse 52% 45% at 8% 94%, rgba(0, 0, 0, 0.65) 0%, transparent 68%);
     }
     main.wrap, .site-footer { position: relative; z-index: 1; }
-    /* A streak: teal tail into a coral head, gliding along one grid line.
-       About three are out at a time; the script below sends them. */
-    .streak {
-      position: absolute;
-      top: 0;
-      left: 0;
-      opacity: 0;
-      border-radius: 1px;
-      pointer-events: none;
-      will-change: transform, opacity;
-    }
-    .streak.down {
-      width: 1px;
-      height: var(--length);
-      background: linear-gradient(to bottom, transparent, rgba(45, 212, 191, 0.12) 25%, rgba(45, 212, 191, 0.45) 52%, rgba(45, 212, 191, 0.85) 72%, rgba(255, 98, 77, 0.92) 90%, #ff7a63);
-      box-shadow: 0 0 6px rgba(255, 98, 77, 0.45);
-    }
-    .streak.across {
-      width: var(--length);
-      height: 1px;
-      background: linear-gradient(to right, transparent, rgba(45, 212, 191, 0.12) 25%, rgba(45, 212, 191, 0.45) 52%, rgba(45, 212, 191, 0.85) 72%, rgba(255, 98, 77, 0.92) 90%, #ff7a63);
-      box-shadow: 0 0 6px rgba(255, 98, 77, 0.45);
-    }
-    @media (max-width: 600px) { .grid-field { --grid: 88px; } }
-    @media (prefers-reduced-motion: reduce), print { .streak { display: none; } }
+    @media (max-width: 600px) { .grid-field { --hex-w: 44px; --hex-h: 76px; } }
 
     /* Hero: a word typed, held, taken back, and the next one typed */
     .hero {
@@ -932,7 +927,7 @@
       border: 1px solid var(--line-strong);
       border-radius: 999px;
       color: var(--text);
-      background: rgba(17, 17, 21, 0.92);
+      background: rgba(12, 20, 30, 0.92);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
       box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
@@ -1591,56 +1586,6 @@
       }
       deleting = true;
       wait(2800);
-    })();
-  </script>
-  <script>
-    // Grid streaks: one sent along a random grid line every so often, at a
-    // brisk pace, so about three are out at once. None for reduced motion.
-    (() => {
-      const field = document.querySelector(".grid-field");
-      if (!field || !field.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      const atOnce = 3, speed = 230;
-      let lastLine = "";
-      function lines() {
-        const grid = parseFloat(getComputedStyle(field).getPropertyValue("--grid")) || 112;
-        const width = field.clientWidth, height = field.clientHeight;
-        const found = [];
-        // On the lines the grid draws: one at the middle of the window, the
-        // rest a square apart either way.
-        for (let x = width / 2; x > 0; x -= grid) found.push({ down: true, at: x });
-        for (let x = width / 2 + grid; x < width; x += grid) found.push({ down: true, at: x });
-        for (let y = grid / 2; y < height; y += grid) found.push({ down: false, at: y });
-        return { found, width, height };
-      }
-      function send() {
-        const { found, width, height } = lines();
-        let line;
-        do { line = found[Math.floor(Math.random() * found.length)]; } while (found.length > 1 && line.down + ":" + line.at === lastLine);
-        lastLine = line.down + ":" + line.at;
-        const length = Math.round((line.down ? height : width) * (0.5 + Math.random() * 0.12));
-        const travel = (line.down ? height : width) + length;
-        const streak = document.createElement("span");
-        streak.className = "streak " + (line.down ? "down" : "across");
-        streak.style.setProperty("--length", length + "px");
-        streak.style[line.down ? "left" : "top"] = Math.round(line.at) + "px";
-        field.appendChild(streak);
-        const move = line.down ? (d) => `translate3d(0, ${d}px, 0)` : (d) => `translate3d(${d}px, 0, 0)`;
-        const duration = travel / (speed * (0.85 + Math.random() * 0.3)) * 1000;
-        streak.animate([
-          { transform: move(-length), opacity: 0 },
-          { opacity: 1, offset: 0.08 },
-          { opacity: 1, offset: 0.88 },
-          { transform: move(travel - length), opacity: 0 },
-        ], { duration, easing: "linear" }).onfinish = () => streak.remove();
-        return duration;
-      }
-      function loop() {
-        const duration = document.hidden ? 1500 : send();
-        setTimeout(loop, duration / atOnce * (0.6 + Math.random() * 0.8));
-      }
-      send();
-      setTimeout(send, 500);
-      setTimeout(loop, 1100);
     })();
   </script>
 </body>
