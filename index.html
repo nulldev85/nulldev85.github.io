@@ -59,7 +59,7 @@
       --sky: #60a5fa;
       --teal: #2dd4bf;
       /* The typed word's colours, always melting from one blend into the
-         next; the download buttons wear them too. */
+         next. */
       --blend-a: var(--coral);
       --blend-b: var(--pink);
       --blend-c: var(--violet);
@@ -237,7 +237,7 @@
       padding: 26px 26px 20px;
       border: 1px solid var(--line);
       border-radius: 20px;
-      /* See-through enough for the hex grid and glow to show faintly. */
+      /* See-through enough for the hex grid and its streaks to show faintly. */
       background: linear-gradient(180deg, rgba(18, 29, 42, 0.56) 0%, rgba(12, 20, 30, 0.6) 100%);
       -webkit-backdrop-filter: blur(1.5px);
       backdrop-filter: blur(1.5px);
@@ -377,14 +377,13 @@
       gap: 6px;
       height: 32px;
       padding: 0 13px;
-      border: 1px solid rgba(255, 255, 255, 0.22);
+      border: 1px solid rgba(186, 240, 255, 0.28);
       border-radius: 999px;
-      /* The colours also flow across the button, a seamless loop that slides
-         one tile along every few seconds. */
-      background: linear-gradient(90deg, var(--blend-a), var(--blend-b), var(--blend-c), var(--blend-a)) 0% 50% / 300% 100% repeat-x;
+      /* Soft aqua-to-sky sheen tailored to the cyan-navy hex background. */
+      background: linear-gradient(90deg, #2dd4bf, #22d3ee, #38bdf8, #60a5fa, #2dd4bf) 0% 50% / 300% 100% repeat-x;
       animation: button-flow 7s linear infinite;
-      color: #141416;
-      box-shadow: 0 4px 16px color-mix(in srgb, var(--blend-b) 28%, transparent);
+      color: #07151f;
+      box-shadow: 0 4px 16px rgba(34, 211, 238, 0.26);
       font-size: 13.5px;
       font-weight: 600;
       text-decoration: none;
@@ -542,7 +541,7 @@
       border: 1px solid var(--line-strong);
       border-radius: 20px;
       color: var(--text);
-      /* The same glass as the cards: the hex grid and glow show through. */
+      /* The same glass as the cards: the hex grid and its streaks show through. */
       background: linear-gradient(180deg, rgba(18, 29, 42, 0.56) 0%, rgba(12, 20, 30, 0.6) 100%);
       -webkit-backdrop-filter: blur(1.5px);
       backdrop-filter: blur(1.5px);
@@ -832,8 +831,18 @@
         radial-gradient(ellipse 68% 55% at 86% 6%, #000 0%, rgba(0, 0, 0, 0.45) 40%, transparent 74%),
         radial-gradient(ellipse 52% 45% at 8% 94%, rgba(0, 0, 0, 0.65) 0%, transparent 68%);
     }
+    .hex-streaks {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      -webkit-mask-image: radial-gradient(ellipse 96% 92% at 50% 46%, #000 58%, transparent 100%);
+      mask-image: radial-gradient(ellipse 96% 92% at 50% 46%, #000 58%, transparent 100%);
+    }
     main.wrap, .site-footer { position: relative; z-index: 1; }
     @media (max-width: 600px) { .grid-field { --hex-w: 44px; --hex-h: 76px; } }
+    @media (prefers-reduced-motion: reduce), print { .hex-streaks { display: none; } }
 
     /* Hero: a word typed, held, taken back, and the next one typed */
     .hero {
@@ -1034,6 +1043,7 @@
   </header>
 
   <div class="grid-field" aria-hidden="true">
+    <canvas class="hex-streaks"></canvas>
   </div>
 
   <main class="wrap" id="top">
@@ -1586,6 +1596,243 @@
       }
       deleting = true;
       wait(2800);
+    })();
+  </script>
+  <script>
+    // Hex grid streaks: glowing teal-to-coral lines tracing along the
+    // honeycomb edges, about three out at once. None for reduced motion.
+    (() => {
+      const field = document.querySelector(".grid-field");
+      const canvas = field?.querySelector(".hex-streaks");
+      const ctx = canvas?.getContext("2d");
+      if (!field || !canvas || !ctx || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const atOnce = 3, baseSpeed = 230;
+      const stops = [
+        [0.00, 45, 212, 191, 0.00],
+        [0.25, 45, 212, 191, 0.12],
+        [0.52, 45, 212, 191, 0.45],
+        [0.72, 45, 212, 191, 0.85],
+        [0.90, 255, 98, 77, 0.92],
+        [1.00, 255, 122, 99, 1.00],
+      ];
+
+      let width = 0, height = 0, hexW = 52, hexH = 90, x0 = 0, dpr = 1;
+      const streaks = [];
+      let rafId = 0, nextSpawnAt = 0;
+
+      function measure() {
+        const style = getComputedStyle(field);
+        const nextW = field.clientWidth, nextH = field.clientHeight;
+        const nextHexW = parseFloat(style.getPropertyValue("--hex-w")) || 52;
+        const nextHexH = parseFloat(style.getPropertyValue("--hex-h")) || 90;
+        const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
+        if (nextW === width && nextH === height && nextHexW === hexW && nextHexH === hexH && nextDpr === dpr) return;
+        width = nextW;
+        height = nextH;
+        hexW = nextHexW;
+        hexH = nextHexH;
+        dpr = nextDpr;
+        x0 = width / 2 - hexW / 2;
+        canvas.width = Math.max(1, Math.round(width * dpr));
+        canvas.height = Math.max(1, Math.round(height * dpr));
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        streaks.length = 0;
+        nextSpawnAt = 0;
+      }
+
+      // Exact vertex positions matching the SVG tile (viewBox 0 0 52 90, center top).
+      function vertexPos(type, k, m) {
+        if (type === "A") return { x: x0 + (k + 0.25) * hexW, y: (m + 0.25) * hexH };
+        if (type === "B") return { x: x0 + (k + 0.25) * hexW, y: (m + 7 / 12) * hexH };
+        if (type === "C") return { x: x0 + (k + 0.75) * hexW, y: (m + 0.75) * hexH };
+        return { x: x0 + (k + 0.75) * hexW, y: (m + 1 / 12) * hexH };
+      }
+
+      function buildDownPath() {
+        const minK = Math.floor(-x0 / hexW) + 1;
+        const maxK = Math.ceil((width - x0) / hexW) - 1;
+        let k = minK + Math.floor(Math.random() * Math.max(1, maxK - minK + 1));
+        let m = -1, type = "D", bias = 0;
+        const points = [vertexPos(type, k, m)];
+        for (let step = 0; step < 180; step++) {
+          if (type === "A") {
+            type = "B";
+          } else if (type === "C") {
+            type = "D"; m += 1;
+          } else {
+            // At a fork (B or D), weave smoothly down-left or down-right,
+            // nudging back inside if near the viewport sides.
+            const cur = points[points.length - 1];
+            let goRight = Math.random() < (0.5 + bias * 0.14);
+            if (cur.x < hexW * 1.2) goRight = true;
+            else if (cur.x > width - hexW * 1.2) goRight = false;
+            bias = goRight ? 1 : -1;
+            if (type === "B") {
+              if (!goRight) k -= 1;
+              type = "C";
+            } else {
+              if (goRight) k += 1;
+              type = "A";
+            }
+          }
+          const pt = vertexPos(type, k, m);
+          points.push(pt);
+          if (pt.y > height + hexH) break;
+        }
+        return points;
+      }
+
+      function buildAcrossPath() {
+        const minM = 0;
+        const maxM = Math.max(0, Math.floor(height / hexH) - 1);
+        let m = minM + Math.floor(Math.random() * (maxM - minM + 1));
+        let k = Math.floor(-x0 / hexW) - 1;
+        let type = Math.random() < 0.5 ? "A" : "B";
+        const points = [vertexPos(type, k, m)];
+        for (let step = 0; step < 220; step++) {
+          const cur = points[points.length - 1];
+          // Occasionally step vertically one hex edge to shift rows while flowing right.
+          const stepVertical = Math.random() < 0.2;
+          if (type === "A") {
+            if (stepVertical && cur.y < height - hexH) { type = "B"; }
+            else { type = "D"; }
+          } else if (type === "D") {
+            if (stepVertical && cur.y > hexH) { type = "C"; m -= 1; }
+            else { type = "A"; k += 1; }
+          } else if (type === "B") {
+            if (stepVertical && cur.y > hexH) { type = "A"; }
+            else { type = "C"; }
+          } else {
+            if (stepVertical && cur.y < height - hexH) { type = "D"; m += 1; }
+            else { type = "B"; k += 1; }
+          }
+          const pt = vertexPos(type, k, m);
+          points.push(pt);
+          if (pt.x > width + hexW) break;
+        }
+        return points;
+      }
+
+      function spawn(now) {
+        if (width < 40 || height < 40) return 1200;
+        const down = Math.random() < 0.5;
+        const points = down ? buildDownPath() : buildAcrossPath();
+        const cum = [0];
+        for (let i = 1; i < points.length; i++) {
+          cum.push(cum[i - 1] + Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y));
+        }
+        const total = cum[cum.length - 1];
+        if (total < 60) return 1000;
+        const length = Math.round(total * (0.42 + Math.random() * 0.14));
+        const speed = baseSpeed * (0.85 + Math.random() * 0.3);
+        const duration = ((total + length) / speed) * 1000;
+        streaks.push({ points, cum, total, length, speed, start: now, duration });
+        return duration;
+      }
+
+      function colorAt(t, alphaMul) {
+        const clamped = Math.max(0, Math.min(1, t));
+        let i = 0;
+        while (i < stops.length - 2 && clamped > stops[i + 1][0]) i++;
+        const a = stops[i], b = stops[i + 1];
+        const f = b[0] === a[0] ? 0 : (clamped - a[0]) / (b[0] - a[0]);
+        const r = Math.round(a[1] + (b[1] - a[1]) * f);
+        const g = Math.round(a[2] + (b[2] - a[2]) * f);
+        const bl = Math.round(a[3] + (b[3] - a[3]) * f);
+        const al = (a[4] + (b[4] - a[4]) * f) * alphaMul;
+        return `rgba(${r},${g},${bl},${al.toFixed(3)})`;
+      }
+
+      function drawStreak(s, now) {
+        const elapsed = now - s.start;
+        if (elapsed < 0) return true;
+        if (elapsed > s.duration) return false;
+        const progress = elapsed / s.duration;
+        const fade = progress < 0.08 ? progress / 0.08 : progress > 0.88 ? (1 - progress) / 0.12 : 1;
+        const head = (elapsed / 1000) * s.speed;
+        const tail = head - s.length;
+        const { points, cum, total, length } = s;
+        if (head <= 0 || tail >= total) return true;
+
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        for (let pass = 0; pass < 2; pass++) {
+          const isGlow = pass === 0;
+          ctx.lineWidth = isGlow ? 4.5 : 1.35;
+          const alphaMul = fade * (isGlow ? 0.28 : 1);
+
+          for (let i = 1; i < points.length; i++) {
+            const d0 = cum[i - 1], d1 = cum[i];
+            if (d1 <= tail) continue;
+            if (d0 >= head) break;
+            const segLen = d1 - d0;
+            if (segLen <= 0.001) continue;
+            const segStart = Math.max(d0, tail);
+            const segEnd = Math.min(d1, head);
+            const t0 = (segStart - tail) / length;
+            const t1 = (segEnd - tail) / length;
+            if (isGlow && t1 < 0.48) continue;
+
+            const p0 = points[i - 1], p1 = points[i];
+            const f0 = (segStart - d0) / segLen;
+            const f1 = (segEnd - d0) / segLen;
+            const sx = p0.x + (p1.x - p0.x) * f0;
+            const sy = p0.y + (p1.y - p0.y) * f0;
+            const ex = p0.x + (p1.x - p0.x) * f1;
+            const ey = p0.y + (p1.y - p0.y) * f1;
+
+            const grad = ctx.createLinearGradient(sx, sy, ex, ey);
+            grad.addColorStop(0, colorAt(t0, alphaMul));
+            grad.addColorStop(1, colorAt(t1, alphaMul));
+            ctx.strokeStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(ex, ey);
+            ctx.stroke();
+          }
+        }
+        return true;
+      }
+
+      function frame(now) {
+        rafId = 0;
+        if (document.hidden) return;
+        measure();
+        if (!streaks.length && nextSpawnAt === 0) {
+          const duration = spawn(now - 900);
+          spawn(now + 450);
+          nextSpawnAt = now + Math.min(1200, (duration / atOnce) * 0.8);
+        } else if (now >= nextSpawnAt && streaks.length < atOnce + 2) {
+          const duration = spawn(now);
+          nextSpawnAt = now + (duration / atOnce) * (0.6 + Math.random() * 0.8);
+        }
+        ctx.clearRect(0, 0, width, height);
+        for (let i = streaks.length - 1; i >= 0; i--) {
+          if (!drawStreak(streaks[i], now)) streaks.splice(i, 1);
+        }
+        rafId = requestAnimationFrame(frame);
+      }
+
+      function start() {
+        if (rafId || document.hidden) return;
+        measure();
+        nextSpawnAt = 0;
+        rafId = requestAnimationFrame(frame);
+      }
+
+      addEventListener("resize", measure, { passive: true });
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+        } else {
+          streaks.length = 0;
+          nextSpawnAt = 0;
+          start();
+        }
+      });
+      start();
     })();
   </script>
 </body>
