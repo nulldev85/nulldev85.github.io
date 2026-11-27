@@ -535,7 +535,7 @@
       width: min(540px, 100% - 32px);
       max-width: none;
       max-height: var(--dialog-height);
-      margin: auto;
+      margin: max(calc(20px + env(safe-area-inset-top)), calc((100dvh - var(--dialog-height)) / 2)) auto auto;
       padding: 0;
       overflow: hidden;
       border: 1px solid var(--line-strong);
@@ -998,7 +998,7 @@
       .release-dialog {
         --dialog-height: calc(100dvh - 18px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         width: calc(100% - 16px);
-        margin: auto auto calc(8px + env(safe-area-inset-bottom));
+        margin: calc(10px + env(safe-area-inset-top)) auto calc(8px + env(safe-area-inset-bottom));
         border-radius: 20px;
       }
       .release-dialog[open] { animation-name: sheet-in; }
